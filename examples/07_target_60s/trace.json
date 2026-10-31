@@ -1,0 +1,263 @@
+{
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "limits": {
+    "max_steps": 16,
+    "max_tool_calls": 20
+  },
+  "steps": [
+    {
+      "n": 1,
+      "rationale": "目标 60 秒，写一版包含三条素材事实的脚本",
+      "action": "write_draft",
+      "args": {
+        "title": "60 秒讲清：字幕、画中画和竖屏导出",
+        "shots": [
+          {
+            "id": "S1",
+            "claim_scope": "generic",
+            "visual": "分镜S1画面",
+            "narration": "视频没字幕的时候，静音观看的人很容易漏掉画面里的重点信息，所以字幕对短视频很重要。",
+            "subtitle": "没字幕容易漏重点",
+            "claims": []
+          },
+          {
+            "id": "S2",
+            "claim_scope": "product",
+            "visual": "分镜S2画面",
+            "narration": "这款产品支持字幕，下面用几个画面说明它在短视频里的实际用法和注意点。",
+            "subtitle": "支持字幕",
+            "claims": [
+              {
+                "text": "支持字幕",
+                "source_id": "P01",
+                "quote": "支持字幕"
+              }
+            ]
+          },
+          {
+            "id": "S3",
+            "claim_scope": "product",
+            "visual": "分镜S3画面",
+            "narration": "它还支持画中画，可以把讲解和演示放在同一个画面里，方便观众对照理解。",
+            "subtitle": "支持画中画",
+            "claims": [
+              {
+                "text": "支持画中画",
+                "source_id": "P02",
+                "quote": "支持画中画"
+              }
+            ]
+          },
+          {
+            "id": "S4",
+            "claim_scope": "product",
+            "visual": "分镜S4画面",
+            "narration": "同时支持竖屏导出，方便直接发布到短视频平台，不用再额外转换格式。",
+            "subtitle": "支持竖屏导出",
+            "claims": [
+              {
+                "text": "支持竖屏导出",
+                "source_id": "P03",
+                "quote": "支持竖屏导出"
+              }
+            ]
+          },
+          {
+            "id": "S5",
+            "claim_scope": "generic",
+            "visual": "分镜S5画面",
+            "narration": "先列出一条核心信息，再把关键词逐条放进字幕里，观众一眼就能看懂重点。",
+            "subtitle": "核心信息进字幕",
+            "claims": []
+          },
+          {
+            "id": "S6",
+            "claim_scope": "generic",
+            "visual": "分镜S6画面",
+            "narration": "镜头切换的时候，保留同一句字幕，观众会更容易跟上画面节奏和内容变化。",
+            "subtitle": "保留同一句字幕",
+            "claims": []
+          },
+          {
+            "id": "S7",
+            "claim_scope": "generic",
+            "visual": "分镜S7画面",
+            "narration": "最后按自己的内容调整，不必完全照搬模板，适合自己的表达方式才最重要。",
+            "subtitle": "按内容调整",
+            "claims": []
+          },
+          {
+            "id": "S8",
+            "claim_scope": "generic",
+            "visual": "分镜S8画面",
+            "narration": "发布前再看一遍整体效果。",
+            "subtitle": "发布前检查",
+            "claims": []
+          }
+        ]
+      },
+      "observation": {
+        "ok": true,
+        "revision": 1,
+        "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734",
+        "diff": {
+          "from": 0,
+          "to": 1,
+          "removed_shots": [],
+          "added_shots": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8"
+          ],
+          "changed_shots": []
+        }
+      },
+      "next": "estimate_duration",
+      "draft_revision": 1,
+      "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+    },
+    {
+      "n": 2,
+      "rationale": "估算当前稿时长",
+      "action": "estimate_duration",
+      "args": {},
+      "observation": {
+        "ok": true,
+        "version": "v1",
+        "cps": 4.2,
+        "subtitle_cps": 5.0,
+        "pause_per_shot": 0.3,
+        "target_sec": 60.0,
+        "min_sec": 58.0,
+        "max_sec": 60.0,
+        "total_sec": 58.5,
+        "delta_sec": -1.5,
+        "pass": true,
+        "shots": [
+          {
+            "id": "S1",
+            "start_sec": 0.0,
+            "duration_sec": 9.4,
+            "narration_chars": 38,
+            "subtitle_chars": 8
+          },
+          {
+            "id": "S2",
+            "start_sec": 9.4,
+            "duration_sec": 8.0,
+            "narration_chars": 32,
+            "subtitle_chars": 4
+          },
+          {
+            "id": "S3",
+            "start_sec": 17.4,
+            "duration_sec": 7.7,
+            "narration_chars": 31,
+            "subtitle_chars": 5
+          },
+          {
+            "id": "S4",
+            "start_sec": 25.1,
+            "duration_sec": 7.3,
+            "narration_chars": 29,
+            "subtitle_chars": 6
+          },
+          {
+            "id": "S5",
+            "start_sec": 32.4,
+            "duration_sec": 7.7,
+            "narration_chars": 31,
+            "subtitle_chars": 7
+          },
+          {
+            "id": "S6",
+            "start_sec": 40.1,
+            "duration_sec": 7.7,
+            "narration_chars": 31,
+            "subtitle_chars": 7
+          },
+          {
+            "id": "S7",
+            "start_sec": 47.8,
+            "duration_sec": 7.7,
+            "narration_chars": 31,
+            "subtitle_chars": 5
+          },
+          {
+            "id": "S8",
+            "start_sec": 55.5,
+            "duration_sec": 3.0,
+            "narration_chars": 11,
+            "subtitle_chars": 5
+          }
+        ],
+        "revision": 1,
+        "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+      },
+      "next": "check_rules",
+      "draft_revision": 1,
+      "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+    },
+    {
+      "n": 3,
+      "rationale": "检查规则",
+      "action": "check_rules",
+      "args": {},
+      "observation": {
+        "ok": true,
+        "pass": true,
+        "rule_set": "demo_default",
+        "violations": [],
+        "needs_review": [],
+        "revision": 1,
+        "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+      },
+      "next": "check_citations",
+      "draft_revision": 1,
+      "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+    },
+    {
+      "n": 4,
+      "rationale": "检查引用",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": true,
+        "pass": true,
+        "unsupported_claims": [],
+        "needs_review": [],
+        "revision": 1,
+        "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+      },
+      "next": "finish",
+      "draft_revision": 1,
+      "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+    },
+    {
+      "n": 5,
+      "rationale": "首稿已在 60 秒目标区间内，直接输出",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "60 秒目标无需压缩。"
+      },
+      "observation": {
+        "ok": true,
+        "missing": []
+      },
+      "next": null,
+      "draft_revision": 1,
+      "draft_hash": "sha256:b3528e6592751ec4137d7c3cbacd7c48dfd75c015368eba4481d6d542776c734"
+    }
+  ],
+  "result_status": "completed",
+  "stop_reason": null,
+  "tool_calls": 4
+}

@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+addopts = "-m 'not live'"
+markers = ["live: requires a real model API key"]
+testpaths = ["tests"]

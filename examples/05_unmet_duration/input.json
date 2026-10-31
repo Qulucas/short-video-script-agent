@@ -1,0 +1,14 @@
+{
+  "topic": "字幕功能速览",
+  "audience": "泛人群",
+  "platform": "douyin",
+  "target_duration_sec": 8,
+  "style": "简洁口播",
+  "product_name": "小影",
+  "material_query": "字幕",
+  "material_ids": [
+    "P01"
+  ],
+  "brand_rule_set": "strict_disclaimer",
+  "scenario": "unmet_duration"
+}

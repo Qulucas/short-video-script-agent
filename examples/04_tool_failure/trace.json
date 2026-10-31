@@ -1,0 +1,69 @@
+{
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "limits": {
+    "max_steps": 16,
+    "max_tool_calls": 20
+  },
+  "steps": [
+    {
+      "n": 1,
+      "rationale": "先检索素材",
+      "action": "search_materials",
+      "args": {
+        "query": "小影 字幕"
+      },
+      "observation": {
+        "ok": false,
+        "items": null,
+        "error_code": "TIMEOUT",
+        "message": "素材检索超时",
+        "retryable": true,
+        "hint": "可以缩小查询重试一次"
+      },
+      "next": "search_materials",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 2,
+      "rationale": "检索超时，缩小查询重试一次",
+      "action": "search_materials",
+      "args": {
+        "query": "小影 字幕"
+      },
+      "observation": {
+        "ok": false,
+        "items": null,
+        "error_code": "TIMEOUT",
+        "message": "素材检索超时",
+        "retryable": true,
+        "hint": "可以缩小查询重试一次"
+      },
+      "next": "finish",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 3,
+      "rationale": "连续两次检索超时，无法验证素材，结束并保留错误",
+      "action": "finish",
+      "args": {
+        "status": "incomplete",
+        "stop_reason": "tool_unavailable",
+        "summary": "素材检索连续超时，未能生成可验证脚本。"
+      },
+      "observation": {
+        "ok": true,
+        "missing": []
+      },
+      "next": null,
+      "draft_revision": 0,
+      "draft_hash": null
+    }
+  ],
+  "result_status": "incomplete",
+  "stop_reason": "tool_unavailable",
+  "tool_calls": 2
+}

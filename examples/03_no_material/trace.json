@@ -1,0 +1,73 @@
+{
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "limits": {
+    "max_steps": 16,
+    "max_tool_calls": 20
+  },
+  "steps": [
+    {
+      "n": 1,
+      "rationale": "先检索用户主题相关素材",
+      "action": "search_materials",
+      "args": {
+        "query": "火星素材"
+      },
+      "observation": {
+        "ok": true,
+        "items": [],
+        "total": 0,
+        "query": "火星素材",
+        "error_code": null,
+        "empty": true
+      },
+      "next": "search_materials",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 2,
+      "rationale": "第一次无结果，换一个更短的关键词再试",
+      "action": "search_materials",
+      "args": {
+        "query": "火星素材 补充"
+      },
+      "observation": {
+        "ok": true,
+        "items": [],
+        "total": 0,
+        "query": "火星素材 补充",
+        "error_code": null,
+        "empty": true
+      },
+      "next": "finish",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 3,
+      "rationale": "两次检索仍无素材，不能编造产品事实，请求用户补充",
+      "action": "finish",
+      "args": {
+        "status": "needs_input",
+        "stop_reason": "insufficient_material",
+        "missing_fields": [
+          "product_material"
+        ],
+        "question": "请提供至少一条产品素材（例如功能事实或参数），我再生成脚本。",
+        "summary": "缺少可用产品素材。"
+      },
+      "observation": {
+        "ok": true,
+        "missing": []
+      },
+      "next": null,
+      "draft_revision": 0,
+      "draft_hash": null
+    }
+  ],
+  "result_status": "needs_input",
+  "stop_reason": "insufficient_material",
+  "tool_calls": 2
+}

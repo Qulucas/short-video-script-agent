@@ -1,0 +1,14 @@
+{
+  "topic": "字幕工具推荐",
+  "audience": "短视频创作者",
+  "platform": "douyin",
+  "target_duration_sec": 30,
+  "style": "简洁口播",
+  "product_name": "小影",
+  "material_query": "字幕",
+  "material_ids": [
+    "P04"
+  ],
+  "brand_rule_set": "demo_default",
+  "scenario": "unmet_rules"
+}

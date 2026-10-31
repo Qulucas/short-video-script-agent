@@ -1,0 +1,254 @@
+{
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "limits": {
+    "max_steps": 16,
+    "max_tool_calls": 20
+  },
+  "steps": [
+    {
+      "n": 1,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 2,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 3,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 4,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 5,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 6,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 7,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 8,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 9,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 10,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 11,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 12,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 13,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 14,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 15,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 16,
+      "rationale": "继续检查引用，等待更多信息",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": null,
+      "draft_revision": 0,
+      "draft_hash": null
+    }
+  ],
+  "result_status": "incomplete",
+  "stop_reason": "step_limit_reached",
+  "tool_calls": 16
+}

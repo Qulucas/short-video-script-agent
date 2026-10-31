@@ -1,0 +1,12 @@
+{
+  "topic": "字幕、画中画和竖屏导出",
+  "audience": "短视频创作者",
+  "platform": "douyin",
+  "target_duration_sec": 60,
+  "style": "简洁口播",
+  "product_name": "小影",
+  "material_query": "字幕 画中画 竖屏",
+  "material_ids": ["P01", "P02", "P03"],
+  "brand_rule_set": "demo_default",
+  "scenario": "target_60"
+}

@@ -1,0 +1,42 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from src.tools.citations import check_citations
+
+ROOT = Path(__file__).resolve().parents[2]
+MATERIALS = json.loads((ROOT / "data" / "materials.json").read_text(encoding="utf-8"))
+BRIEF = {"product_name": "小影", "platform": "douyin", "topic": "字幕"}
+
+
+def _draft(name):
+    return json.loads((ROOT / "fixtures" / "drafts" / (name + ".json")).read_text(encoding="utf-8"))
+
+
+def test_normal_draft_passes_citations():
+    result = check_citations(_draft("v2_28s"), MATERIALS, BRIEF)
+    assert result["pass"] is True
+    assert result["unsupported_claims"] == []
+
+
+def test_adversarial_extra_sentence_is_rejected_even_with_valid_claim():
+    result = check_citations(_draft("adversarial_v1"), MATERIALS, BRIEF)
+    assert result["pass"] is False
+    assert any("自动生成字幕" in item["sentence"] for item in result["unsupported_claims"])
+
+
+def test_unknown_source_is_rejected():
+    draft = _draft("v2_28s")
+    draft["shots"][1]["claims"][0]["source_id"] = "P99"
+    result = check_citations(draft, MATERIALS, BRIEF)
+    assert result["pass"] is False
+    assert any(item["code"] == "UNKNOWN_SOURCE" for item in result["unsupported_claims"])
+
+
+def test_quote_not_found_is_rejected():
+    draft = _draft("v2_28s")
+    draft["shots"][1]["claims"][0]["quote"] = "支持自动生成字幕"
+    result = check_citations(draft, MATERIALS, BRIEF)
+    assert result["pass"] is False
+    assert any(item["code"] == "QUOTE_NOT_FOUND" for item in result["unsupported_claims"])

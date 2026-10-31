@@ -1,0 +1,29 @@
+{
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "limits": {
+    "max_steps": 16,
+    "max_tool_calls": 20
+  },
+  "steps": [
+    {
+      "n": 0,
+      "rationale": "输入缺少必填字段，前置校验终止",
+      "action": "preflight",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "missing": [
+          "target_duration_sec"
+        ]
+      },
+      "next": null,
+      "draft_revision": 0,
+      "draft_hash": null
+    }
+  ],
+  "result_status": "needs_input",
+  "stop_reason": "missing_required_fields",
+  "tool_calls": 0
+}

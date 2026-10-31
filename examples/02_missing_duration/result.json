@@ -1,0 +1,25 @@
+{
+  "status": "needs_input",
+  "stop_reason": "missing_required_fields",
+  "message": "请补充：target_duration_sec",
+  "exit_code": 2,
+  "run_id": "preflight-c6b7cc",
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "missing_fields": [
+    "target_duration_sec"
+  ],
+  "question": "请补充：target_duration_sec",
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为素材白名单"
+  ],
+  "target_duration_sec": null,
+  "title": "未生成标题",
+  "shots": [],
+  "sources": [],
+  "checks": {},
+  "risks": []
+}
