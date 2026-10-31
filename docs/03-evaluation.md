@@ -9,7 +9,7 @@ pytest -q
 实际输出见 [examples/test-report.txt](../examples/test-report.txt)：
 
 ```text
-42 passed, 1 deselected in 0.62s
+42 passed, 1 deselected in 0.47s
 ```
 
 `1 deselected` 是 live smoke 测试，默认不运行，避免无 key 环境误调用。
