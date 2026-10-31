@@ -1,0 +1,51 @@
+{
+  "title": "30 秒讲清：字幕怎么用",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "generic",
+      "visual": "人物正对镜头口播，画面角落出现静音图标",
+      "narration": "刷短视频时很多人先关声音，没有字幕就容易漏掉重点。",
+      "subtitle": "很多人先关声音，没字幕易漏重点",
+      "claims": []
+    },
+    {
+      "id": "S2",
+      "claim_scope": "product",
+      "visual": "手机剪辑界面展示字幕轨道",
+      "narration": "小影支持字幕，下面用画面讲讲它在短视频里的用法。",
+      "subtitle": "小影支持字幕，讲几个用法",
+      "claims": [
+        {
+          "text": "支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "claim_scope": "generic",
+      "visual": "字幕输入框逐字打出一条核心信息",
+      "narration": "把一条核心信息写进字幕，关键词再逐条出现更清楚。",
+      "subtitle": "一条核心信息，关键词逐条出现",
+      "claims": []
+    },
+    {
+      "id": "S4",
+      "claim_scope": "generic",
+      "visual": "两个镜头切换，字幕条保持在同一位��",
+      "narration": "镜头切换时保留同一句字幕，观众更容易跟上你的节奏。",
+      "subtitle": "切镜头保留同一句字幕",
+      "claims": []
+    },
+    {
+      "id": "S5",
+      "claim_scope": "generic",
+      "visual": "创作者对镜头点头，画面收尾",
+      "narration": "以上就是字幕用法建议，你可以按内容灵活调整节奏。",
+      "subtitle": "字幕用法建议，按内容灵活调整",
+      "claims": []
+    }
+  ]
+}

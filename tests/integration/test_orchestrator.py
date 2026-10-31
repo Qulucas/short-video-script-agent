@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from src.limits import MAX_STEPS, MAX_TOOL_CALLS
 from src.orchestrator import run_case
 from src.schemas import normalize_brief
 from src.providers.base import Provider
@@ -140,6 +141,10 @@ def test_unmet_duration_is_explicit():
     assert result["stop_reason"] == "duration_cannot_meet"
     assert result["estimated_total_sec"] > result["target_duration_sec"]
     assert "9.4" in result["blocking_reason"]
+    assert "9.0" in result["blocking_reason"]
+    estimates = [s["observation"]["total_sec"] for s in trace["steps"] if s["action"] == "estimate_duration"]
+    assert len(estimates) == 2 and estimates[0] > estimates[1]
+    assert revisions[0]["draft"] != revisions[1]["draft"]
 
 
 def test_rule_violation_is_fixed():
@@ -163,7 +168,41 @@ def test_step_limit_is_explicit():
     result, trace, revisions = run("08_step_limit")
     assert result["status"] == "incomplete"
     assert result["stop_reason"] == "step_limit_reached"
-    assert len(trace["steps"]) <= 20
+    assert len(trace["steps"]) == MAX_STEPS
+    assert trace["tool_calls"] < MAX_TOOL_CALLS
+    rejected = [s for s in trace["steps"] if s["action"] == "finish"]
+    assert rejected and all(s["observation"]["ok"] is False for s in rejected)
+
+
+def test_tool_call_limit_is_reachable_and_explicit():
+    assert MAX_TOOL_CALLS < MAX_STEPS
+    result, trace, revisions = run("11_tool_call_limit")
+    assert result["status"] == "incomplete"
+    assert result["stop_reason"] == "tool_call_limit_reached"
+    assert trace["tool_calls"] == MAX_TOOL_CALLS
+    assert trace["steps"][-1]["observation"]["error_code"] == "TOOL_CALL_LIMIT"
+
+
+def test_seeded_draft_is_compressed_from_38_to_28():
+    result, trace, revisions = run("12_seeded_draft_38s")
+    assert trace["steps"][0]["action"] == "seed_draft"
+    assert all(s["action"] != "write_draft" or s["n"] > 0 for s in trace["steps"])
+    first_est = next(s for s in trace["steps"] if s["action"] == "estimate_duration")
+    assert first_est["observation"]["total_sec"] == 38.0
+    assert first_est["draft_revision"] == 1
+    assert result["status"] == "completed"
+    assert result["estimated_total_sec"] == 28.0
+    assert [r["revision"] for r in revisions] == [1, 2]
+
+
+def test_invalid_seed_draft_is_reported_not_installed():
+    raw = load("12_seeded_draft_38s")
+    raw["initial_draft"]["shots"][1]["claims"][0]["source_id"] = "P99"
+    result, trace, revisions = run_case(raw, BadActionProvider())
+    seed = trace["steps"][0]
+    assert seed["action"] == "seed_draft"
+    assert seed["observation"]["error_code"] == "SEED_DRAFT_INVALID"
+    assert revisions == []
 
 
 def test_rules_cannot_meet_is_explicit():

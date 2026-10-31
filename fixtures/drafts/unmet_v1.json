@@ -1,0 +1,39 @@
+{
+  "title": "8 秒讲清字幕",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "generic",
+      "visual": "白底黑字免责声明",
+      "narration": "具体效果以实际使用为准，下面看三个使用场景和注意点。",
+      "subtitle": "具体效果以实际使用为准",
+      "claims": []
+    },
+    {
+      "id": "S2",
+      "claim_scope": "product",
+      "visual": "剪辑界面中打开字幕轨道",
+      "narration": "小影支持字幕，剪辑时把重点放进字幕。",
+      "subtitle": "小影支持字幕",
+      "claims": [
+        {"text": "小影支持字幕", "source_id": "P01", "quote": "支持字幕"}
+      ]
+    },
+    {
+      "id": "S3",
+      "claim_scope": "generic",
+      "visual": "静音播放的手机画面",
+      "narration": "静音观看时，观众也能跟上内容。",
+      "subtitle": "静音也能看懂",
+      "claims": []
+    },
+    {
+      "id": "S4",
+      "claim_scope": "generic",
+      "visual": "创作者对镜头挥手",
+      "narration": "关注我，下期讲字幕排版。",
+      "subtitle": "下期讲字幕排版",
+      "claims": []
+    }
+  ]
+}

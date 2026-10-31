@@ -25,11 +25,29 @@ CLI -> 输入校验 -> Orchestrator -> Provider.decide
 
 - 执行模型选的动作；
 - 把工具结果原样回灌；
-- 维护 `MAX_STEPS=20`、`MAX_TOOL_CALLS=24`、`MAX_QUERY_REWRITES=2`、`MAX_DRAFT_WRITES=4`；
+- 维护 `MAX_STEPS=20`、`MAX_TOOL_CALLS=16`、`MAX_QUERY_REWRITES=2`、`MAX_DRAFT_WRITES=4`（集中在 `src/limits.py`，prompt 的剩余预算也从这里算）；
 - 在 `finish` 前做完成闸门；
 - 写 Trace。
 
+`MAX_TOOL_CALLS` 故意小于 `MAX_STEPS`：被闸门拒绝的 `finish` 和解析失败只消耗步数、不消耗工具调用，所以两条上限都能真实触发（`08_step_limit` 触发步数上限，`11_tool_call_limit` 触发工具上限）。早期版本是 20/24，每步最多一次工具调用，工具上限永远到不了。
+
 完成闸门要求当前 revision 的 estimate/rules/citations 都绑定同一个 `draft_hash`，防止“检查旧稿、提交新稿”。
+
+## 模型能看到什么
+
+每次调用模型都是无状态的单轮请求，输入是当前状态快照：
+
+- `brief`、已检索到的 `materials`；
+- `brand_rules`：当前规则集的规则 ID/名称、`min_content_shots`、必选段（文本和最短秒数）——与 `check_rules` 执行的是同一份数据；
+- `current_draft`、`last_estimate`、`last_checks`、`last_observation`；
+- `history`：最近 8 步的紧凑记录（动作、检索词、错误码、时长、违规 rule_id 等），让模型知道自己已经试过什么；
+- `budget`：剩余步数/工具调用/写稿/改写次数。
+
+system prompt 还写明了估算公式（4.2 字/秒 + 0.3s 停顿、每镜 ≥1.0s、3~8 镜）和 `stop_reason` 的取值表。估算公式公开是为了让模型能自己判断“理论下限已超目标”，而不是只能反复试错；时长本身仍然只能由工具算。
+
+## 用户提供初稿（`initial_draft`）
+
+输入可以带一份 `initial_draft`（`{title, shots}`）。编排器在第 0 步把它校验后装为 revision 1（Trace 动作为 `seed_draft`，不计入模型写稿次数）；校验失败时不安装，错误作为 observation 交给模型。这对应“可编辑脚本”的需求，也让参考示例（38 秒初稿 → 压缩 → 28 秒左右）能用真实模型复现：初稿固定，压缩决策由模型做。
 
 ## 五个工具
 

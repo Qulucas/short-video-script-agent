@@ -4,7 +4,7 @@
   "mode": "offline",
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "steps": [
     {
@@ -28,7 +28,7 @@
     },
     {
       "n": 2,
-      "rationale": "第一次无结果，换一个更短的关键词再试",
+      "rationale": "第一次检索 total=0，换一个关键词再试",
       "action": "search_materials",
       "args": {
         "query": "火星素材 补充"
@@ -47,7 +47,7 @@
     },
     {
       "n": 3,
-      "rationale": "两次检索仍无素材，不能编造产品事实，请求用户补充",
+      "rationale": "两次检索 total 均为 0，不能编造产品事实，请求用户补充",
       "action": "finish",
       "args": {
         "status": "needs_input",

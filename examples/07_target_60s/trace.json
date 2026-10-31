@@ -4,7 +4,7 @@
   "mode": "offline",
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "steps": [
     {
@@ -207,7 +207,7 @@
     },
     {
       "n": 3,
-      "rationale": "检查规则",
+      "rationale": "时长 58.5s 在 58.0s–60.0s 内，无需压缩，检查规则",
       "action": "check_rules",
       "args": {},
       "observation": {
@@ -225,7 +225,7 @@
     },
     {
       "n": 4,
-      "rationale": "检查引用",
+      "rationale": "规则通过，检查引用",
       "action": "check_citations",
       "args": {},
       "observation": {

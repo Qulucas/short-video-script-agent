@@ -1,5 +1,5 @@
 {
-  "run_id": "20261031T113536Z-720b72",
+  "run_id": "20261031T120412Z-8c232b",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -17,7 +17,7 @@
   ],
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "draft_revision": 0,
   "draft_hash": null,

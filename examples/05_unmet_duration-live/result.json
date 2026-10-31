@@ -1,0 +1,161 @@
+{
+  "run_id": "20261031T120336Z-2f9e41",
+  "provider": "live",
+  "model": "deepseek-reasoner",
+  "mode": "live",
+  "status": "unmet_constraints",
+  "stop_reason": "rules_cannot_meet",
+  "exit_code": 3,
+  "title": "小影字幕功能速览",
+  "target_duration_sec": 8.0,
+  "estimated_total_sec": 8.0,
+  "estimator": {
+    "version": "v1",
+    "cps": 4.2,
+    "subtitle_cps": 5.0,
+    "pause_per_shot": 0.3
+  },
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为素材白名单"
+  ],
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 16
+  },
+  "draft_revision": 3,
+  "draft_hash": "sha256:290f0d023a5e5d4144971b3f2c44be4e5b2bd992fbf1792e7af5730cf5d704e2",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "product",
+      "visual": "小影剪辑界面，字幕轨道在时间线上亮起，预览画面同屏展示；底部叠免责声明",
+      "narration": "小影支持字幕，具体效果以实际使用为准，请以实际为准",
+      "subtitle": "小影支持字幕，具体效果以实际使用为准，请以实际使用时的效果为准",
+      "claims": [
+        {
+          "text": "支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "start_sec": 0.0,
+      "duration_sec": 6.0,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": "S2",
+      "claim_scope": "generic",
+      "visual": "字幕轨道特写，光标在时间线滑动",
+      "narration": "看这",
+      "subtitle": "看这",
+      "claims": [],
+      "start_sec": 6.0,
+      "duration_sec": 1.0,
+      "source_ids": []
+    },
+    {
+      "id": "S3",
+      "claim_scope": "generic",
+      "visual": "画面回到剪辑界面全景，简洁收尾",
+      "narration": "收尾",
+      "subtitle": "收尾",
+      "claims": [],
+      "start_sec": 7.0,
+      "duration_sec": 1.0,
+      "source_ids": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "P01",
+      "used_in": [
+        "S1"
+      ],
+      "text": "支持字幕"
+    }
+  ],
+  "checks": {
+    "duration": {
+      "version": "v1",
+      "cps": 4.2,
+      "subtitle_cps": 5.0,
+      "pause_per_shot": 0.3,
+      "target_sec": 8.0,
+      "min_sec": 7.2,
+      "max_sec": 8.0,
+      "total_sec": 8.0,
+      "delta_sec": 0.0,
+      "pass": true,
+      "shots": [
+        {
+          "id": "S1",
+          "start_sec": 0.0,
+          "duration_sec": 6.0,
+          "narration_chars": 23,
+          "subtitle_chars": 29
+        },
+        {
+          "id": "S2",
+          "start_sec": 6.0,
+          "duration_sec": 1.0,
+          "narration_chars": 2,
+          "subtitle_chars": 2
+        },
+        {
+          "id": "S3",
+          "start_sec": 7.0,
+          "duration_sec": 1.0,
+          "narration_chars": 2,
+          "subtitle_chars": 2
+        }
+      ],
+      "revision": 3,
+      "draft_hash": "sha256:290f0d023a5e5d4144971b3f2c44be4e5b2bd992fbf1792e7af5730cf5d704e2"
+    },
+    "rules": {
+      "ok": true,
+      "pass": false,
+      "rule_set": "strict_disclaimer",
+      "violations": [
+        {
+          "rule_id": "BR-03",
+          "severity": "block",
+          "field": "shots",
+          "shot_id": null,
+          "span": "",
+          "message": "内容分镜不足：需要至少 3 个，当前 2 个",
+          "suggestion": "修改或删除该表达后重新检查"
+        }
+      ],
+      "needs_review": [],
+      "revision": 3,
+      "draft_hash": "sha256:290f0d023a5e5d4144971b3f2c44be4e5b2bd992fbf1792e7af5730cf5d704e2"
+    },
+    "citations": null
+  },
+  "risks": [
+    {
+      "code": "LIMITED_MATERIAL",
+      "severity": "warn",
+      "message": "可用产品素材很少，脚本以使用建议为主。"
+    },
+    {
+      "code": "NO_EFFECT_DATA",
+      "severity": "info",
+      "message": "未提供效果数据，脚本不包含效果提升结论。"
+    }
+  ],
+  "message": "小影“支持字幕”单条素材在 strict_disclaimer 规则集下无法生成 8.0s 合规脚本：DISC-01 免责段需 6.0s，BR-03 要求至少 3 个内容分镜（各≥1.0s），合计下限 9.0s。",
+  "question": null,
+  "missing_fields": [],
+  "blocking_reason": "规则冲突导致时长不可行：DISC-01 免责声明段 min_sec=6.0（单镜 6.0s）+ BR-03 min_content_shots=3 × 单镜最短 1.0s = 最少 9.0s，超过目标上限 8.0s（通过区间 7.2~8.0s）；同时素材仅 P01“支持字幕”1 条，无法拆出更多有事实依据的产品 claim 分镜来压缩免责段占比。",
+  "options": [
+    "将 target_duration_sec 提升到 ≥9.0s",
+    "放宽 strict_disclaimer 的 min_content_shots 至 2 或 DISC-01 min_sec 至 ≤4.0s",
+    "补充更多产品素材以支持更多可引用分镜"
+  ]
+}

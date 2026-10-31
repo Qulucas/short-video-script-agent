@@ -36,6 +36,8 @@ EXPECTED = {
     "08_step_limit": "incomplete",
     "09_unmet_rules": "unmet_constraints",
     "10_adversarial_claim": "completed",
+    "11_tool_call_limit": "incomplete",
+    "12_seeded_draft_38s": "completed",
 }
 
 

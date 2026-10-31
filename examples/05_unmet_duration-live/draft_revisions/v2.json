@@ -1,0 +1,35 @@
+{
+  "title": "小影字幕功能速览",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "product",
+      "visual": "小影剪辑界面，字幕轨道在时间线上亮起，预览画面同屏展示",
+      "narration": "小影支持字幕",
+      "subtitle": "小影支持字幕",
+      "claims": [
+        {
+          "text": "支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "claim_scope": "generic",
+      "visual": "画面定格在功能展示页，底部出现说明文字",
+      "narration": "具体效果以实际使用为准",
+      "subtitle": "具体效果以实际使用为准",
+      "claims": []
+    },
+    {
+      "id": "S3",
+      "claim_scope": "generic",
+      "visual": "画面回到剪辑界面全景，简洁收尾",
+      "narration": "字幕功能速览就到这里",
+      "subtitle": "字幕功能速览就到这里",
+      "claims": []
+    }
+  ]
+}

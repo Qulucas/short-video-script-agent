@@ -1,0 +1,23 @@
+{
+  "from": 1,
+  "to": 2,
+  "removed_shots": [],
+  "added_shots": [],
+  "changed_shots": [
+    {
+      "id": "S1",
+      "before": "看",
+      "after": "小影支持字幕"
+    },
+    {
+      "id": "S2",
+      "before": "小影支持字幕哦，具体效果以实际使用为准，欢迎来体验",
+      "after": "具体效果以实际使用为准"
+    },
+    {
+      "id": "S3",
+      "before": "好",
+      "after": "字幕功能速览就到这里"
+    }
+  ]
+}

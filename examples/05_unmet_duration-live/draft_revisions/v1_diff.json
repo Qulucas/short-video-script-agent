@@ -1,0 +1,11 @@
+{
+  "from": 0,
+  "to": 1,
+  "removed_shots": [],
+  "added_shots": [
+    "S1",
+    "S2",
+    "S3"
+  ],
+  "changed_shots": []
+}

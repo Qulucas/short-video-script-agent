@@ -4,7 +4,7 @@
   "mode": "offline",
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "steps": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "n": 2,
-      "rationale": "先写完整首稿，随后用工具检查时长",
+      "rationale": "检索到 1 条素材，先写完整首稿，随后用工具检查时长",
       "action": "write_draft",
       "args": {
         "title": "30 秒讲清：字幕怎么用",
@@ -125,7 +125,7 @@
     },
     {
       "n": 3,
-      "rationale": "估算首稿时长",
+      "rationale": "估算 revision 1 时长",
       "action": "estimate_duration",
       "args": {},
       "observation": {
@@ -193,7 +193,7 @@
     },
     {
       "n": 4,
-      "rationale": "首稿 38 秒超过 30 秒，删除次要镜头并压缩旁白",
+      "rationale": "当前 38.0s 超过上限 30.0s（超 8.0s），删除次要镜头并压缩旁白",
       "action": "write_draft",
       "args": {
         "title": "30 秒讲清：字幕怎么用",
@@ -292,7 +292,7 @@
     },
     {
       "n": 5,
-      "rationale": "估算首稿时长",
+      "rationale": "估算 revision 2 时长",
       "action": "estimate_duration",
       "args": {},
       "observation": {
@@ -353,7 +353,7 @@
     },
     {
       "n": 6,
-      "rationale": "检查品牌规则",
+      "rationale": "时长 28.0s 在 28.0s–30.0s 内，检查品牌规则",
       "action": "check_rules",
       "args": {},
       "observation": {
@@ -371,7 +371,7 @@
     },
     {
       "n": 7,
-      "rationale": "检查事实引用",
+      "rationale": "规则通过，检查事实引用",
       "action": "check_citations",
       "args": {},
       "observation": {

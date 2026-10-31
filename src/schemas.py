@@ -50,11 +50,12 @@ def normalize_brief(raw: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str,
         "brand_rule_set": str(raw.get("brand_rule_set") or "demo_default").strip(),
         "scenario": str(raw.get("scenario") or "normal").strip(),
         "faults": raw.get("faults") or {},
+        "initial_draft": raw.get("initial_draft") if isinstance(raw.get("initial_draft"), dict) else None,
         "assumptions": [
             "audience 使用输入值" if raw.get("audience") else "audience 未提供，使用默认泛人群",
             "style 使用输入值" if raw.get("style") else "style 未提供，使用默认简洁口播",
             "material_ids 为空，按 material_query 检索" if not material_ids else "material_ids 为素材白名单",
-        ],
+        ] + (["initial_draft 由用户提供，作为 revision 1 待检查和修改"] if isinstance(raw.get("initial_draft"), dict) else []),
     }
     return brief, errors
 

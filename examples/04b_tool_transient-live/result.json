@@ -1,0 +1,213 @@
+{
+  "run_id": "20261031T120336Z-0fff33",
+  "provider": "live",
+  "model": "deepseek-reasoner",
+  "mode": "live",
+  "status": "completed",
+  "stop_reason": null,
+  "exit_code": 0,
+  "title": "用字幕提升短视频信息密度",
+  "target_duration_sec": 30.0,
+  "estimated_total_sec": 29.9,
+  "estimator": {
+    "version": "v1",
+    "cps": 4.2,
+    "subtitle_cps": 5.0,
+    "pause_per_shot": 0.3
+  },
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为素材白名单"
+  ],
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 16
+  },
+  "draft_revision": 1,
+  "draft_hash": "sha256:dfa0534f969441bf563e7583a94146adc153bff02f84ca4a7f23fb3b62467241",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "generic",
+      "visual": "创作者对镜头口播，画面简洁",
+      "narration": "刚开始做短视频，别急着堆画面，先把表达想清楚。",
+      "subtitle": "刚开始做短视频，别急着堆画面，先把表达想清楚。",
+      "claims": [],
+      "start_sec": 0.0,
+      "duration_sec": 5.1,
+      "source_ids": []
+    },
+    {
+      "id": "S2",
+      "claim_scope": "generic",
+      "visual": "口播画面上出现重点字幕条",
+      "narration": "口播重点句子，用字幕留在画面下方，方便观众看。",
+      "subtitle": "口播重点句子，用字幕留在画面下方，方便观众看。",
+      "claims": [],
+      "start_sec": 5.1,
+      "duration_sec": 5.1,
+      "source_ids": []
+    },
+    {
+      "id": "S3",
+      "claim_scope": "product",
+      "visual": "手机剪辑界面停留，画面出现“小影”和字幕提示",
+      "narration": "小影支持字幕，具体怎么用，先记住这条产品信息。",
+      "subtitle": "小影支持字幕，具体怎么用，先记住这条产品信息。",
+      "claims": [
+        {
+          "text": "小影支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "start_sec": 10.2,
+      "duration_sec": 5.1,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": "S4",
+      "claim_scope": "generic",
+      "visual": "字幕逐句出现，每屏只保留一个重点",
+      "narration": "每句话只留一个重点，字幕别太长，读起来更轻松。",
+      "subtitle": "每句话只留一个重点，字幕别太长，读起来更轻松。",
+      "claims": [],
+      "start_sec": 15.3,
+      "duration_sec": 5.1,
+      "source_ids": []
+    },
+    {
+      "id": "S5",
+      "claim_scope": "generic",
+      "visual": "口播与字幕同步滚动",
+      "narration": "字幕和口播尽量同步，别让观众来回找重点。",
+      "subtitle": "字幕和口播尽量同步，别让观众来回找重点。",
+      "claims": [],
+      "start_sec": 20.4,
+      "duration_sec": 4.6,
+      "source_ids": []
+    },
+    {
+      "id": "S6",
+      "claim_scope": "generic",
+      "visual": "干净画面叠加简短字幕，节奏利落",
+      "narration": "画面保持干净，再用字幕补充信息，短视频清楚。",
+      "subtitle": "画面保持干净，再用字幕补充信息，短视频清楚。",
+      "claims": [],
+      "start_sec": 25.0,
+      "duration_sec": 4.9,
+      "source_ids": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "P01",
+      "used_in": [
+        "S3"
+      ],
+      "text": "支持字幕"
+    }
+  ],
+  "checks": {
+    "duration": {
+      "version": "v1",
+      "cps": 4.2,
+      "subtitle_cps": 5.0,
+      "pause_per_shot": 0.3,
+      "target_sec": 30.0,
+      "min_sec": 28.0,
+      "max_sec": 30.0,
+      "total_sec": 29.9,
+      "delta_sec": -0.1,
+      "pass": true,
+      "shots": [
+        {
+          "id": "S1",
+          "start_sec": 0.0,
+          "duration_sec": 5.1,
+          "narration_chars": 20,
+          "subtitle_chars": 20
+        },
+        {
+          "id": "S2",
+          "start_sec": 5.1,
+          "duration_sec": 5.1,
+          "narration_chars": 20,
+          "subtitle_chars": 20
+        },
+        {
+          "id": "S3",
+          "start_sec": 10.2,
+          "duration_sec": 5.1,
+          "narration_chars": 20,
+          "subtitle_chars": 20
+        },
+        {
+          "id": "S4",
+          "start_sec": 15.3,
+          "duration_sec": 5.1,
+          "narration_chars": 20,
+          "subtitle_chars": 20
+        },
+        {
+          "id": "S5",
+          "start_sec": 20.4,
+          "duration_sec": 4.6,
+          "narration_chars": 18,
+          "subtitle_chars": 18
+        },
+        {
+          "id": "S6",
+          "start_sec": 25.0,
+          "duration_sec": 4.9,
+          "narration_chars": 19,
+          "subtitle_chars": 19
+        }
+      ],
+      "revision": 1,
+      "draft_hash": "sha256:dfa0534f969441bf563e7583a94146adc153bff02f84ca4a7f23fb3b62467241"
+    },
+    "rules": {
+      "ok": true,
+      "pass": true,
+      "rule_set": "demo_default",
+      "violations": [],
+      "needs_review": [],
+      "revision": 1,
+      "draft_hash": "sha256:dfa0534f969441bf563e7583a94146adc153bff02f84ca4a7f23fb3b62467241"
+    },
+    "citations": {
+      "ok": true,
+      "pass": true,
+      "unsupported_claims": [],
+      "needs_review": [],
+      "revision": 1,
+      "draft_hash": "sha256:dfa0534f969441bf563e7583a94146adc153bff02f84ca4a7f23fb3b62467241"
+    }
+  },
+  "risks": [
+    {
+      "code": "LIMITED_MATERIAL",
+      "severity": "warn",
+      "message": "可用产品素材很少，脚本以使用建议为主。"
+    },
+    {
+      "code": "NO_EFFECT_DATA",
+      "severity": "info",
+      "message": "未提供效果数据，脚本不包含效果提升结论。"
+    },
+    {
+      "code": "TIMEOUT",
+      "severity": "error",
+      "message": "素材检索超时"
+    }
+  ],
+  "message": "生成 30 秒抖音口播脚本《用字幕提升短视频信息密度》，共 6 个分镜：前两镜讲清表达与字幕留重点，S3 绑定素材 P01 说明“小影支持字幕”，后三镜讲字幕长度、同步与画面干净。estimate_duration 计算总时长 29.9s（区间 28.0~30.0，pass），check_rules 无违规，check_citations 无 unsupported claim，产品 claim 已保留可追溯。",
+  "question": null,
+  "missing_fields": [],
+  "blocking_reason": "",
+  "options": []
+}

@@ -1,0 +1,267 @@
+{
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 16
+  },
+  "steps": [
+    {
+      "n": 1,
+      "rationale": "反复检查引用（观察到 无错误），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 2,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 3,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 4,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 5,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 6,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 7,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 8,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 9,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 10,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 11,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 12,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 13,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 14,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 15,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 16,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 17,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "TOOL_CALL_LIMIT"
+      },
+      "next": null,
+      "draft_revision": 0,
+      "draft_hash": null
+    }
+  ],
+  "result_status": "incomplete",
+  "stop_reason": "tool_call_limit_reached",
+  "tool_calls": 16
+}

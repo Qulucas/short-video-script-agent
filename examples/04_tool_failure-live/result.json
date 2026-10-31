@@ -1,0 +1,78 @@
+{
+  "run_id": "20261031T120336Z-c60165",
+  "provider": "live",
+  "model": "deepseek-reasoner",
+  "mode": "live",
+  "status": "incomplete",
+  "stop_reason": "tool_unavailable",
+  "exit_code": 4,
+  "title": "未生成标题",
+  "target_duration_sec": 30.0,
+  "estimated_total_sec": null,
+  "estimator": null,
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为素材白名单"
+  ],
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 16
+  },
+  "draft_revision": 0,
+  "draft_hash": null,
+  "shots": [],
+  "sources": [],
+  "checks": {
+    "duration": null,
+    "rules": null,
+    "citations": null
+  },
+  "risks": [
+    {
+      "code": "LIMITED_MATERIAL",
+      "severity": "warn",
+      "message": "可用产品素材很少，脚本以使用建议为主。"
+    },
+    {
+      "code": "NO_EFFECT_DATA",
+      "severity": "info",
+      "message": "未提供效果数据，脚本不包含效果提升结论。"
+    },
+    {
+      "code": "TIMEOUT",
+      "severity": "error",
+      "message": "素材检索超时"
+    },
+    {
+      "code": "TIMEOUT",
+      "severity": "error",
+      "message": "素材检索超时"
+    },
+    {
+      "code": "TIMEOUT",
+      "severity": "error",
+      "message": "素材检索超时"
+    }
+  ],
+  "message": "目标为 30s 抖音口播脚本（产品：小影，品牌规则 demo_default），但检索接口连续三次超时，materials 为空，query_rewrites_left=0，无法获得任何可标注 source_id 与 quote 的产品事实，故未写稿。",
+  "question": null,
+  "missing_fields": [
+    "materials[].source_id",
+    "materials[].quote",
+    "产品功能事实（小影字幕相关能力说明）"
+  ],
+  "blocking_reason": "history 中 n=1..3 的 search_materials 均返回 error_code=TIMEOUT（retryable=true），last_observation.ok=false，且 budget.query_rewrites_left=0；无素材即无法满足“每条产品事实必须绑定 source_id 和 quote”的硬约束。",
+  "options": [
+    "恢复素材检索服务后重新运行本任务",
+    "由人工提供小影官方功能说明文本（含出处）作为 materials 注入"
+  ],
+  "last_state": {
+    "draft_revision": 0,
+    "checks": {
+      "duration": false,
+      "rules": false,
+      "citations": false
+    }
+  }
+}

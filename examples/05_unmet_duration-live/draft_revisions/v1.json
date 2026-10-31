@@ -1,0 +1,35 @@
+{
+  "title": "小影字幕功能速览",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "generic",
+      "visual": "手机屏幕上剪辑界面快速划过，字幕轨道亮起",
+      "narration": "看",
+      "subtitle": "看",
+      "claims": []
+    },
+    {
+      "id": "S2",
+      "claim_scope": "product",
+      "visual": "小影剪辑界面中字幕轨道与预览画面同屏展示",
+      "narration": "小影支持字幕哦，具体效果以实际使用为准，欢迎来体验",
+      "subtitle": "小影支持字幕哦，具体效果以实际使用为准，请您以实际使用效果为准",
+      "claims": [
+        {
+          "text": "支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "claim_scope": "generic",
+      "visual": "画面定格在功能展示页，出现简洁收尾",
+      "narration": "好",
+      "subtitle": "好",
+      "claims": []
+    }
+  ]
+}

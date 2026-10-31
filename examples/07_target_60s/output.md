@@ -1,6 +1,6 @@
 # 60 秒讲清：字幕、画中画和竖屏导出
 
-- run_id: `20261031T113538Z-7c5055`
+- run_id: `20261031T120412Z-29f9b7`
 - status: `completed`
 - stop_reason: `null`
 - provider: `fixture`

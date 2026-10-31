@@ -4,7 +4,7 @@
   "mode": "offline",
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "steps": [
     {
@@ -28,7 +28,7 @@
     },
     {
       "n": 2,
-      "rationale": "检索超时，缩小查询重试一次",
+      "rationale": "检索返回 TIMEOUT（retryable=true），缩小查询重试一次",
       "action": "search_materials",
       "args": {
         "query": "小影 字幕"
@@ -47,7 +47,7 @@
     },
     {
       "n": 3,
-      "rationale": "连续两次检索超时，无法验证素材，结束并保留错误",
+      "rationale": "连续 2 次检索 TIMEOUT，无法取得可引用素材，结束并保留错误",
       "action": "finish",
       "args": {
         "status": "incomplete",

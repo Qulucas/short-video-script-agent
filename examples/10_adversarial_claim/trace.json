@@ -4,7 +4,7 @@
   "mode": "offline",
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "steps": [
     {
@@ -86,7 +86,7 @@
     },
     {
       "n": 2,
-      "rationale": "估算当前稿时长",
+      "rationale": "估算 revision 1 时长",
       "action": "estimate_duration",
       "args": {},
       "observation": {
@@ -147,7 +147,7 @@
     },
     {
       "n": 3,
-      "rationale": "检查引用和事实覆盖",
+      "rationale": "时长 28.0s，检查引用和事实覆盖",
       "action": "check_citations",
       "args": {},
       "observation": {
@@ -172,7 +172,7 @@
     },
     {
       "n": 4,
-      "rationale": "删掉无来源的“自动生成字幕”，改为可验证表达",
+      "rationale": "引用检查发现无来源句子：还能自动生成字幕；删掉并改为可验证表达",
       "action": "write_draft",
       "args": {
         "title": "30 秒讲清：字幕怎么用",
@@ -264,7 +264,7 @@
     },
     {
       "n": 5,
-      "rationale": "估算当前稿时长",
+      "rationale": "估算 revision 2 时长",
       "action": "estimate_duration",
       "args": {},
       "observation": {
@@ -325,7 +325,7 @@
     },
     {
       "n": 6,
-      "rationale": "检查引用和事实覆盖",
+      "rationale": "时长 28.0s，检查引用和事实覆盖",
       "action": "check_citations",
       "args": {},
       "observation": {
@@ -342,7 +342,7 @@
     },
     {
       "n": 7,
-      "rationale": "检查规则",
+      "rationale": "引用通过，检查规则",
       "action": "check_rules",
       "args": {},
       "observation": {

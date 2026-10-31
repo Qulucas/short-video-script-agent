@@ -4,7 +4,7 @@
   "mode": "offline",
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "steps": [
     {
@@ -18,20 +18,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 2,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -48,20 +54,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 4,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -78,20 +90,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 6,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -108,20 +126,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 8,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -138,20 +162,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 10,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -168,20 +198,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 12,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -198,20 +234,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 14,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -228,20 +270,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 16,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -258,20 +306,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 18,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": "check_citations",
       "draft_revision": 0,
@@ -288,20 +342,26 @@
         "message": "请先写草稿",
         "retryable": true
       },
-      "next": "check_citations",
+      "next": "finish",
       "draft_revision": 0,
       "draft_hash": null
     },
     {
       "n": 20,
-      "rationale": "继续检查引用，等待更多信息",
-      "action": "check_citations",
-      "args": {},
+      "rationale": "引用检查返回 DRAFT_REQUIRED，仍尝试直接完成",
+      "action": "finish",
+      "args": {
+        "status": "completed",
+        "summary": "尝试在没有草稿时完成。"
+      },
       "observation": {
         "ok": false,
-        "error_code": "DRAFT_REQUIRED",
-        "message": "请先写草稿",
-        "retryable": true
+        "missing": [
+          "draft",
+          "duration",
+          "rules",
+          "citations"
+        ]
       },
       "next": null,
       "draft_revision": 0,
@@ -310,5 +370,5 @@
   ],
   "result_status": "incomplete",
   "stop_reason": "step_limit_reached",
-  "tool_calls": 20
+  "tool_calls": 10
 }

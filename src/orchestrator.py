@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from src.config import DATA_DIR, load_json
+from src.limits import (MAX_ACTION_REPAIRS, MAX_DRAFT_WRITES, MAX_QUERY_REWRITES,
+                        MAX_STEPS, MAX_TOOL_CALLS)
 from src.render import exit_code_for
 from src.schemas import draft_hash, normalize_brief, parse_action, validate_draft
 from src.tools.citations import check_citations
@@ -17,11 +19,7 @@ from src.tools.materials import FaultInjector, MaterialsTool
 from src.tools.rules import check_rules
 from src.trace import TraceRecorder
 
-MAX_STEPS = 20
-MAX_TOOL_CALLS = 24
-MAX_QUERY_REWRITES = 2
-MAX_DRAFT_WRITES = 4
-MAX_ACTION_REPAIRS = 2
+HISTORY_WINDOW = 8
 
 
 class ModelError(Exception):
@@ -105,6 +103,8 @@ class Orchestrator:
             "revisions": [],
             "step": 0,
             "trace_errors": [],
+            "history": [],
+            "rule_set": self._rule_set_view(brief.get("brand_rule_set", "")),
         }
         self.trace = TraceRecorder(
             provider=provider.name,
@@ -114,8 +114,67 @@ class Orchestrator:
         )
         self.run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
 
+    def _rule_set_view(self, name: str) -> Dict[str, Any]:
+        """Brand guidelines the model may read; check_rules enforces the same data."""
+        rule_set = self.rules_config.get("rule_sets", {}).get(name)
+        if rule_set is None:
+            return {"name": name, "error": "UNKNOWN_RULE_SET"}
+        names = self.rules_config.get("rules", {})
+        return {
+            "name": name,
+            "rules": [{"id": rid, "name": names.get(rid, {}).get("name", "")} for rid in rule_set.get("rules", [])],
+            "min_content_shots": rule_set.get("min_content_shots", 0),
+            "required_segments": rule_set.get("required_segments", []),
+        }
+
     def _record_error(self, code: str, message: str) -> None:
         self.state["trace_errors"].append({"code": code, "message": message})
+
+    def _remember(self, step: int, action: Dict[str, Any], observation: Dict[str, Any]) -> None:
+        """Keep a compact action history so a stateless model call can see what it already tried."""
+        name = action.get("name") if isinstance(action, dict) else str(action)
+        args = action.get("args", {}) if isinstance(action, dict) else {}
+        item: Dict[str, Any] = {"n": step, "action": name, "ok": observation.get("ok")}
+        if name == "search_materials":
+            item["query"] = args.get("query")
+        if name == "finish":
+            item["status"] = args.get("status")
+        for key in ("error_code", "revision", "total_sec", "pass", "total", "missing"):
+            if observation.get(key) is not None:
+                item[key] = observation[key]
+        if observation.get("violations"):
+            item["violations"] = [v.get("rule_id") for v in observation["violations"]]
+        if observation.get("unsupported_claims"):
+            item["unsupported"] = [u.get("code") for u in observation["unsupported_claims"]]
+        self.state["history"] = (self.state["history"] + [item])[-HISTORY_WINDOW:]
+
+    def _seed_draft(self) -> None:
+        """Install a user-supplied draft as revision 1; it is input, not a model write."""
+        seed = self.brief.get("initial_draft")
+        if not seed:
+            return
+        draft = {"title": seed.get("title"), "shots": seed.get("shots")}
+        errors = validate_draft(draft)
+        known = set(m["id"] for m in self.visible_materials) | {"BRIEF"}
+        if not errors:
+            for shot in draft["shots"]:
+                for claim in shot.get("claims", []):
+                    if claim.get("source_id") not in known:
+                        errors.append("未知来源: " + str(claim.get("source_id")))
+        if errors:
+            obs = {"ok": False, "error_code": "SEED_DRAFT_INVALID", "errors": errors}
+            self.trace.add(0, "用户提供的初稿未通过校验，交给模型决定是否重写", "seed_draft", obs, 0, None)
+            self.state["last_observation"] = obs
+            return
+        h = draft_hash(draft)
+        diff = _rev_diff(None, draft, 0, 1)
+        self.state["current_draft"] = draft
+        self.state["draft_revision"] = 1
+        self.state["draft_hash"] = h
+        self.state["revisions"].append({"revision": 1, "draft": copy.deepcopy(draft), "diff": diff})
+        obs = {"ok": True, "revision": 1, "draft_hash": h, "source": "user_input"}
+        self.trace.add(0, "载入用户提供的初稿作为 revision 1（不计入模型写稿次数）", "seed_draft", obs, 1, h)
+        self.state["last_observation"] = obs
 
     def _execute_tool(self, action: Dict[str, Any]) -> Dict[str, Any]:
         name = action["name"]
@@ -384,6 +443,9 @@ class Orchestrator:
 
     def run(self) -> Tuple[Dict[str, Any], Dict[str, Any], List[Dict[str, Any]]]:
         prev_trace_index: Optional[int] = None
+        self._seed_draft()
+        if self.trace.steps:
+            prev_trace_index = len(self.trace.steps) - 1
         for step in range(1, MAX_STEPS + 1):
             self.state["step"] = step
             try:
@@ -411,6 +473,7 @@ class Orchestrator:
                 idx = self.trace.add(step, "", "parse_error", obs,
                                      self.state["draft_revision"], self.state["draft_hash"])
                 prev_trace_index = idx
+                self._remember(step, "parse_error", obs)
                 if self.state["action_repairs"] > MAX_ACTION_REPAIRS:
                     self.trace.finalize("incomplete", "invalid_action_limit", self.state["tool_calls"])
                     result = _terminal("incomplete", "invalid_action_limit",
@@ -427,11 +490,12 @@ class Orchestrator:
                 idx = self.trace.add(step, action.get("rationale", ""), action, obs,
                                      self.state["draft_revision"], self.state["draft_hash"])
                 prev_trace_index = idx
+                self._remember(step, action, obs)
                 if not ok:
                     self.state["last_observation"] = {"ok": False, "error_code": "CHECKS_REQUIRED", "missing": missing}
                     continue
                 status = action["args"]["status"]
-                stop_reason = action["args"].get("stop_reason")
+                stop_reason = _normalize_stop_reason(status, action["args"].get("stop_reason"))
                 self.trace.finalize(status, stop_reason, self.state["tool_calls"])
                 result = self._finalize(action, status, stop_reason)
                 return result, self.trace.to_dict(), self.state["revisions"]
@@ -452,6 +516,7 @@ class Orchestrator:
             idx = self.trace.add(step, action.get("rationale", ""), action, observation,
                                  self.state["draft_revision"], self.state["draft_hash"])
             prev_trace_index = idx
+            self._remember(step, action, observation)
 
         self.trace.finalize("incomplete", "step_limit_reached", self.state["tool_calls"])
         result = _terminal("incomplete", "step_limit_reached",

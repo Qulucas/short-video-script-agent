@@ -1,0 +1,72 @@
+{
+  "topic": "用字幕提升短视频信息密度",
+  "audience": "刚开始做短视频的创作者",
+  "platform": "douyin",
+  "target_duration_sec": 30,
+  "style": "简洁口播",
+  "product_name": "小影",
+  "material_query": "字幕 剪辑",
+  "material_ids": [
+    "P01"
+  ],
+  "brand_rule_set": "demo_default",
+  "initial_draft": {
+    "title": "30 秒讲清：字幕怎么用",
+    "shots": [
+      {
+        "id": "S1",
+        "claim_scope": "generic",
+        "visual": "分镜S1画面",
+        "narration": "刷短视频时很多人会先关声音，没有字幕就容易错过画面里的重点信息。",
+        "subtitle": "刷视频先关声音，没字幕容易漏重点",
+        "claims": []
+      },
+      {
+        "id": "S2",
+        "claim_scope": "product",
+        "visual": "分镜S2画面",
+        "narration": "这款产品支持字幕，下面用三个画面简单说明它在短视频里的实际用法。",
+        "subtitle": "支持字幕，下面简单说明",
+        "claims": [
+          {
+            "text": "支持字幕",
+            "source_id": "P01",
+            "quote": "支持字幕"
+          }
+        ]
+      },
+      {
+        "id": "S3",
+        "claim_scope": "generic",
+        "visual": "分镜S3画面",
+        "narration": "先列出一条核心信息，再把两三个关键词逐条放进字幕，观众一眼就能看懂。",
+        "subtitle": "一条核心信息，关键词进字幕",
+        "claims": []
+      },
+      {
+        "id": "S4",
+        "claim_scope": "generic",
+        "visual": "分镜S4画面",
+        "narration": "镜头切换的时候，保留同一句字幕，观众更容易跟上画面节奏和内容。",
+        "subtitle": "切换镜头，保留同一句字幕",
+        "claims": []
+      },
+      {
+        "id": "S5",
+        "claim_scope": "generic",
+        "visual": "分镜S5画面",
+        "narration": "以上就是今天的字幕使用建议，你可以按自己的内容灵活调整和节奏。",
+        "subtitle": "字幕使用建议",
+        "claims": []
+      },
+      {
+        "id": "S6",
+        "claim_scope": "generic",
+        "visual": "分镜S6画面",
+        "narration": "收尾。",
+        "subtitle": "收尾",
+        "claims": []
+      }
+    ]
+  }
+}

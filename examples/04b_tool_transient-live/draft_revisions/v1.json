@@ -1,0 +1,59 @@
+{
+  "title": "用字幕提升短视频信息密度",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "generic",
+      "visual": "创作者对镜头口播，画面简洁",
+      "narration": "刚开始做短视频，别急着堆画面，先把表达想清楚。",
+      "subtitle": "刚开始做短视频，别急着堆画面，先把表达想清楚。",
+      "claims": []
+    },
+    {
+      "id": "S2",
+      "claim_scope": "generic",
+      "visual": "口播画面上出现重点字幕条",
+      "narration": "口播重点句子，用字幕留在画面下方，方便观众看。",
+      "subtitle": "口播重点句子，用字幕留在画面下方，方便观众看。",
+      "claims": []
+    },
+    {
+      "id": "S3",
+      "claim_scope": "product",
+      "visual": "手机剪辑界面停留，画面出现“小影”和字幕提示",
+      "narration": "小影支持字幕，具体怎么用，先记住这条产品信息。",
+      "subtitle": "小影支持字幕，具体怎么用，先记住这条产品信息。",
+      "claims": [
+        {
+          "text": "小影支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "claim_scope": "generic",
+      "visual": "字幕逐句出现，每屏只保留一个重点",
+      "narration": "每句话只留一个重点，字幕别太长，读起来更轻松。",
+      "subtitle": "每句话只留一个重点，字幕别太长，读起来更轻松。",
+      "claims": []
+    },
+    {
+      "id": "S5",
+      "claim_scope": "generic",
+      "visual": "口播与字幕同步滚动",
+      "narration": "字幕和口播尽量同步，别让观众来回找重点。",
+      "subtitle": "字幕和口播尽量同步，别让观众来回找重点。",
+      "claims": []
+    },
+    {
+      "id": "S6",
+      "claim_scope": "generic",
+      "visual": "干净画面叠加简短字幕，节奏利落",
+      "narration": "画面保持干净，再用字幕补充信息，短视频清楚。",
+      "subtitle": "画面保持干净，再用字幕补充信息，短视频清楚。",
+      "claims": []
+    }
+  ]
+}

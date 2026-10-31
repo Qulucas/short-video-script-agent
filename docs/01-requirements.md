@@ -17,7 +17,8 @@
 - `audience`、`style`；
 - `product_name`；
 - `material_query`、`material_ids`（素材白名单）；
-- `brand_rule_set`（`demo_default` / `strict_disclaimer`）。
+- `brand_rule_set`（`demo_default` / `strict_disclaimer`）；
+- `initial_draft`：用户已有的脚本（`{title, shots}`），作为 revision 1 交给 Agent 检查和修改。
 
 ## 输出
 
@@ -35,7 +36,7 @@
 
 3 小时校招考核版本，优先核心链路：
 
-- 做：CLI、受限 ReAct、五个工具、10 个场景、测试、Trace、真实 fixture 输出；
+- 做：CLI、受限 ReAct、五个工具、12 个 fixture 场景 + live 场景、测试、Trace；
 - 不做：UI、线上部署、多 Agent、生产级 Runtime、真实 TTS。
 
 ## 成功标准
@@ -55,9 +56,9 @@
 | 缺关键信息 | `examples/02_missing_duration/` |
 | 无素材 | `examples/03_no_material/` |
 | 工具失败 | `examples/04_tool_failure/` |
-| 超时长修正 | `examples/01_normal_30s/trace.json`（38→28） |
+| 超时长修正 | fixture：`examples/01_normal_30s/`、`examples/12_seeded_draft_38s/`（38→28）；live：`examples/12_seeded_draft_38s-live/` |
 | 超时长不可满足 | `examples/05_unmet_duration/` |
 | 规则修正/规则不可满足 | `examples/06_rule_violation/`、`examples/09_unmet_rules/` |
 | 动作随时长变化 | `examples/07_target_60s/` |
-| 步数上限 | `examples/08_step_limit/` |
+| 步数/工具调用上限 | `examples/08_step_limit/`、`examples/11_tool_call_limit/` |
 | 对抗性事实夹带 | `examples/10_adversarial_claim/` |

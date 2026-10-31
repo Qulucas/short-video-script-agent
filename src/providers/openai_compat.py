@@ -39,7 +39,7 @@ class OpenAICompatProvider(Provider):
     def __init__(self) -> None:
         self.api_key = os.environ.get("LLM_API_KEY", "").strip()
         self.base_url = os.environ.get("LLM_BASE_URL", "https://api.deepseek.com").rstrip("/")
-        self.model = os.environ.get("LLM_MODEL", "deepseek-chat").strip() or "deepseek-chat"
+        self.model = os.environ.get("LLM_MODEL", "deepseek-reasoner").strip() or "deepseek-reasoner"
         self.timeout = int(os.environ.get("LLM_TIMEOUT_SEC", "60"))
         if not self.api_key:
             raise ModelError("LLM_API_KEY 未配置，live 模式不可用；请使用 --provider fixture 或配置 .env")

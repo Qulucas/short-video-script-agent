@@ -1,0 +1,101 @@
+{
+  "provider": "live",
+  "model": "deepseek-reasoner",
+  "mode": "live",
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 16
+  },
+  "steps": [
+    {
+      "n": 1,
+      "rationale": "素材列表为空，需要先检索「小影」的产品事实，否则无法写出带 source_id 和 quote 的产品 claim。",
+      "action": "search_materials",
+      "args": {
+        "query": "小影 字幕 短视频 功能",
+        "top_k": 5
+      },
+      "observation": {
+        "ok": false,
+        "items": null,
+        "error_code": "TIMEOUT",
+        "message": "素材检索超时",
+        "retryable": true,
+        "hint": "可以缩小查询重试一次"
+      },
+      "next": "search_materials",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 2,
+      "rationale": "上一次检索以 TIMEOUT 失败，且错误标记为 retryable，提示可以缩小查询重试；query_rewrites_left 还有 2 次，因此按提示用更窄的查询重试，以取得产品事实依据。",
+      "action": "search_materials",
+      "args": {
+        "query": "小影 字幕",
+        "top_k": 5
+      },
+      "observation": {
+        "ok": false,
+        "items": null,
+        "error_code": "TIMEOUT",
+        "message": "素材检索超时",
+        "retryable": true,
+        "hint": "可以缩小查询重试一次"
+      },
+      "next": "search_materials",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 3,
+      "rationale": "两次素材检索均为 TIMEOUT，错误码可重试，且 budget.query_rewrites_left=1；按提示缩小查询范围再试一次，争取拿到产品事实依据。",
+      "action": "search_materials",
+      "args": {
+        "query": "小影",
+        "top_k": 3
+      },
+      "observation": {
+        "ok": false,
+        "items": null,
+        "error_code": "TIMEOUT",
+        "message": "素材检索超时",
+        "retryable": true,
+        "hint": "可以缩小查询重试一次"
+      },
+      "next": "finish",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 4,
+      "rationale": "三次素材检索均因 TIMEOUT 失败且 query_rewrites_left 已为 0，无法取得任何可绑定的产品事实（source_id/quote）；在没有 materials 的情况下写稿只能编造功能参数，违反硬约束 1/2，因此按硬约束 7 以工具不可用结束，不产出无依据脚本。",
+      "action": "finish",
+      "args": {
+        "status": "incomplete",
+        "summary": "目标为 30s 抖音口播脚本（产品：小影，品牌规则 demo_default），但检索接口连续三次超时，materials 为空，query_rewrites_left=0，无法获得任何可标注 source_id 与 quote 的产品事实，故未写稿。",
+        "missing_fields": [
+          "materials[].source_id",
+          "materials[].quote",
+          "产品功能事实（小影字幕相关能力说明）"
+        ],
+        "blocking_reason": "history 中 n=1..3 的 search_materials 均返回 error_code=TIMEOUT（retryable=true），last_observation.ok=false，且 budget.query_rewrites_left=0；无素材即无法满足“每条产品事实必须绑定 source_id 和 quote”的硬约束。",
+        "options": [
+          "恢复素材检索服务后重新运行本任务",
+          "由人工提供小影官方功能说明文本（含出处）作为 materials 注入"
+        ],
+        "stop_reason": "tool_unavailable"
+      },
+      "observation": {
+        "ok": true,
+        "missing": []
+      },
+      "next": null,
+      "draft_revision": 0,
+      "draft_hash": null
+    }
+  ],
+  "result_status": "incomplete",
+  "stop_reason": "tool_unavailable",
+  "tool_calls": 3
+}

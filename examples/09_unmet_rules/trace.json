@@ -4,7 +4,7 @@
   "mode": "offline",
   "limits": {
     "max_steps": 20,
-    "max_tool_calls": 24
+    "max_tool_calls": 16
   },
   "steps": [
     {
@@ -147,7 +147,7 @@
     },
     {
       "n": 3,
-      "rationale": "检查品牌规则",
+      "rationale": "时长 28.3s，检查品牌规则",
       "action": "check_rules",
       "args": {},
       "observation": {
@@ -184,7 +184,7 @@
     },
     {
       "n": 4,
-      "rationale": "P04 含绝对化表达且无替代素材，无法满足规则",
+      "rationale": "规则命中 BR-01，且唯一素材 P04 本身含该表达，无替代素材",
       "action": "finish",
       "args": {
         "status": "unmet_constraints",
