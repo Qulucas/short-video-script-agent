@@ -163,7 +163,7 @@ def test_step_limit_is_explicit():
     result, trace, revisions = run("08_step_limit")
     assert result["status"] == "incomplete"
     assert result["stop_reason"] == "step_limit_reached"
-    assert len(trace["steps"]) <= 16
+    assert len(trace["steps"]) <= 20
 
 
 def test_rules_cannot_meet_is_explicit():

@@ -1,0 +1,190 @@
+{
+  "run_id": "20261031T095419Z-9b743b",
+  "provider": "live",
+  "model": "deepseek-reasoner",
+  "mode": "live",
+  "status": "completed",
+  "stop_reason": null,
+  "exit_code": 0,
+  "title": "用字幕提升短视频信息密度",
+  "target_duration_sec": 30.0,
+  "estimated_total_sec": 28.3,
+  "estimator": {
+    "version": "v1",
+    "cps": 4.2,
+    "subtitle_cps": 5.0,
+    "pause_per_shot": 0.3
+  },
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为素材白名单"
+  ],
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 24
+  },
+  "draft_revision": 3,
+  "draft_hash": "sha256:556884b802e439a7d22e2a3f4b4ea47dc7f54f84b3c560675533fa01832332cf",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "generic",
+      "visual": "创作者面对手机镜头，画面出现零散文字标签",
+      "narration": "短视频信息太散？试试用字幕抓重点，让观众一眼看懂。",
+      "subtitle": "用字幕抓重点",
+      "claims": [],
+      "start_sec": 0.0,
+      "duration_sec": 5.6,
+      "source_ids": []
+    },
+    {
+      "id": "S2",
+      "claim_scope": "generic",
+      "visual": "口播画面，核心词以短句字幕同步出现",
+      "narration": "口播时，把核心词压成短句，屏幕同步出现，观众更容易跟上。",
+      "subtitle": "核心词压成短句",
+      "claims": [],
+      "start_sec": 5.6,
+      "duration_sec": 6.1,
+      "source_ids": []
+    },
+    {
+      "id": "S3",
+      "claim_scope": "generic",
+      "visual": "画面切换处叠加步骤或结论字幕",
+      "narration": "画面切换处，用字幕补上时间、步骤或结论，减少信息断点感。",
+      "subtitle": "切换处补步骤或结论",
+      "claims": [],
+      "start_sec": 11.7,
+      "duration_sec": 6.1,
+      "source_ids": []
+    },
+    {
+      "id": "S4",
+      "claim_scope": "product",
+      "visual": "画面展示小影品牌名与“字幕”字样",
+      "narration": "小影支持字幕，剪辑时用短句标出重点。",
+      "subtitle": "小影支持字幕",
+      "claims": [
+        {
+          "text": "小影支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "start_sec": 17.8,
+      "duration_sec": 4.2,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": "S5",
+      "claim_scope": "generic",
+      "visual": "创作者写下重点句并添加字幕条",
+      "narration": "先写一句重点，再加一条字幕，让表达更清楚，也方便观众记住。",
+      "subtitle": "一句重点加一条字幕",
+      "claims": [],
+      "start_sec": 22.0,
+      "duration_sec": 6.3,
+      "source_ids": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "P01",
+      "used_in": [
+        "S4"
+      ],
+      "text": "支持字幕"
+    }
+  ],
+  "checks": {
+    "duration": {
+      "version": "v1",
+      "cps": 4.2,
+      "subtitle_cps": 5.0,
+      "pause_per_shot": 0.3,
+      "target_sec": 30.0,
+      "min_sec": 28.0,
+      "max_sec": 30.0,
+      "total_sec": 28.3,
+      "delta_sec": -1.7,
+      "pass": true,
+      "shots": [
+        {
+          "id": "S1",
+          "start_sec": 0.0,
+          "duration_sec": 5.6,
+          "narration_chars": 22,
+          "subtitle_chars": 6
+        },
+        {
+          "id": "S2",
+          "start_sec": 5.6,
+          "duration_sec": 6.1,
+          "narration_chars": 24,
+          "subtitle_chars": 7
+        },
+        {
+          "id": "S3",
+          "start_sec": 11.7,
+          "duration_sec": 6.1,
+          "narration_chars": 24,
+          "subtitle_chars": 9
+        },
+        {
+          "id": "S4",
+          "start_sec": 17.8,
+          "duration_sec": 4.2,
+          "narration_chars": 16,
+          "subtitle_chars": 6
+        },
+        {
+          "id": "S5",
+          "start_sec": 22.0,
+          "duration_sec": 6.3,
+          "narration_chars": 25,
+          "subtitle_chars": 9
+        }
+      ],
+      "revision": 3,
+      "draft_hash": "sha256:556884b802e439a7d22e2a3f4b4ea47dc7f54f84b3c560675533fa01832332cf"
+    },
+    "rules": {
+      "ok": true,
+      "pass": true,
+      "rule_set": "demo_default",
+      "violations": [],
+      "needs_review": [],
+      "revision": 3,
+      "draft_hash": "sha256:556884b802e439a7d22e2a3f4b4ea47dc7f54f84b3c560675533fa01832332cf"
+    },
+    "citations": {
+      "ok": true,
+      "pass": true,
+      "unsupported_claims": [],
+      "needs_review": [],
+      "revision": 3,
+      "draft_hash": "sha256:556884b802e439a7d22e2a3f4b4ea47dc7f54f84b3c560675533fa01832332cf"
+    }
+  },
+  "risks": [
+    {
+      "code": "LIMITED_MATERIAL",
+      "severity": "warn",
+      "message": "可用产品素材很少，脚本以使用建议为主。"
+    },
+    {
+      "code": "NO_EFFECT_DATA",
+      "severity": "info",
+      "message": "未提供效果数据，脚本不包含效果提升结论。"
+    }
+  ],
+  "message": "5 个镜头、总时长 28.3 秒（目标 30 秒区间 28–30 秒内）的抖音简洁口播脚本已完成。前 3 镜与第 5 镜为通用字幕技巧（拆重点、口播短句同步、切换处补步骤/结论、一句重点加一条字幕），第 4 镜为唯一产品 claim“小影支持字幕”，原文引用 P01“支持字幕”，未扩写为自动生成字幕等未授权表述。时长、品牌规则、引用三项检查均通过。",
+  "question": null,
+  "missing_fields": [],
+  "blocking_reason": "",
+  "options": []
+}

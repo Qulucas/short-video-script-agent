@@ -1,0 +1,50 @@
+{
+  "run_id": "20261031T095541Z-693afc",
+  "provider": "live",
+  "model": "deepseek-reasoner",
+  "mode": "live",
+  "status": "needs_input",
+  "stop_reason": "检索为空且查询改写额度耗尽",
+  "exit_code": 2,
+  "title": "未生成标题",
+  "target_duration_sec": 30.0,
+  "estimated_total_sec": null,
+  "estimator": null,
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为空，按 material_query 检索"
+  ],
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 24
+  },
+  "draft_revision": 0,
+  "draft_hash": null,
+  "shots": [],
+  "sources": [],
+  "checks": {
+    "duration": null,
+    "rules": null,
+    "citations": null
+  },
+  "risks": [
+    {
+      "code": "NO_EFFECT_DATA",
+      "severity": "info",
+      "message": "未提供效果数据，脚本不包含效果提升结论。"
+    }
+  ],
+  "message": "检索返回 0 条素材，且没有剩余查询改写次数，无法获得任何可绑定 source_id 的火星相关事实，因此不能生成有事实依据的脚本。",
+  "question": "请补充：materials（火星相关知识/数据素材）、brief.product_name（若需产品口播）",
+  "missing_fields": [
+    "materials（火星相关知识/数据素材）",
+    "brief.product_name（若需产品口播）"
+  ],
+  "blocking_reason": "materials 为空数组，last_observation.empty=true 且 query_rewrites_left=0；在无素材情况下写出任何火星事实或数字都会违反“不得编造”的硬约束。",
+  "options": [
+    "补充火星主题素材（如行星基本参数、探测任务公开资料）后重试",
+    "若为品牌推广，请提供 product_name 与产品资料，以便绑定产品 claim",
+    "放宽为纯通用口播（不涉具体数字/事实）并确认可接受无引用脚本"
+  ]
+}

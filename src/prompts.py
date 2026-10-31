@@ -51,9 +51,9 @@ def build_user_prompt(state: Dict[str, Any]) -> str:
         "last_estimate": state.get("last_estimate"),
         "last_checks": state.get("last_checks"),
         "budget": {
-            "steps_left": 16 - int(state.get("step", 0)),
-            "tool_calls_left": 20 - int(state.get("tool_calls", 0)),
-            "draft_writes_left": 3 - int(state.get("draft_writes", 0)),
+            "steps_left": 20 - int(state.get("step", 0)),
+            "tool_calls_left": 24 - int(state.get("tool_calls", 0)),
+            "draft_writes_left": 4 - int(state.get("draft_writes", 0)),
             "query_rewrites_left": max(0, 2 - max(0, int(state.get("search_attempts", 0)) - 1)),
         },
         "last_observation": state.get("last_observation"),

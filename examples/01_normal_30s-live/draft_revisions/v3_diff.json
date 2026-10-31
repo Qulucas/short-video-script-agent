@@ -1,0 +1,13 @@
+{
+  "from": 2,
+  "to": 3,
+  "removed_shots": [],
+  "added_shots": [],
+  "changed_shots": [
+    {
+      "id": "S4",
+      "before": "剪辑时可以用小影，它支持字幕，重点内容更好找。",
+      "after": "小影支持字幕，剪辑时用短句标出重点。"
+    }
+  ]
+}

@@ -3,7 +3,11 @@
   "stop_reason": "missing_required_fields",
   "message": "请补充：target_duration_sec",
   "exit_code": 2,
-  "run_id": "preflight-c6b7cc",
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 24
+  },
+  "run_id": "preflight-ce9ee5",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",

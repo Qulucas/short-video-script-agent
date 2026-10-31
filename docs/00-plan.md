@@ -5,6 +5,8 @@
 > 文档定位：这是一份面向 3 小时校招考核的**实现方案**，不是运行结果。文中出现的 38 秒、28 秒是验收夹具的目标值；实际提交时，`examples/` 中必须放真实运行产生的输出和 Trace，不能把本文示例当作已完成的证据。
 >
 > v2 修订：针对审查意见，已把 live trace 提升为 P0；按估算器重算了示例分镜时长；把 `MAX_STEPS` 提升到 16；明确 `demo_default` 与 `strict_disclaimer` 两套规则；模型状态加入当前草稿，动作加入 `rationale`；补齐 5 种终态契约、退出码、revision/hash 绑定和伪代码分支；并补充非法动作、规则无法满足、预算回归等测试。
+>
+> 实现备注：live 已用 `deepseek-reasoner` 跑通 2 条；为容纳 live 的额外改稿尝试，代码预算为 `MAX_STEPS=20`、`MAX_TOOL_CALLS=24`、`MAX_DRAFT_WRITES=4`，详见 README 和 `docs/02-solution.md`。
 
 ## 1. 一页结论
 

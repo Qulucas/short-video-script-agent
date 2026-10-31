@@ -51,7 +51,7 @@ class OpenAICompatProvider(Provider):
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": build_user_prompt(state)},
             ],
-            "temperature": 0.2,
+            "temperature": 0.0,
             "response_format": {"type": "json_object"},
         }
         request = urllib.request.Request(

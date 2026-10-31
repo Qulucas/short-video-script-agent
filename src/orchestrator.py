@@ -17,15 +17,34 @@ from src.tools.materials import FaultInjector, MaterialsTool
 from src.tools.rules import check_rules
 from src.trace import TraceRecorder
 
-MAX_STEPS = 16
-MAX_TOOL_CALLS = 20
+MAX_STEPS = 20
+MAX_TOOL_CALLS = 24
 MAX_QUERY_REWRITES = 2
-MAX_DRAFT_WRITES = 3
+MAX_DRAFT_WRITES = 4
 MAX_ACTION_REPAIRS = 2
 
 
 class ModelError(Exception):
     pass
+
+
+_STOP_REASON_ALIASES = {
+    "no_materials_available": "insufficient_material",
+    "no_material": "insufficient_material",
+    "duration_below_min": "duration_cannot_meet",
+    "duration_below_min_and_no_draft_writes_left": "duration_cannot_meet",
+    "duration_over_max": "duration_cannot_meet",
+    "draft_writes_left=0 且时长检查未通过": "duration_cannot_meet",
+    "rules_failed": "rules_cannot_meet",
+}
+
+
+def _normalize_stop_reason(status: str, stop_reason: Optional[str]) -> Optional[str]:
+    if status == "completed":
+        return None
+    if not stop_reason:
+        return "insufficient_material" if status == "needs_input" else stop_reason
+    return _STOP_REASON_ALIASES.get(str(stop_reason), stop_reason)
 
 
 def _terminal(status: str, stop_reason: Optional[str], message: str = "", **extra: Any) -> Dict[str, Any]:
@@ -34,6 +53,7 @@ def _terminal(status: str, stop_reason: Optional[str], message: str = "", **extr
         "stop_reason": stop_reason,
         "message": message,
         "exit_code": exit_code_for(status),
+        "limits": {"max_steps": MAX_STEPS, "max_tool_calls": MAX_TOOL_CALLS},
     }
     data.update(extra)
     return data
@@ -306,6 +326,11 @@ class Orchestrator:
         args = action.get("args", {})
         draft = st["current_draft"] or {}
         est = st["last_estimate"] or {}
+        stop_reason = _normalize_stop_reason(status, stop_reason)
+        question = args.get("question")
+        if status == "needs_input" and not question:
+            missing = args.get("missing_fields") or []
+            question = "请补充：" + "、".join(str(x) for x in missing) if missing else "请补充必要信息后重试。"
         checks = {
             "duration": st["last_checks"].get("duration"),
             "rules": st["last_checks"].get("rules"),
@@ -337,7 +362,7 @@ class Orchestrator:
             "checks": checks,
             "risks": self._risks(),
             "message": args.get("summary") or "",
-            "question": args.get("question"),
+            "question": question,
             "missing_fields": args.get("missing_fields", []),
             "blocking_reason": args.get("blocking_reason"),
             "options": args.get("options", []),

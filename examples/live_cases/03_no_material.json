@@ -1,0 +1,10 @@
+{
+  "topic": "火星主题短视频",
+  "audience": "泛人群",
+  "platform": "douyin",
+  "target_duration_sec": 30,
+  "style": "简洁口播",
+  "material_query": "火星素材",
+  "material_ids": [],
+  "brand_rule_set": "demo_default"
+}

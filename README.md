@@ -41,9 +41,9 @@ pytest -q
 | 规则违规修正、60 秒动作对照、非法动作、检查哈希绑定 | 已完成 |
 | 10 个场景输入、result/trace/output/draft_revisions | 已完成 |
 | `pytest -q` | **42 passed, 1 deselected** |
-| **2 条 live trace** | **未完成：当前环境没有 `LLM_API_KEY`** |
+| **2 条 live trace** | **已完成：deepseek-reasoner，路径 A completed，路径 B needs_input** |
 
-**不要把这理解成 live 已通过。** `examples/01_normal_30s-live/` 和 `examples/03_no_material-live/` 只有阻塞说明，没有伪造的 trace。live 是方案中的 P0 证据；配置 key 后按 [examples/LIVE_BLOCKED.md](examples/LIVE_BLOCKED.md) 运行两条命令，替换这两个目录即可。
+live 证据在 [examples/01_normal_30s-live/](examples/01_normal_30s-live/) 和 [examples/03_no_material-live/](examples/03_no_material-live/)。路径 A 是 20.7s→29.2s→28.3s 的真实修正链；路径 B 是三次空检索后 `needs_input`。复现命令见 [examples/LIVE_RUNBOOK.md](examples/LIVE_RUNBOOK.md)。
 
 ## 功能模块
 
@@ -67,7 +67,7 @@ pytest -q
 
 - 动作：`search_materials` / `write_draft` / `estimate_duration` / `check_rules` / `check_citations` / `finish`
 - 每次动作必须带 `rationale`，Trace 原样记录；不记录模型内部思维链。
-- `MAX_STEPS=16`，`MAX_TOOL_CALLS=20`，`MAX_DRAFT_WRITES=3`；到顶返回 `incomplete`。
+- `MAX_STEPS=20`，`MAX_TOOL_CALLS=24`，`MAX_DRAFT_WRITES=4`；到顶返回 `incomplete`。
 - `finish(completed)` 必须满足：当前稿有绑定 `draft_hash` 的时长/规则/引用检查，时长和规则通过，事实可追溯。
 - `needs_input` / `unmet_constraints` / `incomplete` / `failed` 各有独立 `stop_reason` 和退出码。
 
@@ -98,8 +98,9 @@ pytest -q
 ## 与方案 v2 的实现偏差
 
 - 运行环境是 Python 3.9.6，因此用标准库 `dataclasses/json/urllib` 实现，**未引入 Pydantic/httpx**；schema 校验手写在 `src/schemas.py`。这降低了评审安装成本，代价是错误信息不如 Pydantic 丰富。
-- `fixture` 是确定性测试替身；它按 observation 分支，但仍不是 live 模型决策证据。
+- `fixture` 是可重复回归；live 已实际运行，但真实模型有不确定性。
 - `v3_32s` 实际为 32.2 秒；`unmet_9s` 实际为 9.4 秒；`v60_58s` 为 58.5 秒。测试断言使用实际值。
+- 为容纳 live 模型的额外改稿尝试，预算从方案里的 16/3 调整为 20/4；仍是有限预算。
 - 未实现 UI、部署、多 Agent、真实 TTS。
 
 ## 文档
@@ -112,7 +113,7 @@ pytest -q
 
 ## 已知限制
 
-1. **live 未完成**：没有 key；README 和 `docs/03-evaluation.md` 明确标注，不能把 fixture 当 live。
+1. **live 结果不稳定**：路径 A 是真实模型的一次成功运行，不保证每次 38→28；fixture 的 38→28 才是可重复证据。
 2. 时长是估算，不是 TTS 实测。
 3. claim 扫描是启发式，复杂语义改写仍需人工复核。
 4. `material_ids` 是白名单；正常案例使用 P01，避免 P04 污染。

@@ -1,0 +1,51 @@
+{
+  "title": "用字幕提升短视频信息密度",
+  "shots": [
+    {
+      "id": "S1",
+      "claim_scope": "generic",
+      "visual": "创作者面对手机镜头，画面出现零散文字标签",
+      "narration": "短视频信息太散？试试用字幕抓重点，让观众一眼看懂。",
+      "subtitle": "用字幕抓重点",
+      "claims": []
+    },
+    {
+      "id": "S2",
+      "claim_scope": "generic",
+      "visual": "口播画面，核心词以短句字幕同步出现",
+      "narration": "口播时，把核心词压成短句，屏幕同步出现，观众更容易跟上。",
+      "subtitle": "核心词压成短句",
+      "claims": []
+    },
+    {
+      "id": "S3",
+      "claim_scope": "generic",
+      "visual": "画面切换处叠加步骤或结论字幕",
+      "narration": "画面切换处，用字幕补上时间、步骤或结论，减少信息断点感。",
+      "subtitle": "切换处补步骤或结论",
+      "claims": []
+    },
+    {
+      "id": "S4",
+      "claim_scope": "product",
+      "visual": "画面展示小影品牌名与“字幕”字样",
+      "narration": "小影支持字幕，剪辑时用短句标出重点。",
+      "subtitle": "小影支持字幕",
+      "claims": [
+        {
+          "text": "小影支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ]
+    },
+    {
+      "id": "S5",
+      "claim_scope": "generic",
+      "visual": "创作者写下重点句并添加字幕条",
+      "narration": "先写一句重点，再加一条字幕，让表达更清楚，也方便观众记住。",
+      "subtitle": "一句重点加一条字幕",
+      "claims": []
+    }
+  ]
+}
