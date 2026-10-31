@@ -9,7 +9,7 @@ pytest -q
 实际输出见 [examples/test-report.txt](../examples/test-report.txt)：
 
 ```text
-42 passed, 1 deselected in 0.34s
+49 passed, 1 deselected in 0.50s
 ```
 
 `1 deselected` 是 live smoke 测试，默认不运行，避免无 key 环境误调用。
@@ -48,6 +48,9 @@ source P01 used_in S2, quote "支持字幕"
 - `tests/unit/test_citations.py`：正常引用、对抗夹带、未知来源、quote 不匹配；
 - `tests/unit/test_schemas.py`：缺字段、草稿 schema、非法动作、clarification 别名；
 - `tests/integration/test_orchestrator.py`：10 个场景、非法动作、未知来源、旧检查复用；
+- `tests/integration/test_security.py`：T09 注入指令无法绕过来源校验；
+- `tests/integration/test_three_draft.py`：T13 38→32.2→28 三稿完成；
+- `tests/unit/test_status_contract.py`：T18 五终态契约；
 - `tests/scenarios/test_examples.py`：全部 examples 状态、artifact 写出、退出码矩阵。
 
 ## live 证据状态：已完成 2 条
@@ -77,4 +80,4 @@ live 结果不稳定，不保证每次得到同一时长；README 已注明。
 3. **claim 扫描是启发式**：能抓“自动生成字幕”“80%”等明显夹带，复杂语义改写仍需人工复核。
 4. **规则通过 ≠ 法律合规**：只覆盖配置的 BR-01~05。
 5. **60 秒场景只验证动作对照**：不评价文案质量；素材只有 P01–P03。
-6. **测试数量**：42 个离线测试通过；live smoke 由手动命令运行，未纳入默认 pytest。
+6. **测试数量**：49 个离线测试通过；live smoke 由手动命令运行，未纳入默认 pytest。

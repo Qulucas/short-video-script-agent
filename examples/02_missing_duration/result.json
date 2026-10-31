@@ -7,7 +7,7 @@
     "max_steps": 20,
     "max_tool_calls": 24
   },
-  "run_id": "preflight-ce9ee5",
+  "run_id": "preflight-384b27",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",

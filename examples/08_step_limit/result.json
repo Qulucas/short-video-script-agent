@@ -7,11 +7,11 @@
     "max_steps": 20,
     "max_tool_calls": 24
   },
-  "run_id": "20261031T101610Z-b75465",
-  "provider": "fixture",
-  "model": "policy-fixture-v1",
-  "mode": "offline",
   "last_state": {
     "draft_revision": 0
-  }
+  },
+  "run_id": "20261031T113538Z-53b965",
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline"
 }

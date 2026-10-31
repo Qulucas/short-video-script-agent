@@ -11,7 +11,7 @@
 | 范围 | AI 参与 | 验证 |
 |---|---|---|
 | 方案 | 根据审查意见修订 `docs/00-plan.md` | 人工审查意见逐条对照 |
-| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 42 passed |
+| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 49 passed |
 | 测试 | 单元、集成、场景测试 | 实际运行 |
 | 示例 | 10 个 case 的 result/trace/output | 实际运行 fixture 生成 |
 | 文档 | README、docs/01–05 | 对照实际输出复核 |
@@ -30,14 +30,14 @@
 
 - live 路径 A：`deepseek-reasoner`，20.7s→29.2s→引用失败→28.3s，completed；
 - live 路径 B：三次空检索后 `needs_input`；
-- fixture 10 个场景、42 个离线测试通过。
+- fixture 10 个场景、49 个离线测试通过。
 
 ## 未验证/未完成
 
 - live 只跑了 2 条，不是稳定性评测；
 - 真实 TTS 时长：未接入；
 - 人工对 10 个场景文案的质量评审：未做；
-- GitHub 远端 URL、最终 commit SHA：待候选人提交时填写。
+- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.0` 为准。
 
 ## 防伪声明
 

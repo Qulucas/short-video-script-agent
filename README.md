@@ -1,6 +1,10 @@
 # 短视频脚本 Agent（校招考核提交）
 
-> 题号：短视频脚本 Agent（提交时填写官方题号）
+> 题号：短视频脚本 Agent
+>
+> GitHub：https://github.com/Qulucas/short-video-script-agent
+>
+> 提交版本：tag `v1.0`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
 >
 > 一句话：把“生成脚本”做成可审计的闭环——模型选动作，工具算时长、查规则、验引用，检查结果再驱动下一轮修改或明确失败。
 
@@ -40,7 +44,7 @@ pytest -q
 | 缺关键信息、无素材、工具失败、超时长不可满足 | 已完成 |
 | 规则违规修正、60 秒动作对照、非法动作、检查哈希绑定 | 已完成 |
 | 10 个场景输入、result/trace/output/draft_revisions | 已完成 |
-| `pytest -q` | **42 passed, 1 deselected** |
+| `pytest -q` | **49 passed, 1 deselected** |
 | **2 条 live trace** | **已完成：deepseek-reasoner，路径 A completed，路径 B needs_input** |
 
 live 证据在 [examples/01_normal_30s-live/](examples/01_normal_30s-live/) 和 [examples/03_no_material-live/](examples/03_no_material-live/)。路径 A 是 20.7s→29.2s→28.3s 的真实修正链；路径 B 是三次空检索后 `needs_input`。复现命令见 [examples/LIVE_RUNBOOK.md](examples/LIVE_RUNBOOK.md)。

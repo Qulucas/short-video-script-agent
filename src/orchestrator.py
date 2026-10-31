@@ -55,6 +55,8 @@ def _terminal(status: str, stop_reason: Optional[str], message: str = "", **extr
         "exit_code": exit_code_for(status),
         "limits": {"max_steps": MAX_STEPS, "max_tool_calls": MAX_TOOL_CALLS},
     }
+    if status == "incomplete":
+        data.setdefault("last_state", {"draft_revision": None, "checks": None})
     data.update(extra)
     return data
 
@@ -367,6 +369,17 @@ class Orchestrator:
             "blocking_reason": args.get("blocking_reason"),
             "options": args.get("options", []),
         }
+        if status == "incomplete":
+            result["last_state"] = {
+                "draft_revision": st["draft_revision"],
+                "checks": {
+                    "duration": bool(st["last_checks"].get("duration")),
+                    "rules": bool(st["last_checks"].get("rules")),
+                    "citations": bool(st["last_checks"].get("citations")),
+                },
+            }
+        if status == "failed":
+            result["error_code"] = args.get("error_code") or "failure"
         return result
 
     def run(self) -> Tuple[Dict[str, Any], Dict[str, Any], List[Dict[str, Any]]]:

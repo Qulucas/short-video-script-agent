@@ -150,3 +150,49 @@ def parse_action(raw: Any) -> Tuple[Dict[str, Any], List[str]]:
 
 def canonical_json(data: Any) -> str:
     return json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def validate_terminal_result(result: Dict[str, Any]) -> List[str]:
+    """Validate the externally visible terminal result contract."""
+    errors: List[str] = []
+    status = result.get("status")
+    if status not in ("completed", "needs_input", "unmet_constraints", "incomplete", "failed"):
+        return ["unknown status"]
+    for key in ("run_id", "provider", "model", "mode", "exit_code"):
+        if result.get(key) in (None, ""):
+            errors.append("missing " + key)
+    if status == "completed":
+        for key in ("title", "target_duration_sec", "estimated_total_sec", "draft_hash"):
+            if result.get(key) in (None, ""):
+                errors.append("completed missing " + key)
+        if not result.get("shots"):
+            errors.append("completed missing shots")
+        for key in ("duration", "rules", "citations"):
+            check = (result.get("checks") or {}).get(key)
+            if not check:
+                errors.append("completed missing check " + key)
+            elif not check.get("pass"):
+                errors.append("completed check not pass: " + key)
+        if not result.get("sources"):
+            errors.append("completed missing sources")
+    elif status == "needs_input":
+        if not result.get("missing_fields"):
+            errors.append("needs_input missing missing_fields")
+        if not result.get("question"):
+            errors.append("needs_input missing question")
+    elif status == "unmet_constraints":
+        if not result.get("blocking_reason"):
+            errors.append("unmet missing blocking_reason")
+        if not result.get("shots"):
+            errors.append("unmet missing best-effort shots")
+    elif status == "incomplete":
+        if not result.get("stop_reason"):
+            errors.append("incomplete missing stop_reason")
+        if not result.get("last_state"):
+            errors.append("incomplete missing last_state")
+    elif status == "failed":
+        if not result.get("error_code"):
+            errors.append("failed missing error_code")
+        if not result.get("message"):
+            errors.append("failed missing message")
+    return errors

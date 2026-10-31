@@ -1,5 +1,5 @@
 {
-  "run_id": "20261031T101609Z-087ed2",
+  "run_id": "20261031T113536Z-720b72",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -54,5 +54,13 @@
   "question": null,
   "missing_fields": [],
   "blocking_reason": null,
-  "options": []
+  "options": [],
+  "last_state": {
+    "draft_revision": 0,
+    "checks": {
+      "duration": false,
+      "rules": false,
+      "citations": false
+    }
+  }
 }
