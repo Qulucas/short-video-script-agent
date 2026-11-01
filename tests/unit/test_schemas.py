@@ -37,3 +37,27 @@ def test_request_clarification_alias_becomes_finish():
     })
     assert errors == []
     assert action["name"] == "finish"
+
+
+def test_creative_brief_is_kept_in_beat_order():
+    from src.schemas import normalize_brief
+    raw = json.loads((ROOT / "examples" / "cases" / "13_creative_brief.json").read_text(encoding="utf-8"))
+    brief, errors = normalize_brief(raw)
+    assert errors == []
+    creative = brief["creative_brief"]
+    assert [b["beat"] for b in creative["script_structure"]] == ["hook", "problem", "solution", "demo", "cta"]
+    assert creative["character_setting"]["catchphrase"] == "潜入信息深海，捞取创作干货~"
+    assert len(creative["visual_notes"]) == 4 and len(creative["text_overlay_hints"]) == 3
+    assert any("creative_brief" in a for a in brief["assumptions"])
+
+
+def test_plain_brief_has_no_creative_block():
+    from src.schemas import normalize_brief
+    brief, _ = normalize_brief({"topic": "x", "platform": "douyin", "target_duration_sec": 30})
+    assert brief["creative_brief"] is None
+
+
+def test_production_fields_must_be_strings():
+    draft = json.loads((ROOT / "fixtures" / "drafts" / "v2_28s.json").read_text(encoding="utf-8"))
+    draft["shots"][0]["camera"] = ["推近"]
+    assert any("camera" in e for e in validate_draft(draft))

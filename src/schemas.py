@@ -11,7 +11,52 @@ ACTION_NAMES = {
     "check_rules",
     "check_citations",
     "finish",
+    "load_skill",
+    "check_production",
 }
+
+# Optional per-shot fields for the video-production handoff. They do not affect duration;
+# check_production decides which ones are required for a given creative brief.
+PRODUCTION_FIELDS = (
+    "beat", "shot_size", "camera", "character_action", "expression",
+    "on_screen_text", "sfx", "bgm", "transition",
+)
+
+
+def _str_list(value: Any) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(x).strip() for x in value if str(x).strip()]
+
+
+def normalize_creative_brief(raw: Dict[str, Any]) -> Dict[str, Any]:
+    """Collect the user's creative direction (character, beats, visual notes) into one block.
+
+    It is direction for the writer, not a fact source: product claims inside it still need
+    materials. ``script_structure`` may be an object keyed by beat name or a list of beats;
+    it is normalized to an ordered list of ``{"beat", "time_range", "visual", "audio"}``.
+    """
+    creative: Dict[str, Any] = {}
+    character = raw.get("character_setting")
+    if isinstance(character, dict) and character:
+        creative["character_setting"] = {str(k): str(v) for k, v in character.items() if str(v).strip()}
+    structure = raw.get("script_structure")
+    beats: List[Dict[str, str]] = []
+    if isinstance(structure, dict):
+        items = [dict(v, beat=k) for k, v in structure.items() if isinstance(v, dict)]
+    elif isinstance(structure, list):
+        items = [v for v in structure if isinstance(v, dict) and v.get("beat")]
+    else:
+        items = []
+    for item in items:
+        beats.append({key: str(item.get(key) or "") for key in ("beat", "time_range", "visual", "audio")})
+    if beats:
+        creative["script_structure"] = beats
+    for key in ("visual_notes", "text_overlay_hints"):
+        values = _str_list(raw.get(key))
+        if values:
+            creative[key] = values
+    return creative
 
 
 def normalize_brief(raw: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str, str]]]:
@@ -37,6 +82,7 @@ def normalize_brief(raw: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str,
     if not isinstance(material_ids, list):
         material_ids = []
     material_ids = [str(x).strip() for x in material_ids if str(x).strip()]
+    creative = normalize_creative_brief(raw)
 
     brief = {
         "topic": topic,
@@ -51,11 +97,14 @@ def normalize_brief(raw: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str,
         "scenario": str(raw.get("scenario") or "normal").strip(),
         "faults": raw.get("faults") or {},
         "initial_draft": raw.get("initial_draft") if isinstance(raw.get("initial_draft"), dict) else None,
+        "creative_brief": creative or None,
         "assumptions": [
             "audience 使用输入值" if raw.get("audience") else "audience 未提供，使用默认泛人群",
             "style 使用输入值" if raw.get("style") else "style 未提供，使用默认简洁口播",
             "material_ids 为空，按 material_query 检索" if not material_ids else "material_ids 为素材白名单",
-        ] + (["initial_draft 由用户提供，作为 revision 1 待检查和修改"] if isinstance(raw.get("initial_draft"), dict) else []),
+        ] + (["initial_draft 由用户提供，作为 revision 1 待检查和修改"] if isinstance(raw.get("initial_draft"), dict) else [])
+          + (["creative_brief 包含 %s，按制作模式输出并要求 check_production" % "/".join(sorted(creative))]
+             if creative else []),
     }
     return brief, errors
 
@@ -93,6 +142,9 @@ def validate_draft(draft: Any) -> List[str]:
                 errors.append(label + "." + field + " 必须是字符串")
         if not (shot.get("narration") or shot.get("subtitle")):
             errors.append(label + " 至少需要旁白或字幕")
+        for field in PRODUCTION_FIELDS:
+            if field in shot and not isinstance(shot.get(field), str):
+                errors.append(label + "." + field + " 必须是字符串")
         claims = shot.get("claims", [])
         if not isinstance(claims, list):
             errors.append(label + ".claims 必须是数组")
@@ -146,6 +198,9 @@ def parse_action(raw: Any) -> Tuple[Dict[str, Any], List[str]]:
     if name == "write_draft":
         if not isinstance(args.get("title"), str) or not isinstance(args.get("shots"), list):
             errors.append("write_draft 需要 title/shots")
+    if name == "load_skill":
+        if not isinstance(args.get("name"), str) or not args.get("name", "").strip():
+            errors.append("load_skill.name 不能为空")
     return {"name": name, "args": args, "rationale": rationale or ""}, errors
 
 

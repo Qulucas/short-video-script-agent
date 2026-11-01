@@ -1,0 +1,297 @@
+{
+  "run_id": "20261101T040033Z-83a510",
+  "provider": "fixture",
+  "model": "policy-fixture-v1",
+  "mode": "offline",
+  "status": "completed",
+  "stop_reason": null,
+  "exit_code": 0,
+  "title": "鲸鱼娘教你用字幕留住观众",
+  "target_duration_sec": 30.0,
+  "estimated_total_sec": 29.1,
+  "estimator": {
+    "version": "v1",
+    "cps": 4.2,
+    "subtitle_cps": 5.0,
+    "pause_per_shot": 0.3
+  },
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为素材白名单",
+    "creative_brief 包含 character_setting/script_structure/text_overlay_hints/visual_notes，按制作模式输出并要求 check_production"
+  ],
+  "limits": {
+    "max_steps": 20,
+    "max_tool_calls": 16
+  },
+  "draft_revision": 2,
+  "draft_hash": "sha256:77ef1d29875c2af0f305c946e8538b0f4802d9c02b84a4498a4a5482396ab6d5",
+  "shots": [
+    {
+      "id": "S1",
+      "beat": "hook",
+      "claim_scope": "generic",
+      "visual": "蓝白配色的鲸鱼娘从画面左侧游入，头顶小鲸鱼鳍发饰发光，身后拖出一行模糊的字幕残影，深蓝色数据流粒子背景",
+      "shot_size": "中景",
+      "camera": "横移跟随角色入场",
+      "character_action": "从左侧游入后停在画面中央，尾巴一甩把字幕残影甩散",
+      "expression": "挑眉、略带嫌弃地看向镜头",
+      "narration": "视频没人看完？可能是你的信息密度不够！",
+      "subtitle": "视频没人看完？",
+      "on_screen_text": "信息密度不足？",
+      "sfx": "残影甩散时一声轻微的“嗖”",
+      "bgm": "轻快电子风，120BPM，无歌词，从第一镜开始",
+      "transition": "鲸鱼娘游动轨迹作为遮罩，从左向右擦除转场",
+      "claims": [],
+      "start_sec": 0.0,
+      "duration_sec": 4.4,
+      "source_ids": []
+    },
+    {
+      "id": "S2",
+      "beat": "problem",
+      "claim_scope": "generic",
+      "visual": "鲸鱼娘站在画面左侧，右侧弹出两部手机对比：左边无字幕的视频被手指快速划走，右边有字幕的视频停留播放",
+      "shot_size": "全景",
+      "camera": "固定机位，对比图弹出时轻微推近",
+      "character_action": "右手指向对比图，尾巴轻轻摆动强调右侧手机",
+      "expression": "托腮，一副“这都不知道？”的傲娇表情",
+      "narration": "刷视频谁会一直开着声音？没有字幕，观众很快就会划走。",
+      "subtitle": "没有字幕，观众很快划走",
+      "on_screen_text": "静音刷视频",
+      "sfx": "手指划走时“唰”一声",
+      "transition": "硬切",
+      "claims": [],
+      "start_sec": 4.4,
+      "duration_sec": 5.8,
+      "source_ids": []
+    },
+    {
+      "id": "S3",
+      "beat": "solution",
+      "claim_scope": "product",
+      "visual": "鲸鱼娘手中浮现小影剪辑界面，时间线下方出现字幕轨道，字幕逐条出现在视频画面底部，关键词亮蓝色放大",
+      "shot_size": "近景",
+      "camera": "缓慢推近到剪辑界面",
+      "character_action": "双手托起剪辑界面，说到“重点”时发饰闪一下光",
+      "expression": "认真、略带得意的微笑",
+      "narration": "小影支持字幕，把每句的重点直接放到画面上，关键词用亮色标出来。",
+      "subtitle": "小影支持字幕，重点直接上画面",
+      "on_screen_text": "小影支持字幕",
+      "sfx": "每条字幕出现时“叮”一声",
+      "transition": "叠化",
+      "claims": [
+        {
+          "text": "小影支持字幕",
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "start_sec": 10.2,
+      "duration_sec": 7.0,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": "S4",
+      "beat": "demo",
+      "claim_scope": "generic",
+      "visual": "上下分屏：上半是没有字幕的原始素材，下半是同一段素材加上字幕，字幕随语音逐字弹出，关键词亮蓝色描边",
+      "shot_size": "分屏",
+      "camera": "固定机位",
+      "character_action": "鲸鱼娘缩小出现在右下角，用尾巴指向下半屏",
+      "expression": "眨眼示意",
+      "narration": "你看，同一段素材，加上字幕以后，静音刷到也能一眼看懂重点。",
+      "subtitle": "加上字幕，静音也能看懂",
+      "on_screen_text": "同一段素材",
+      "sfx": "字幕逐字弹出时连续轻“叮”",
+      "transition": "鲸鱼娘游动轨迹遮罩转场",
+      "claims": [],
+      "start_sec": 17.2,
+      "duration_sec": 6.3,
+      "source_ids": []
+    },
+    {
+      "id": "S5",
+      "beat": "cta",
+      "claim_scope": "generic",
+      "visual": "蓝白配色的鲸鱼娘游向镜头，双手向前一推，身后浮起“信息密度↑”的弹幕特效和数据流粒子",
+      "shot_size": "近景",
+      "camera": "角色游向镜头时缓慢推近，最后定格",
+      "character_action": "游向镜头，双手前推，最后比出小鲸鱼手势",
+      "expression": "自信的笑，最后俏皮眨眼",
+      "narration": "潜入信息深海，捞取创作干货~我是鲸鱼娘，我们下次见！",
+      "subtitle": "潜入信息深海，捞取创作干货",
+      "on_screen_text": "关注鲸鱼娘 · 下期见",
+      "sfx": "定格时一声清脆的“叮”",
+      "transition": "",
+      "claims": [],
+      "start_sec": 23.5,
+      "duration_sec": 5.6,
+      "source_ids": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "P01",
+      "used_in": [
+        "S3"
+      ],
+      "text": "支持字幕"
+    }
+  ],
+  "checks": {
+    "duration": {
+      "version": "v1",
+      "cps": 4.2,
+      "subtitle_cps": 5.0,
+      "pause_per_shot": 0.3,
+      "target_sec": 30.0,
+      "min_sec": 28.0,
+      "max_sec": 30.0,
+      "total_sec": 29.1,
+      "delta_sec": -0.9,
+      "pass": true,
+      "shots": [
+        {
+          "id": "S1",
+          "start_sec": 0.0,
+          "duration_sec": 4.4,
+          "narration_chars": 17,
+          "subtitle_chars": 6
+        },
+        {
+          "id": "S2",
+          "start_sec": 4.4,
+          "duration_sec": 5.8,
+          "narration_chars": 23,
+          "subtitle_chars": 10
+        },
+        {
+          "id": "S3",
+          "start_sec": 10.2,
+          "duration_sec": 7.0,
+          "narration_chars": 28,
+          "subtitle_chars": 13
+        },
+        {
+          "id": "S4",
+          "start_sec": 17.2,
+          "duration_sec": 6.3,
+          "narration_chars": 25,
+          "subtitle_chars": 10
+        },
+        {
+          "id": "S5",
+          "start_sec": 23.5,
+          "duration_sec": 5.6,
+          "narration_chars": 22,
+          "subtitle_chars": 12
+        }
+      ],
+      "revision": 2,
+      "draft_hash": "sha256:77ef1d29875c2af0f305c946e8538b0f4802d9c02b84a4498a4a5482396ab6d5"
+    },
+    "rules": {
+      "ok": true,
+      "pass": true,
+      "rule_set": "demo_default",
+      "violations": [],
+      "needs_review": [],
+      "revision": 2,
+      "draft_hash": "sha256:77ef1d29875c2af0f305c946e8538b0f4802d9c02b84a4498a4a5482396ab6d5"
+    },
+    "citations": {
+      "ok": true,
+      "pass": true,
+      "unsupported_claims": [],
+      "needs_review": [],
+      "revision": 2,
+      "draft_hash": "sha256:77ef1d29875c2af0f305c946e8538b0f4802d9c02b84a4498a4a5482396ab6d5"
+    },
+    "production": {
+      "ok": true,
+      "pass": true,
+      "required_fields": [
+        "beat",
+        "shot_size",
+        "camera",
+        "transition",
+        "character_action",
+        "expression"
+      ],
+      "issues": [],
+      "revision": 2,
+      "draft_hash": "sha256:77ef1d29875c2af0f305c946e8538b0f4802d9c02b84a4498a4a5482396ab6d5"
+    }
+  },
+  "risks": [
+    {
+      "code": "NO_EFFECT_DATA",
+      "severity": "info",
+      "message": "未提供效果数据，脚本不包含效果提升结论。"
+    }
+  ],
+  "message": "制作模式脚本已完成：5 个段落、角色动作和制作字段齐全。",
+  "question": null,
+  "missing_fields": [],
+  "blocking_reason": null,
+  "options": [],
+  "creative_brief": {
+    "character_setting": {
+      "name": "DeepSeek鲸鱼娘",
+      "appearance": "蓝白配色的鲸鱼系少女形象，头顶有小鲸鱼鳍发饰，穿着科技感短裙，身后有浮动的数据流粒子特效",
+      "personality": "聪明、耐心、带点傲娇的AI助手，说话时会用尾巴/发饰轻轻摆动强调重点",
+      "catchphrase": "潜入信息深海，捞取创作干货~"
+    },
+    "script_structure": [
+      {
+        "beat": "hook",
+        "time_range": "0-3s",
+        "visual": "鲸鱼娘从屏幕左侧游入，身后拖出一行模糊的字幕残影",
+        "audio": "视频没人看？可能不是内容不好，是你的信息密度不够！"
+      },
+      {
+        "beat": "problem",
+        "time_range": "3-8s",
+        "visual": "鲸鱼娘指向屏幕右侧弹出的对比图：左图无字幕（观众划走），右图有字幕（观众停留）",
+        "audio": "刷视频谁会一直开声音？没有字幕，观众3秒就划走。加上字幕，信息密度直接拉满。"
+      },
+      {
+        "beat": "solution",
+        "time_range": "8-18s",
+        "visual": "鲸鱼娘手中浮现小影App界面，演示「AI字幕」功能：一键识别语音→自动生成字幕→选择花字样式",
+        "audio": "用「小影」的AI字幕，一键识别语音，自动生成字幕条。还能选花字、加关键词高亮，重点自己蹦出来。"
+      },
+      {
+        "beat": "demo",
+        "time_range": "18-25s",
+        "visual": "分屏展示：上半段原始素材（无字幕），下半段加完字幕后的成品，字幕随语音逐字弹出",
+        "audio": "你看，同一段素材，加了动态字幕之后，完播率完全不一样。"
+      },
+      {
+        "beat": "cta",
+        "time_range": "25-30s",
+        "visual": "鲸鱼娘游向镜头，双手推出小影App图标，身后出现「信息密度↑」的弹幕特效",
+        "audio": "潜入信息深海，捞取创作干货~我是鲸鱼娘，用小影做字幕，下次见！"
+      }
+    ],
+    "visual_notes": [
+      "字幕样式：关键词用亮蓝色高亮+放大动效，普通字幕用白色描边",
+      "转场：鲸鱼娘游动轨迹作为转场遮罩，从左侧滑入滑出",
+      "BGM：轻快电子风，120BPM，无歌词",
+      "音效：字幕弹出时加「叮」的清脆提示音"
+    ],
+    "text_overlay_hints": [
+      "0-3s: 屏幕顶部闪现「信息密度不足？」",
+      "8-18s: 画面角落固定显示「小影AI字幕」标签",
+      "25-30s: 底部常驻「小影App · AI字幕一键生成」"
+    ]
+  },
+  "skills_loaded": [
+    "short_video_structure",
+    "virtual_character_direction"
+  ]
+}

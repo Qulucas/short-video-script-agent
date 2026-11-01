@@ -9,17 +9,20 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from src.config import DATA_DIR, load_json
 from src.limits import (MAX_ACTION_REPAIRS, MAX_DRAFT_WRITES, MAX_QUERY_REWRITES,
-                        MAX_STEPS, MAX_TOOL_CALLS)
+                        MAX_SKILL_LOADS, MAX_STEPS, MAX_TOOL_CALLS)
 from src.render import exit_code_for
 from src.schemas import draft_hash, normalize_brief, parse_action, validate_draft
+from src.skills import list_skills, load_skill
 from src.tools.citations import check_citations
 from src.tools.duration import estimate_draft
 from src.tools.errors import ToolError
 from src.tools.materials import FaultInjector, MaterialsTool
+from src.tools.production import check_production
 from src.tools.rules import check_rules
 from src.trace import TraceRecorder
 
 HISTORY_WINDOW = 8
+EMPTY_CHECKS = {"duration": None, "rules": None, "citations": None, "production": None}
 
 
 class ModelError(Exception):
@@ -94,7 +97,7 @@ class Orchestrator:
             "draft_revision": 0,
             "draft_hash": None,
             "last_estimate": None,
-            "last_checks": {"duration": None, "rules": None, "citations": None},
+            "last_checks": dict(EMPTY_CHECKS),
             "last_observation": {"ok": True, "error_code": None},
             "search_attempts": 0,
             "tool_calls": 0,
@@ -105,6 +108,9 @@ class Orchestrator:
             "trace_errors": [],
             "history": [],
             "rule_set": self._rule_set_view(brief.get("brand_rule_set", "")),
+            "skills_available": list_skills(),
+            "loaded_skills": {},
+            "skill_loads": 0,
         }
         self.trace = TraceRecorder(
             provider=provider.name,
@@ -127,6 +133,26 @@ class Orchestrator:
             "required_segments": rule_set.get("required_segments", []),
         }
 
+    @property
+    def production_mode(self) -> bool:
+        """A creative brief means the script goes to a video model, so check_production gates completion."""
+        return bool(self.brief.get("creative_brief"))
+
+    def _load_skill(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        name = str(args.get("name") or "").strip()
+        if name in self.state["loaded_skills"]:
+            return {"ok": True, "skill": name, "already_loaded": True}
+        if self.state["skill_loads"] >= MAX_SKILL_LOADS:
+            return {"ok": False, "error_code": "SKILL_LOAD_LIMIT",
+                    "message": "最多读取 %d 个技能" % MAX_SKILL_LOADS, "retryable": False}
+        skill = load_skill(name)
+        if skill is None:
+            return {"ok": False, "error_code": "SKILL_NOT_FOUND", "retryable": True,
+                    "available": [s["id"] for s in self.state["skills_available"]]}
+        self.state["skill_loads"] += 1
+        self.state["loaded_skills"][name] = skill["body"]
+        return {"ok": True, "skill": name, "title": skill.get("title", ""), "chars": len(skill["body"])}
+
     def _record_error(self, code: str, message: str) -> None:
         self.state["trace_errors"].append({"code": code, "message": message})
 
@@ -139,6 +165,8 @@ class Orchestrator:
             item["query"] = args.get("query")
         if name == "finish":
             item["status"] = args.get("status")
+        if name == "load_skill":
+            item["skill"] = args.get("name")
         for key in ("error_code", "revision", "total_sec", "pass", "total", "missing"):
             if observation.get(key) is not None:
                 item[key] = observation[key]
@@ -146,6 +174,8 @@ class Orchestrator:
             item["violations"] = [v.get("rule_id") for v in observation["violations"]]
         if observation.get("unsupported_claims"):
             item["unsupported"] = [u.get("code") for u in observation["unsupported_claims"]]
+        if observation.get("issues"):
+            item["issues"] = sorted({i.get("code") for i in observation["issues"]})
         self.state["history"] = (self.state["history"] + [item])[-HISTORY_WINDOW:]
 
     def _seed_draft(self) -> None:
@@ -225,7 +255,7 @@ class Orchestrator:
             self.state["draft_revision"] = rev
             self.state["draft_hash"] = h
             self.state["last_estimate"] = None
-            self.state["last_checks"] = {"duration": None, "rules": None, "citations": None}
+            self.state["last_checks"] = dict(EMPTY_CHECKS)
             self.state["draft_writes"] += 1
             self.state["revisions"].append({"revision": rev, "draft": copy.deepcopy(draft), "diff": diff})
             return {"ok": True, "revision": rev, "draft_hash": h, "diff": diff}
@@ -272,6 +302,16 @@ class Orchestrator:
             self.state["last_checks"]["citations"] = result
             return {"ok": True, **result}
 
+        if name == "check_production":
+            draft = self.state["current_draft"]
+            if not draft:
+                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
+            result = check_production(draft, self.brief.get("creative_brief") or {})
+            result["revision"] = self.state["draft_revision"]
+            result["draft_hash"] = self.state["draft_hash"]
+            self.state["last_checks"]["production"] = result
+            return {"ok": True, **result}
+
         return {"ok": False, "error_code": "UNKNOWN_ACTION", "message": "未知动作", "retryable": False}
 
     def _required_missing(self) -> List[str]:
@@ -287,6 +327,10 @@ class Orchestrator:
         citations = st["last_checks"].get("citations")
         if not citations or citations.get("draft_hash") != st["draft_hash"]:
             missing.append("citations")
+        if self.production_mode:
+            production = st["last_checks"].get("production")
+            if not production or production.get("draft_hash") != st["draft_hash"]:
+                missing.append("production")
         return missing
 
     def _validate_finish(self, action: Dict[str, Any]) -> Tuple[bool, List[str]]:
@@ -309,6 +353,8 @@ class Orchestrator:
             citations = st["last_checks"]["citations"]
             if not citations.get("pass"):
                 missing.append("citations_not_pass")
+            if self.production_mode and not st["last_checks"]["production"].get("pass"):
+                missing.append("production_not_pass")
             if self.brief.get("product_name") or self.brief.get("material_ids"):
                 has_claim = any(
                     shot.get("claims")
@@ -397,6 +443,8 @@ class Orchestrator:
             "rules": st["last_checks"].get("rules"),
             "citations": st["last_checks"].get("citations"),
         }
+        if self.production_mode:
+            checks["production"] = st["last_checks"].get("production")
         result = {
             "run_id": self.run_id,
             "provider": self.provider.name,
@@ -428,6 +476,9 @@ class Orchestrator:
             "blocking_reason": args.get("blocking_reason"),
             "options": args.get("options", []),
         }
+        if self.production_mode:
+            result["creative_brief"] = self.brief["creative_brief"]
+            result["skills_loaded"] = sorted(st["loaded_skills"])
         if status == "incomplete":
             result["last_state"] = {
                 "draft_revision": st["draft_revision"],
@@ -499,6 +550,15 @@ class Orchestrator:
                 self.trace.finalize(status, stop_reason, self.state["tool_calls"])
                 result = self._finalize(action, status, stop_reason)
                 return result, self.trace.to_dict(), self.state["revisions"]
+
+            if action["name"] == "load_skill":
+                obs = self._load_skill(action.get("args", {}))
+                self.state["last_observation"] = obs
+                idx = self.trace.add(step, action.get("rationale", ""), action, obs,
+                                     self.state["draft_revision"], self.state["draft_hash"])
+                prev_trace_index = idx
+                self._remember(step, action, obs)
+                continue
 
             if self.state["tool_calls"] >= MAX_TOOL_CALLS:
                 self.trace.add(step, action.get("rationale", ""), action,

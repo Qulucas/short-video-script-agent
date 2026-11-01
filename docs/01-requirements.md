@@ -18,7 +18,14 @@
 - `product_name`；
 - `material_query`、`material_ids`（素材白名单）；
 - `brand_rule_set`（`demo_default` / `strict_disclaimer`）；
-- `initial_draft`：用户已有的脚本（`{title, shots}`），作为 revision 1 交给 Agent 检查和修改。
+- `initial_draft`：用户已有的脚本（`{title, shots}`），作为 revision 1 交给 Agent 检查和修改；
+- 创作方向（任一出现即进入“制作模式”，脚本要能直接交给视频生成模型）：
+  - `character_setting`：角色名、外观、性格、口头禅（`catchphrase`）；
+  - `script_structure`：按段落（如 hook/problem/solution/demo/cta）给出计划的时间段、画面和台词；
+  - `visual_notes`：全片规范（字幕样式、转场、BGM、音效）；
+  - `text_overlay_hints`：按时间段的屏幕文字。
+
+  这些是方向，不是事实来源：其中的产品功能、效果说法仍要有素材依据。
 
 ## 输出
 
@@ -32,11 +39,17 @@
 - `risks`；
 - `status`、`stop_reason`、`exit_code`。
 
+制作模式下另外输出：
+
+- 每个分镜的 `beat`、`shot_size`、`camera`、`character_action`、`expression`、`on_screen_text`、`sfx`、`bgm`、`transition`；
+- `checks.production`、`creative_brief`、`skills_loaded`；
+- `storyboard.md`：逐镜制作单，每镜附一段可直接交给视频模型的提示词（重复角色设定，避免各镜角色走样）。
+
 ## 范围
 
 3 小时校招考核版本，优先核心链路：
 
-- 做：CLI、受限 ReAct、五个工具、12 个 fixture 场景 + live 场景、测试、Trace；
+- 做：CLI、受限 ReAct、六个工具 + 写作技能、13 个 fixture 场景 + live 场景、测试、Trace；
 - 不做：UI、线上部署、多 Agent、生产级 Runtime、真实 TTS。
 
 ## 成功标准
@@ -62,3 +75,4 @@
 | 动作随时长变化 | `examples/07_target_60s/` |
 | 步数/工具调用上限 | `examples/08_step_limit/`、`examples/11_tool_call_limit/` |
 | 对抗性事实夹带 | `examples/10_adversarial_claim/` |
+| 创作方向落地（制作模式） | fixture：`examples/13_creative_brief/`；live：`examples/13_creative_brief-live/` |

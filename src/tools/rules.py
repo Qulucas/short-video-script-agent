@@ -48,8 +48,9 @@ def check_rules(
 
     all_fields = [("title", None, draft.get("title", ""))]
     for shot in draft.get("shots", []):
-        for field in ("narration", "subtitle"):
-            all_fields.append((field, shot.get("id"), shot.get(field, "")))
+        # on_screen_text is shown to viewers too, so it is held to the same rules.
+        for field in ("narration", "subtitle", "on_screen_text"):
+            all_fields.append((field, shot.get("id"), shot.get(field, "") or ""))
 
     # BR-01 absolute language.
     if "BR-01" in active:

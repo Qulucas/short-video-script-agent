@@ -6,6 +6,9 @@ from typing import Any, Dict, List, Optional
 PRODUCT_PREDICATE_RE = re.compile(r"这款|产品|它|支持|还能|拥有|自带|让你")
 FEATURE_RE = re.compile(r"字幕|画中画|竖屏|导出|识别|翻译|剪辑")
 EFFECT_RE = re.compile(r"(\d+\s*[%％]|提升|提高|增长|节省|降低|八成)")
+# A bare effect verb ("提升信息密度") is advice, not a number; only quantified effects need data.
+EFFECT_NUMBER_RE = re.compile(
+    r"\d+\s*[%％倍]|八成|(提升|提高|增长|节省|降低).{0,6}(\d+|[一二三四五六七八九十]+)\s*(?:%|％|成|倍)")
 SENTENCE_SPLIT_RE = re.compile(r"[。！？!?；;\n]+")
 
 
@@ -45,7 +48,7 @@ def check_citations(
     for shot in draft.get("shots", []):
         shot_id = shot.get("id")
         scope = shot.get("claim_scope")
-        shot_text = (shot.get("narration", "") or "") + "。" + (shot.get("subtitle", "") or "")
+        shot_text = "。".join(str(shot.get(k) or "") for k in ("narration", "subtitle", "on_screen_text"))
         claims = shot.get("claims", []) or []
         supported_claims = []
         for claim in claims:
@@ -93,7 +96,7 @@ def check_citations(
                     })
 
         # Effect numbers must have a data-backed claim, even if no product predicate is present.
-        if EFFECT_RE.search(shot_text):
+        if EFFECT_NUMBER_RE.search(shot_text):
             has_data = False
             for claim in supported_claims:
                 src = source_map.get(claim.get("source_id"), {})

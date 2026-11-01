@@ -241,3 +241,92 @@ def test_stale_checks_cannot_be_reused():
     result, trace, revisions = run_case(raw, StaleCheckProvider())
     assert result["status"] != "completed"
     assert any((s["observation"].get("missing") or []) for s in trace["steps"] if s["action"] == "finish")
+
+
+def _actions(trace):
+    return [s["action"] if isinstance(s["action"], str) else s["action"]["name"] for s in trace["steps"]]
+
+
+def test_creative_brief_revises_until_production_check_passes(tmp_path):
+    from src.render import write_artifacts
+    result, trace, revisions = run("13_creative_brief")
+    assert result["status"] == "completed"
+    assert result["checks"]["production"]["pass"] is True
+    assert result["skills_loaded"] == ["short_video_structure", "virtual_character_direction"]
+    productions = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "check_production"]
+    assert [p["pass"] for p in productions] == [False, True]
+    assert [p["revision"] for p in productions] == [1, 2]
+    # load_skill costs a step, not a tool call.
+    assert trace["tool_calls"] == len([a for a in _actions(trace) if a not in ("load_skill", "finish")])
+    assert all(s["beat"] and s["shot_size"] and s["camera"] for s in result["shots"])
+    write_artifacts(tmp_path, load("13_creative_brief"), result, trace, revisions)
+    storyboard = (tmp_path / "storyboard.md").read_text(encoding="utf-8")
+    assert storyboard.count("```text") == len(result["shots"])
+    assert "潜入信息深海" in storyboard
+
+
+def test_plain_brief_does_not_require_production_check(tmp_path):
+    from src.render import write_artifacts
+    result, trace, revisions = run("01_normal_30s")
+    assert result["status"] == "completed"
+    assert "production" not in result["checks"] and "creative_brief" not in result
+    write_artifacts(tmp_path, load("01_normal_30s"), result, trace, revisions)
+    assert not (tmp_path / "storyboard.md").exists()
+
+
+class SkipProductionProvider(Provider):
+    """Passes the three original checks, then tries to finish without check_production."""
+    name = "fixture"
+    model = "skip-production-test"
+    mode = "test"
+
+    def __init__(self):
+        self.script = [
+            ("search_materials", {"query": "字幕"}),
+            ("write_draft", json.loads((ROOT / "fixtures" / "drafts" / "prod_v2.json").read_text(encoding="utf-8"))),
+            ("estimate_duration", {}), ("check_rules", {}), ("check_citations", {}),
+        ]
+
+    def decide(self, state):
+        if self.script:
+            name, args = self.script.pop(0)
+            return {"rationale": "按脚本执行 " + name, "action": name, "args": args}
+        return {"rationale": "跳过制作检查直接完成", "action": "finish",
+                "args": {"status": "completed", "summary": "完成"}}
+
+
+def test_production_mode_gate_requires_check_production():
+    raw = load("13_creative_brief")
+    result, trace, _ = run_case(raw, SkipProductionProvider())
+    rejected = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "finish"]
+    assert rejected and all(o["ok"] is False and "production" in o["missing"] for o in rejected)
+    assert result["status"] == "incomplete"
+
+
+class SkillProvider(Provider):
+    name = "fixture"
+    model = "skill-test"
+    mode = "test"
+
+    def __init__(self, names):
+        self.names = list(names)
+
+    def decide(self, state):
+        if self.names:
+            return {"rationale": "读技能", "action": "load_skill", "args": {"name": self.names.pop(0)}}
+        return {"rationale": "结束", "action": "finish",
+                "args": {"status": "needs_input", "stop_reason": "missing_required_fields",
+                         "summary": "测试", "missing_fields": ["x"]}}
+
+
+def test_load_skill_errors_and_cap():
+    from src.limits import MAX_SKILL_LOADS
+    names = ["nope", "hook_patterns", "hook_patterns", "short_video_structure", "subtitle_and_overlay",
+             "video_ai_handoff"]
+    result, trace, _ = run_case(load("13_creative_brief"), SkillProvider(names))
+    obs = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "load_skill"]
+    assert obs[0]["error_code"] == "SKILL_NOT_FOUND" and "hook_patterns" in obs[0]["available"]
+    assert obs[2].get("already_loaded") is True
+    assert sum(1 for o in obs if o.get("ok") and not o.get("already_loaded")) == MAX_SKILL_LOADS
+    assert obs[-1]["error_code"] == "SKILL_LOAD_LIMIT"
+    assert trace["tool_calls"] == 0

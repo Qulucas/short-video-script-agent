@@ -74,6 +74,44 @@ class FixtureProvider(Provider):
             return _act("反复检查引用（观察到 %s），测试工具调用上限" % (obs.get("error_code") or "无错误"),
                         "check_citations")
 
+        if scenario == "production":
+            creative = self.brief.get("creative_brief") or {}
+            loaded = state.get("loaded_skills") or {}
+            production = checks.get("production")
+            if not state.get("materials"):
+                return self._search(self.brief.get("material_query") or "字幕", "先检索素材，creative_brief 里的产品说法要有来源")
+            if "short_video_structure" not in loaded:
+                return _act("creative_brief 有 %d 个段落、目标 %s，先读段落结构和字数预算"
+                            % (len(creative.get("script_structure", [])), _sec(self.brief["target_duration_sec"])),
+                            "load_skill", {"name": "short_video_structure"})
+            if creative.get("character_setting") and "virtual_character_direction" not in loaded:
+                return _act("有角色设定 %s，读取角色表演指导" % creative["character_setting"].get("name", ""),
+                            "load_skill", {"name": "virtual_character_direction"})
+            if not draft:
+                return self._write("prod_v1", "检索到 %d 条素材；按 5 个段落写首稿，删掉素材不支持的“AI字幕/一键识别”"
+                                   % len(state.get("materials", [])))
+            if est is None:
+                return _act("估算 revision %d 时长" % state.get("draft_revision", 0), "estimate_duration")
+            if not checks.get("rules"):
+                return _act("时长 %s，检查规则" % _sec(est["total_sec"]), "check_rules")
+            if not checks.get("citations"):
+                return _act("规则通过，检查引用", "check_citations")
+            if not production:
+                return _act("引用 pass=%s，检查制作字段" % str(checks["citations"].get("pass")).lower(), "check_production")
+            if not production.get("pass") and writes < 2:
+                codes = sorted({i.get("code") for i in production.get("issues", [])})
+                return self._write("prod_v2", "check_production 报 %d 个问题（%s）；补齐景别/运镜/角色动作/转场/BGM，"
+                                   "CTA 改回原样口头禅" % (len(production.get("issues", [])), "、".join(codes)))
+            if est.get("pass") and checks["rules"].get("pass") and checks["citations"].get("pass") and production.get("pass"):
+                return _act("时长 %s、规则、引用、制作字段全部通过，输出" % _sec(est["total_sec"]), "finish", {
+                    "status": "completed", "summary": "制作模式脚本已完成：5 个段落、角色动作和制作字段齐全。",
+                })
+            return _act("制作字段仍未补齐，结束并说明", "finish", {
+                "status": "unmet_constraints", "stop_reason": "needs_review",
+                "blocking_reason": "check_production 仍有问题。", "options": ["人工补齐制作字段"],
+                "summary": "制作字段未补齐。",
+            })
+
         if scenario == "tool_failure":
             if not obs.get("ok") and obs.get("error_code") == "TIMEOUT":
                 if search_attempts < 2:
