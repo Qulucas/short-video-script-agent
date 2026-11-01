@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Sequence
 
 from src.tools.duration import count_readable_units
 
@@ -15,27 +15,33 @@ def _compact(text: str) -> str:
     return PUNCT_RE.sub("", text or "")
 
 
-def required_fields(creative: Dict[str, Any]) -> List[str]:
+def required_fields(creative: Dict[str, Any], format_fields: Sequence[str] = ()) -> List[str]:
     fields = ["shot_size", "camera", "transition"]
     if creative.get("script_structure"):
         fields.insert(0, "beat")
     if creative.get("character_setting"):
         fields += ["character_action", "expression"]
-    return fields
+    return fields + [f for f in format_fields if f not in fields]
+
+
+def _spoken(shot: Dict[str, Any]) -> str:
+    lines = [str(d.get("line") or "") for d in shot.get("dialogue") or [] if isinstance(d, dict)]
+    return " ".join([str(shot.get("narration") or "")] + lines)
 
 
 def _issue(issues: List[Dict[str, Any]], code: str, message: str, shot_id: Any = None, field: str = "") -> None:
     issues.append({"shot_id": shot_id, "code": code, "field": field, "message": message})
 
 
-def check_production(draft: Dict[str, Any], creative: Dict[str, Any]) -> Dict[str, Any]:
+def check_production(draft: Dict[str, Any], creative: Dict[str, Any],
+                     format_fields: Sequence[str] = ()) -> Dict[str, Any]:
     """Check that the draft carries what a video-generation model needs to follow the brief.
 
     Deterministic, like the other checks: it lists what is missing per shot so the model can
     revise, and never rewrites anything itself.
     """
     shots = draft.get("shots", []) or []
-    fields = required_fields(creative)
+    fields = required_fields(creative, format_fields)
     issues: List[Dict[str, Any]] = []
 
     for idx, shot in enumerate(shots):
@@ -52,7 +58,7 @@ def check_production(draft: Dict[str, Any], creative: Dict[str, Any]) -> Dict[st
                    "visual 只有 %d 字，至少 %d 字（写清主体、动作、场景）" % (units, MIN_VISUAL_UNITS),
                    sid, "visual")
 
-    if not any(str(s.get("bgm") or "").strip() for s in shots):
+    if not any(str(s.get("bgm") or "").strip() for s in shots) and not (draft.get("audio_tracks") or {}).get("bgm"):
         _issue(issues, "BGM_MISSING", "没有任何分镜指定 bgm", None, "bgm")
 
     beats = [b.get("beat") for b in creative.get("script_structure", []) if b.get("beat")]
@@ -73,8 +79,8 @@ def check_production(draft: Dict[str, Any], creative: Dict[str, Any]) -> Dict[st
     catchphrase = (creative.get("character_setting") or {}).get("catchphrase", "")
     if catchphrase:
         target = _compact(catchphrase)
-        if not any(target in _compact(s.get("narration", "")) for s in shots):
-            _issue(issues, "CATCHPHRASE_MISSING", "旁白中没有原样出现口头禅：%s" % catchphrase, None, "narration")
+        if not any(target in _compact(_spoken(s)) for s in shots):
+            _issue(issues, "CATCHPHRASE_MISSING", "旁白/对白中没有原样出现口头禅：%s" % catchphrase, None, "narration")
 
     return {
         "ok": True,

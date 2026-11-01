@@ -216,6 +216,82 @@
             "subtitle_chars": 8
           }
         ],
+        "beats": [
+          {
+            "beat": "hook",
+            "planned": [
+              0.0,
+              3.0
+            ],
+            "actual": [
+              0.0,
+              4.4
+            ],
+            "delta_start": 0.0,
+            "delta_end": 1.4,
+            "pass": false
+          },
+          {
+            "beat": "problem",
+            "planned": [
+              3.0,
+              8.0
+            ],
+            "actual": [
+              4.4,
+              10.2
+            ],
+            "delta_start": 1.4,
+            "delta_end": 2.2,
+            "pass": false
+          },
+          {
+            "beat": "solution",
+            "planned": [
+              8.0,
+              18.0
+            ],
+            "actual": [
+              10.2,
+              17.2
+            ],
+            "delta_start": 2.2,
+            "delta_end": -0.8,
+            "pass": false
+          },
+          {
+            "beat": "demo",
+            "planned": [
+              18.0,
+              25.0
+            ],
+            "actual": [
+              17.2,
+              23.5
+            ],
+            "delta_start": -0.8,
+            "delta_end": -1.5,
+            "pass": false
+          },
+          {
+            "beat": "cta",
+            "planned": [
+              25.0,
+              30.0
+            ],
+            "actual": [
+              23.5,
+              29.1
+            ],
+            "delta_start": -1.5,
+            "delta_end": -0.9,
+            "pass": false
+          }
+        ],
+        "beat_timing": "advisory",
+        "beat_tolerance_sec": 0.5,
+        "beats_pass": false,
+        "window_pass": true,
         "revision": 1,
         "draft_hash": "sha256:b1f1bec09e58f50eaaa934348edbbdca61a674e83c586ffbaa6267310d1c7aad"
       },
@@ -459,7 +535,7 @@
             "shot_id": null,
             "code": "CATCHPHRASE_MISSING",
             "field": "narration",
-            "message": "旁白中没有原样出现口头禅：潜入信息深海，捞取创作干货~"
+            "message": "旁白/对白中没有原样出现口头禅：潜入信息深海，捞取创作干货~"
           }
         ],
         "revision": 1,
@@ -661,6 +737,82 @@
             "subtitle_chars": 12
           }
         ],
+        "beats": [
+          {
+            "beat": "hook",
+            "planned": [
+              0.0,
+              3.0
+            ],
+            "actual": [
+              0.0,
+              4.4
+            ],
+            "delta_start": 0.0,
+            "delta_end": 1.4,
+            "pass": false
+          },
+          {
+            "beat": "problem",
+            "planned": [
+              3.0,
+              8.0
+            ],
+            "actual": [
+              4.4,
+              10.2
+            ],
+            "delta_start": 1.4,
+            "delta_end": 2.2,
+            "pass": false
+          },
+          {
+            "beat": "solution",
+            "planned": [
+              8.0,
+              18.0
+            ],
+            "actual": [
+              10.2,
+              17.2
+            ],
+            "delta_start": 2.2,
+            "delta_end": -0.8,
+            "pass": false
+          },
+          {
+            "beat": "demo",
+            "planned": [
+              18.0,
+              25.0
+            ],
+            "actual": [
+              17.2,
+              23.5
+            ],
+            "delta_start": -0.8,
+            "delta_end": -1.5,
+            "pass": false
+          },
+          {
+            "beat": "cta",
+            "planned": [
+              25.0,
+              30.0
+            ],
+            "actual": [
+              23.5,
+              29.1
+            ],
+            "delta_start": -1.5,
+            "delta_end": -0.9,
+            "pass": false
+          }
+        ],
+        "beat_timing": "advisory",
+        "beat_tolerance_sec": 0.5,
+        "beats_pass": false,
+        "window_pass": true,
         "revision": 2,
         "draft_hash": "sha256:77ef1d29875c2af0f305c946e8538b0f4802d9c02b84a4498a4a5482396ab6d5"
       },

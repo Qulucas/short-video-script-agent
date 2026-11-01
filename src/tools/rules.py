@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
 
+from src.schemas import shot_texts
 from src.tools.errors import ToolError
 
 ABSOLUTE_RE = re.compile(r"全网第一|第一品牌|最好|最佳|最强|顶级|绝对|100\s*[%％]|永久")
@@ -48,9 +49,10 @@ def check_rules(
 
     all_fields = [("title", None, draft.get("title", ""))]
     for shot in draft.get("shots", []):
-        # on_screen_text is shown to viewers too, so it is held to the same rules.
-        for field in ("narration", "subtitle", "on_screen_text"):
-            all_fields.append((field, shot.get("id"), shot.get(field, "") or ""))
+        # Dialogue, on-screen text and overlays reach viewers too, so they are held to the same rules.
+        # fiction scope does not exempt a shot: an in-story joke can still break brand rules.
+        for field, text in shot_texts(shot):
+            all_fields.append((field, shot.get("id"), text))
 
     # BR-01 absolute language.
     if "BR-01" in active:

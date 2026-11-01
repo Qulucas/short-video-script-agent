@@ -25,7 +25,13 @@
   - `visual_notes`：全片规范（字幕样式、转场、BGM、音效）；
   - `text_overlay_hints`：按时间段的屏幕文字。
 
+  - `camera_notes`：全片镜头规范（如“全程第一人称 POV”）；
+  - `audio_notes`：`{bgm, sfx: [...]}` 等声音规范。
+
   这些是方向，不是事实来源：其中的产品功能、效果说法仍要有素材依据。
+- `format`：内容格式，`promo_talking_head`（默认）或 `comedy_pov_sketch`，见 `data/formats.json`。
+
+输入处理：键名不区分大小写并支持别名（`Topic`→`topic`、`duration`→`target_duration_sec` 等），每次改名都写进 `assumptions`；不认识的字段原样放进 `creative_brief.extra`；JSON 语法错误报行、列和可能原因，退出码 2。
 
 ## 输出
 
@@ -44,6 +50,8 @@
 - 每个分镜的 `beat`、`shot_size`、`camera`、`character_action`、`expression`、`on_screen_text`、`sfx`、`bgm`、`transition`；
 - `checks.production`、`creative_brief`、`skills_loaded`；
 - `storyboard.md`：逐镜制作单，每镜附一段可直接交给视频模型的提示词（重复角色设定，避免各镜角色走样）。
+
+使用脚本 v2 字段时另外输出 `timeline`（每句对白、每个音效和屏幕文字的绝对时间）、`audio_tracks`；有 `script_structure` 时输出 `beats`（每段计划 vs 估算）；非默认格式输出 `format`。
 
 ## 范围
 
@@ -76,3 +84,4 @@
 | 步数/工具调用上限 | `examples/08_step_limit/`、`examples/11_tool_call_limit/` |
 | 对抗性事实夹带 | `examples/10_adversarial_claim/` |
 | 创作方向落地（制作模式） | fixture：`examples/13_creative_brief/`；live：`examples/13_creative_brief-live/` |
+| 剧情格式、逐段计时、无素材完成 | fixture：`examples/14_comedy_pov/` |

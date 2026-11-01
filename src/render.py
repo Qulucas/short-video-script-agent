@@ -33,9 +33,47 @@ def _window(shot: Dict[str, Any]) -> str:
     return "%.1f–%.1fs" % (float(start), round(float(start) + float(dur), 1))
 
 
+def _at(value: Any) -> str:
+    return " @%.1fs" % float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else ""
+
+
+def _flat(value: Any) -> str:
+    """One readable line for any v1 string or v2 structured field (camera, sfx, overlays, state)."""
+    if value is None or value == "":
+        return ""
+    if isinstance(value, list):
+        return "；".join(x for x in (_flat(v) for v in value) if x)
+    if isinstance(value, dict):
+        if "move" in value or "handheld" in value:
+            return str(value.get("move") or "") + ("（手持）" if value.get("handheld") else "")
+        if "cue" in value:
+            extra = "，".join(str(value[k]) for k in ("position", "texture") if value.get(k))
+            return str(value["cue"]) + _at(value.get("at_sec")) + ("（%s）" % extra if extra else "")
+        if "text" in value:
+            span = ""
+            if "at_sec" in value or "until_sec" in value:
+                span = " @%s–%ss" % (value.get("at_sec", 0), value.get("until_sec", "?"))
+            extra = "，".join(str(value[k]) for k in ("position", "style", "animation") if value.get(k))
+            return "「%s」%s%s" % (value["text"], span, ("（%s）" % extra) if extra else "")
+        return "；".join("%s: %s" % (k, _flat(v)) for k, v in value.items() if _flat(v))
+    return str(value)
+
+
 def _cell(value: Any) -> str:
-    text = str(value or "").replace("|", "／").replace("\n", " ").strip()
+    text = _flat(value).replace("|", "／").replace("\n", " ").strip()
     return text or "—"
+
+
+def _dialogue_line(line: Dict[str, Any]) -> str:
+    tags = "，".join(x for x in (line.get("delivery"), "画外" if line.get("offscreen") else "") if x)
+    return "%s%s：%s%s" % (line.get("speaker", ""), ("（%s）" % tags) if tags else "", line.get("line", ""),
+                          _at(line.get("at_sec")))
+
+
+def _spoken(shot: Dict[str, Any]) -> str:
+    if shot.get("narration"):
+        return shot["narration"]
+    return " / ".join(_dialogue_line(d) for d in shot.get("dialogue") or [] if isinstance(d, dict))
 
 
 def _has_production(result: Dict[str, Any]) -> bool:
@@ -89,8 +127,8 @@ def render_markdown(result: Dict[str, Any]) -> str:
         for shot in shots:
             sources = ", ".join(shot.get("source_ids", [])) or "—"
             lines.append("| %s | %s | %s | %s | %s | %s | %s | %s |" % (
-                shot.get("id", ""), _window(shot), shot.get("visual", ""), shot.get("narration", ""),
-                shot.get("subtitle", ""), sources, shot.get("claim_scope", ""),
+                shot.get("id", ""), _window(shot), _cell(shot.get("visual")), _cell(_spoken(shot)),
+                _cell(shot.get("subtitle")), sources, shot.get("claim_scope", ""),
                 _fmt_duration(shot.get("duration_sec")),
             ))
         lines.append("")
@@ -102,10 +140,10 @@ def render_markdown(result: Dict[str, Any]) -> str:
             for shot in shots:
                 lines.append("| %s | %s | %s | %s | %s | %s | %s |" % (
                     shot.get("id", ""), _cell(shot.get("beat")),
-                    _cell(" / ".join(x for x in (shot.get("shot_size"), shot.get("camera")) if x)),
+                    _cell(" / ".join(x for x in (_flat(shot.get("shot_size")), _flat(shot.get("camera"))) if x)),
                     _cell(" / ".join(x for x in (shot.get("character_action"), shot.get("expression")) if x)),
-                    _cell(shot.get("on_screen_text")),
-                    _cell(" / ".join(x for x in (shot.get("sfx"), shot.get("bgm")) if x)),
+                    _cell(shot.get("on_screen_text") or shot.get("overlays")),
+                    _cell(" / ".join(x for x in (_flat(shot.get("sfx")), _flat(shot.get("bgm"))) if x)),
                     _cell(shot.get("transition")),
                 ))
             lines.append("")
@@ -161,47 +199,82 @@ def render_storyboard(result: Dict[str, Any]) -> str:
     creative = result.get("creative_brief") or {}
     character = creative.get("character_setting") or {}
     lines: List[str] = ["# 分镜制作单：%s" % result.get("title", "未生成标题"), ""]
-    lines.append("- status: `%s`；预计总时长 %s（目标 %s）" % (
+    lines.append("- status: `%s`；预计总时长 %s（目标 %s）%s" % (
         result.get("status", ""), _fmt_duration(result.get("estimated_total_sec")),
-        _fmt_duration(result.get("target_duration_sec"))))
+        _fmt_duration(result.get("target_duration_sec")),
+        "；format `%s`" % result["format"] if result.get("format") else ""))
     lines.append("")
     if character:
         lines.append("## 角色设定（每镜保持一致）")
         lines.append("")
-        for key in ("name", "appearance", "personality", "catchphrase"):
-            if character.get(key):
-                lines.append("- **%s**：%s" % (key, character[key]))
+        for key, value in character.items():
+            lines.append("- **%s**：%s" % (key, _flat(value)))
         lines.append("")
-    if creative.get("visual_notes"):
+    notes = [("镜头", creative.get("camera_notes")), ("画面", creative.get("visual_notes"))]
+    notes += [("声音 · %s" % k, v) for k, v in (creative.get("audio_notes") or {}).items()]
+    if any(v for _, v in notes):
         lines.append("## 全片规范")
         lines.append("")
-        for note in creative["visual_notes"]:
-            lines.append("- %s" % note)
+        for label, values in notes:
+            for note in values or []:
+                lines.append("- %s：%s" % (label, note))
+        lines.append("")
+    if result.get("beats"):
+        lines.append("## 段落时间（计划 vs 估算）")
+        lines.append("")
+        lines.append("| 段落 | 计划 | 估算 | 偏差（起/止） | 通过 |")
+        lines.append("|---|---|---|---|---|")
+        for beat in result["beats"]:
+            actual = beat.get("actual")
+            lines.append("| %s | %s–%ss | %s | %s | %s |" % (
+                beat.get("beat"), beat["planned"][0], beat["planned"][1],
+                "%s–%ss" % (actual[0], actual[1]) if actual else "缺失",
+                "%+.1f / %+.1f" % (beat["delta_start"], beat["delta_end"]) if actual else "—",
+                "是" if beat.get("pass") else "否"))
+        lines.append("")
+    tracks = result.get("audio_tracks") or {}
+    if tracks:
+        lines.append("## 音轨")
+        lines.append("")
+        for name, items in tracks.items():
+            for item in items:
+                lines.append("- **%s** %s–%ss：%s%s" % (name, item.get("start", 0), item.get("end", "?"), item.get("style", ""),
+                                                      "（%s）" % item["transition"] if item.get("transition") else ""))
         lines.append("")
     appearance = "，".join(x for x in (character.get("name"), character.get("appearance")) if x)
     for shot in result.get("shots") or []:
         lines.append("## %s · %s · %s" % (shot.get("id", ""), _window(shot), shot.get("beat") or "—"))
         lines.append("")
         rows = [
+            ("视角", shot.get("perspective")),
             ("画面", shot.get("visual")),
             ("景别", shot.get("shot_size")),
             ("运镜", shot.get("camera")),
+            ("光线 / 色彩", shot.get("lighting")),
+            ("镜头效果", shot.get("lens_fx")),
+            ("播放速度", "%sx" % shot["playback_rate"] if shot.get("playback_rate") else ""),
+            ("动作时长", _fmt_duration(shot["action_sec"]) if shot.get("action_sec") else ""),
             ("角色动作", shot.get("character_action")),
             ("表情", shot.get("expression")),
+            ("角色状态", shot.get("character_state")),
             ("旁白", shot.get("narration")),
             ("字幕", shot.get("subtitle")),
             ("屏幕文字", shot.get("on_screen_text")),
+            ("屏幕文字动画", shot.get("overlays")),
             ("音效", shot.get("sfx")),
             ("BGM", shot.get("bgm")),
             ("转场到下一镜", shot.get("transition")),
             ("素材来源", ", ".join(shot.get("source_ids", []))),
         ]
         for label, value in rows:
-            if value:
-                lines.append("- **%s**：%s" % (label, value))
+            if _flat(value):
+                lines.append("- **%s**：%s" % (label, _flat(value)))
+        for line in shot.get("dialogue") or []:
+            lines.append("- **对白**：%s" % _dialogue_line(line))
         prompt = "；".join(x for x in (
-            appearance, shot.get("character_action"), shot.get("expression"), shot.get("visual"),
-            "，".join(x for x in (shot.get("shot_size"), shot.get("camera")) if x),
+            appearance, _flat(shot.get("perspective")), shot.get("character_action"), shot.get("expression"),
+            shot.get("visual"), _flat(shot.get("lighting")), _flat(shot.get("lens_fx")),
+            "，".join(x for x in (shot.get("shot_size"), _flat(shot.get("camera"))) if x),
         ) if x)
         lines.append("")
         lines.append("```text")

@@ -6,13 +6,42 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from src.config import ROOT, load_dotenv, load_json
+from src.config import ROOT, load_dotenv
 from src.orchestrator import run_case
 from src.providers.base import ModelError
 from src.providers.fixture import FixtureProvider
 from src.providers.openai_compat import OpenAICompatProvider
 from src.render import write_artifacts
 from src.schemas import normalize_brief
+
+_JSON_HINTS = [
+    ("Expecting ',' delimiter", "上一个值后面缺逗号，或字符串里有未转义的双引号（改成 \\\" 或「」）"),
+    ("Expecting property name", "多了结尾逗号，或键名没有用英文双引号"),
+    ("Unterminated string", "字符串缺少结尾的英文双引号"),
+    ("Invalid control character", "字符串里直接换行了，改用 \\n"),
+    ("Expecting value", "缺少值，或用了中文引号“”、全角逗号代替英文符号"),
+    ("Extra data", "JSON 结束后还有多余内容，检查最外层的大括号"),
+]
+
+
+class InputError(Exception):
+    pass
+
+
+def load_input(path: Path) -> Dict[str, Any]:
+    """Load a case file; on malformed JSON say where and what is likely wrong."""
+    text = path.read_text(encoding="utf-8")
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError as exc:
+        line = text.splitlines()[exc.lineno - 1] if exc.lineno - 1 < len(text.splitlines()) else ""
+        hint = next((h for key, h in _JSON_HINTS if exc.msg.startswith(key)), "")
+        raise InputError("%s 不是合法 JSON：第 %d 行第 %d 列，%s%s\n  %s\n  %s^" % (
+            path, exc.lineno, exc.colno, exc.msg, ("（可能原因：%s）" % hint) if hint else "",
+            line, " " * (exc.colno - 1)))
+    if not isinstance(data, dict):
+        raise InputError("%s 顶层必须是 JSON 对象" % path)
+    return data
 
 
 def _provider(name: str, raw_input: Dict[str, Any]):
@@ -23,7 +52,7 @@ def _provider(name: str, raw_input: Dict[str, Any]):
 
 
 def _run_one(input_path: Path, provider_name: str, out_dir: Path) -> Dict[str, Any]:
-    raw = load_json(input_path)
+    raw = load_input(input_path)
     provider = _provider(provider_name, raw)
     result, trace, revisions = run_case(raw, provider)
     write_artifacts(out_dir, raw, result, trace, revisions)
@@ -34,6 +63,9 @@ def cmd_run(args: argparse.Namespace) -> int:
     load_dotenv()
     try:
         result = _run_one(Path(args.input), args.provider, Path(args.out))
+    except InputError as exc:
+        print("ERROR: " + str(exc), file=sys.stderr)
+        return 2
     except ModelError as exc:
         print("ERROR: " + str(exc), file=sys.stderr)
         return 5
@@ -68,6 +100,9 @@ def cmd_batch(args: argparse.Namespace) -> int:
             code = int(result.get("exit_code", 5))
             summary.append({"case": case.name, "status": result.get("status"), "exit_code": code})
             worst = max(worst, code)
+        except InputError as exc:
+            summary.append({"case": case.name, "status": "invalid_input", "error": str(exc), "exit_code": 2})
+            worst = max(worst, 2)
         except Exception as exc:
             summary.append({"case": case.name, "status": "failed", "error": str(exc), "exit_code": 5})
             worst = 5

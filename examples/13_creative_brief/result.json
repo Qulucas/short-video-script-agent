@@ -1,5 +1,5 @@
 {
-  "run_id": "20261101T040033Z-83a510",
+  "run_id": "20261101T044103Z-c5dd2f",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -191,6 +191,82 @@
           "subtitle_chars": 12
         }
       ],
+      "beats": [
+        {
+          "beat": "hook",
+          "planned": [
+            0.0,
+            3.0
+          ],
+          "actual": [
+            0.0,
+            4.4
+          ],
+          "delta_start": 0.0,
+          "delta_end": 1.4,
+          "pass": false
+        },
+        {
+          "beat": "problem",
+          "planned": [
+            3.0,
+            8.0
+          ],
+          "actual": [
+            4.4,
+            10.2
+          ],
+          "delta_start": 1.4,
+          "delta_end": 2.2,
+          "pass": false
+        },
+        {
+          "beat": "solution",
+          "planned": [
+            8.0,
+            18.0
+          ],
+          "actual": [
+            10.2,
+            17.2
+          ],
+          "delta_start": 2.2,
+          "delta_end": -0.8,
+          "pass": false
+        },
+        {
+          "beat": "demo",
+          "planned": [
+            18.0,
+            25.0
+          ],
+          "actual": [
+            17.2,
+            23.5
+          ],
+          "delta_start": -0.8,
+          "delta_end": -1.5,
+          "pass": false
+        },
+        {
+          "beat": "cta",
+          "planned": [
+            25.0,
+            30.0
+          ],
+          "actual": [
+            23.5,
+            29.1
+          ],
+          "delta_start": -1.5,
+          "delta_end": -0.9,
+          "pass": false
+        }
+      ],
+      "beat_timing": "advisory",
+      "beat_tolerance_sec": 0.5,
+      "beats_pass": false,
+      "window_pass": true,
       "revision": 2,
       "draft_hash": "sha256:77ef1d29875c2af0f305c946e8538b0f4802d9c02b84a4498a4a5482396ab6d5"
     },
@@ -239,6 +315,78 @@
   "missing_fields": [],
   "blocking_reason": null,
   "options": [],
+  "beats": [
+    {
+      "beat": "hook",
+      "planned": [
+        0.0,
+        3.0
+      ],
+      "actual": [
+        0.0,
+        4.4
+      ],
+      "delta_start": 0.0,
+      "delta_end": 1.4,
+      "pass": false
+    },
+    {
+      "beat": "problem",
+      "planned": [
+        3.0,
+        8.0
+      ],
+      "actual": [
+        4.4,
+        10.2
+      ],
+      "delta_start": 1.4,
+      "delta_end": 2.2,
+      "pass": false
+    },
+    {
+      "beat": "solution",
+      "planned": [
+        8.0,
+        18.0
+      ],
+      "actual": [
+        10.2,
+        17.2
+      ],
+      "delta_start": 2.2,
+      "delta_end": -0.8,
+      "pass": false
+    },
+    {
+      "beat": "demo",
+      "planned": [
+        18.0,
+        25.0
+      ],
+      "actual": [
+        17.2,
+        23.5
+      ],
+      "delta_start": -0.8,
+      "delta_end": -1.5,
+      "pass": false
+    },
+    {
+      "beat": "cta",
+      "planned": [
+        25.0,
+        30.0
+      ],
+      "actual": [
+        23.5,
+        29.1
+      ],
+      "delta_start": -1.5,
+      "delta_end": -0.9,
+      "pass": false
+    }
+  ],
   "creative_brief": {
     "character_setting": {
       "name": "DeepSeek鲸鱼娘",

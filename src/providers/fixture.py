@@ -51,7 +51,7 @@ class FixtureProvider(Provider):
 
     def _write(self, name: str, rationale: str) -> Dict[str, Any]:
         draft = _load(name)
-        return _act(rationale, "write_draft", {"title": draft["title"], "shots": draft["shots"]})
+        return _act(rationale, "write_draft", {k: v for k, v in draft.items() if k in ("title", "shots", "audio_tracks")})
 
     def decide(self, state: Dict[str, Any]) -> Dict[str, Any]:
         scenario = self.scenario
@@ -73,6 +73,48 @@ class FixtureProvider(Provider):
         if scenario == "tool_limit":
             return _act("反复检查引用（观察到 %s），测试工具调用上限" % (obs.get("error_code") or "无错误"),
                         "check_citations")
+
+        if scenario == "comedy_pov":
+            fmt = state.get("format") or {}
+            if not draft:
+                return self._write("comedy_v1", "format=%s，materials_required=%s：不陈述产品能力就不需要素材；"
+                                   "先按 5 段计划原样写台词，再看估算" % (fmt.get("name"), str(fmt.get("materials_required")).lower()))
+            if est is None:
+                return _act("估算 revision %d（beat_timing=%s）" % (state.get("draft_revision", 0), fmt.get("beat_timing")),
+                            "estimate_duration")
+            if not est.get("pass") and writes < 2:
+                late = [b for b in est.get("beats", []) if not b.get("pass")]
+                first = late[0] if late else {}
+                return self._write("comedy_v2", "总长 %s 超过 %s；%s 段估算 %s–%ss、计划 %s–%ss（止点偏差 %+.1fs），"
+                                   "压缩该段台词并提速；口头禅不在任何计划段落里，放进 panic_reaction" % (
+                                       _sec(est["total_sec"]), _sec(est["max_sec"]), first.get("beat"),
+                                       (first.get("actual") or [0, 0])[0], (first.get("actual") or [0, 0])[1],
+                                       first.get("planned", [0, 0])[0], first.get("planned", [0, 0])[1],
+                                       first.get("delta_end", 0.0)))
+            if not est.get("pass"):
+                return _act("改稿后仍未通过，结束并说明", "finish", {
+                    "status": "unmet_constraints", "stop_reason": "duration_cannot_meet",
+                    "blocking_reason": "段落时间仍超出计划。", "options": ["放宽段落时间", "删减台词"],
+                    "summary": "段落时间无法满足。",
+                })
+            if not checks.get("rules"):
+                return _act("时长 %s，%d 段时间误差都在 ±%ss 内，检查规则" % (
+                    _sec(est["total_sec"]), len(est.get("beats", [])), est.get("beat_tolerance_sec")), "check_rules")
+            if not checks.get("citations"):
+                return _act("规则通过，检查引用（fiction 分镜只列出不校验）", "check_citations")
+            if not checks.get("production"):
+                return _act("引用 pass=%s，列出 %d 处 fiction 说法；检查制作字段" % (
+                    str(checks["citations"].get("pass")).lower(), len(checks["citations"].get("fiction_claims", []))),
+                    "check_production")
+            if checks["production"].get("pass"):
+                return _act("时长、段落时间、规则、引用、制作字段全部通过，输出", "finish", {
+                    "status": "completed", "summary": "POV 搞笑短剧脚本完成：6 镜按 5 段，段落时间与计划一致。",
+                })
+            return _act("制作字段未补齐，结束并说明", "finish", {
+                "status": "unmet_constraints", "stop_reason": "needs_review",
+                "blocking_reason": "check_production 仍有问题。", "options": ["人工补齐制作字段"],
+                "summary": "制作字段未补齐。",
+            })
 
         if scenario == "production":
             creative = self.brief.get("creative_brief") or {}

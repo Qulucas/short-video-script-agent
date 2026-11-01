@@ -1,0 +1,18 @@
+{
+  "from": 1,
+  "to": 2,
+  "removed_shots": [],
+  "added_shots": [],
+  "changed_shots": [
+    {
+      "id": "S3",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "S5",
+      "before": "",
+      "after": ""
+    }
+  ]
+}

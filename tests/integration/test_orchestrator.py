@@ -330,3 +330,46 @@ def test_load_skill_errors_and_cap():
     assert sum(1 for o in obs if o.get("ok") and not o.get("already_loaded")) == MAX_SKILL_LOADS
     assert obs[-1]["error_code"] == "SKILL_LOAD_LIMIT"
     assert trace["tool_calls"] == 0
+
+
+def test_comedy_pov_revises_on_beat_timing_without_materials(tmp_path):
+    from src.render import write_artifacts
+    result, trace, revisions = run("14_comedy_pov")
+    assert result["status"] == "completed" and result["format"] == "comedy_pov_sketch"
+    estimates = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "estimate_duration"]
+    assert [e["pass"] for e in estimates] == [False, True]
+    punchline = [b for b in estimates[0]["beats"] if b["beat"] == "punchline"][0]
+    assert punchline["pass"] is False and punchline["delta_end"] == 5.5
+    assert "search_materials" not in _actions(trace)          # materials are optional for this format
+    assert result["sources"] == [] and result["checks"]["production"]["pass"] is True
+    assert result["audio_tracks"]["bgm"][1]["style"] == "fast-paced choral track"
+    assert any(r["code"] == "FICTION_CLAIMS" for r in result["risks"])
+    assert {e["type"] for e in result["timeline"]} == {"dialogue", "overlay", "sfx"}
+    write_artifacts(tmp_path, load("14_comedy_pov"), result, trace, revisions)
+    storyboard = (tmp_path / "storyboard.md").read_text(encoding="utf-8")
+    assert "段落时间（计划 vs 估算）" in storyboard and "Owner（low, deadpan，画外）" in storyboard
+    assert "## 音轨" in storyboard and "{" not in (tmp_path / "output.md").read_text(encoding="utf-8")
+
+
+class FictionInPromoProvider(Provider):
+    name = "fixture"
+    model = "fiction-promo-test"
+    mode = "test"
+
+    def __init__(self):
+        self.done = False
+
+    def decide(self, state):
+        if not self.done:
+            self.done = True
+            draft = json.loads((ROOT / "fixtures" / "drafts" / "v2_28s.json").read_text(encoding="utf-8"))
+            draft["shots"][0]["claim_scope"] = "fiction"
+            return {"rationale": "写 fiction 分镜", "action": "write_draft", "args": draft}
+        return {"rationale": "结束", "action": "finish", "args": {
+            "status": "needs_input", "stop_reason": "missing_required_fields", "summary": "x", "missing_fields": ["x"]}}
+
+
+def test_fiction_scope_is_rejected_in_promo_format():
+    result, trace, _ = run_case(load("01_normal_30s"), FictionInPromoProvider())
+    obs = trace["steps"][0]["observation"]
+    assert obs["error_code"] == "DRAFT_SCHEMA" and "fiction" in obs["errors"][0]

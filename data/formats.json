@@ -1,0 +1,23 @@
+{
+  "default": "promo_talking_head",
+  "formats": {
+    "promo_talking_head": {
+      "title": "产品口播 / 讲解",
+      "requires_product_claim": true,
+      "materials_required": true,
+      "allow_fiction": false,
+      "beat_timing": "advisory",
+      "beat_tolerance_sec": 0.5,
+      "production_fields": []
+    },
+    "comedy_pov_sketch": {
+      "title": "POV 第一人称搞笑短剧",
+      "requires_product_claim": false,
+      "materials_required": false,
+      "allow_fiction": true,
+      "beat_timing": "strict",
+      "beat_tolerance_sec": 0.5,
+      "production_fields": ["perspective"]
+    }
+  }
+}

@@ -61,3 +61,25 @@ def test_on_screen_text_needs_a_source_too():
     draft["shots"][0]["on_screen_text"] = "小影AI字幕一键生成"
     result = check_citations(draft, MATERIALS, BRIEF)
     assert any(i["sentence"] == "小影AI字幕一键生成" for i in result["unsupported_claims"])
+
+
+def test_dialogue_lines_are_fact_checked():
+    draft = _draft("v2_28s")
+    draft["shots"][0]["dialogue"] = [{"speaker": "鲸鱼娘", "line": "小影还能一键识别语音"}]
+    result = check_citations(draft, MATERIALS, BRIEF)
+    assert any(i["sentence"] == "小影还能一键识别语音" for i in result["unsupported_claims"])
+
+
+def test_fiction_scope_lists_product_mentions_but_skips_fact_checks():
+    brief = {"product_name": "DeepSeek", "platform": "douyin", "topic": "x",
+             "creative_brief": {"character_setting": {"name": "DeepSeek Whale Maiden", "aliases": ["Whale Maiden"]}}}
+    draft = _draft("v2_28s")
+    draft["shots"][0].update({"claim_scope": "fiction", "claims": [], "narration": "", "subtitle": "", "dialogue": [
+        {"speaker": "DeepSeek Whale Maiden", "line": "DeepSeek's taste model needs data. I am DeepSeek Whale Maiden."}]})
+    result = check_citations(draft, MATERIALS, brief)
+    assert not any(i["shot_id"] == "S1" for i in result["unsupported_claims"])
+    assert result["fiction_claims"] == [{"shot_id": "S1", "sentence": "DeepSeek's taste model needs data"}]
+
+
+def test_no_fiction_key_without_fiction_shots():
+    assert "fiction_claims" not in check_citations(_draft("v2_28s"), MATERIALS, BRIEF)

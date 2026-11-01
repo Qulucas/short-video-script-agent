@@ -3,13 +3,15 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
 
+from src.schemas import shot_texts
+
 PRODUCT_PREDICATE_RE = re.compile(r"这款|产品|它|支持|还能|拥有|自带|让你")
 FEATURE_RE = re.compile(r"字幕|画中画|竖屏|导出|识别|翻译|剪辑")
 EFFECT_RE = re.compile(r"(\d+\s*[%％]|提升|提高|增长|节省|降低|八成)")
 # A bare effect verb ("提升信息密度") is advice, not a number; only quantified effects need data.
 EFFECT_NUMBER_RE = re.compile(
     r"\d+\s*[%％倍]|八成|(提升|提高|增长|节省|降低).{0,6}(\d+|[一二三四五六七八九十]+)\s*(?:%|％|成|倍)")
-SENTENCE_SPLIT_RE = re.compile(r"[。！？!?；;\n]+")
+SENTENCE_SPLIT_RE = re.compile(r"[。！？!?；;\n]+|\.\s+")
 
 
 def normalize(text: str) -> str:
@@ -42,14 +44,29 @@ def check_citations(
     brief_text = " ".join(str(brief.get(k) or "") for k in ("product_name", "platform", "topic"))
     source_map["BRIEF"] = {"id": "BRIEF", "text": brief_text, "source_type": "user_input"}
     product_name = str(brief.get("product_name") or "")
+    character = ((brief.get("creative_brief") or {}).get("character_setting") or {})
+    # A character called "DeepSeek Whale Maiden" mentions the product by name without saying anything about it.
+    character_names = sorted([character.get("name", "")] + list(character.get("aliases", [])), key=len, reverse=True)
     unsupported: List[Dict[str, Any]] = []
     needs_review: List[Dict[str, Any]] = []
+    fiction: List[Dict[str, Any]] = []
 
     for shot in draft.get("shots", []):
         shot_id = shot.get("id")
         scope = shot.get("claim_scope")
-        shot_text = "。".join(str(shot.get(k) or "") for k in ("narration", "subtitle", "on_screen_text"))
+        shot_text = "。".join(text for _, text in shot_texts(shot))
         claims = shot.get("claims", []) or []
+        if scope == "fiction":
+            # In-story jokes ("口味模型需要训练数据") are not product facts and are not fact-checked,
+            # but anything naming the product is listed for a human to sign off.
+            for sentence in _sentences(shot_text):
+                bare = sentence
+                for name in character_names:
+                    if name:
+                        bare = bare.replace(name, "")
+                if _is_product_like(bare, product_name) or (product_name and product_name.lower() in bare.lower()):
+                    fiction.append({"shot_id": shot_id, "sentence": sentence})
+            continue
         supported_claims = []
         for claim in claims:
             sid = claim.get("source_id")
@@ -119,9 +136,12 @@ def check_citations(
         if key not in seen:
             seen.add(key)
             unique.append(item)
-    return {
+    result = {
         "ok": True,
         "pass": len(unique) == 0 and len(needs_review) == 0,
         "unsupported_claims": unique,
         "needs_review": needs_review,
     }
+    if fiction:
+        result["fiction_claims"] = fiction
+    return result

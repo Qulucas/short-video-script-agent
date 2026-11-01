@@ -68,6 +68,18 @@ system prompt 还写明了估算公式（4.2 字/秒 + 0.3s 停顿、每镜 ≥1
 
 用户计划台词里的“AI 字幕 / 一键识别语音 / 自动生成字幕 / 完播率完全不一样”在素材里都没有依据，制作模式不会放行，Agent 会删掉或改成通用表达。要用这些说法，需要先在 `data/materials.json` 补真实的产品事实。
 
+## 内容格式、脚本 v2 和时间引擎
+
+起因：用户给了一份 POV 搞笑短剧的目标脚本（多人对白、画外音、带时间的音效、进度条式屏幕文字、1.5 倍速、镜头被米粒糊住）。按原设计它根本跑不起来：JSON 有语法错误；`Topic` 大写读不到；`camera_notes`/`audio_notes` 被白名单丢掉；素材检索为空直接 `needs_input`；即使写出来，闸门也要求一条产品 claim；英文台词按 4.2 词/秒算，严重低估。
+
+- **输入（阶段 0）**：`cli.load_input` 报 JSON 的行列和可能原因；`normalize_keys` 让键名不区分大小写并走别名表，改名写进 `assumptions`；识别 `camera_notes`/`audio_notes`，其余未知字段进 `creative_brief.extra`（模型可见，但不单独开启制作模式）。
+- **格式**（`data/formats.json`、`src/formats.py`）：`format` 决定是否必须有产品 claim、素材是否必需、是否允许 `fiction`、逐段计时是 `strict` 还是 `advisory`、额外必填的制作字段。`scenario` 仍只给 fixture 选策略，不再兼任内容类型。
+- **fiction**：剧情里角色的玩笑式说法（“口味模型需要训练数据”）不是产品事实，`claim_scope="fiction"` 的分镜不做引用校验，但提到产品名的句子（去掉角色名后）进 `fiction_claims` 和 `FICTION_CLAIMS` 风险，留给人工确认。品牌规则照常检查。默认格式里写 `fiction` 会被 `write_draft` 拒绝。
+- **脚本 v2（阶段 1）**：分镜可选 `dialogue`、`sfx`（字符串或带时间/方位的对象）、`overlays`、`action_sec`、`playback_rate`、`perspective`、`camera`（字符串或 `{move, handheld}`）、`lens_fx`、`lighting`、`character_state`、`fulfills`，草稿级 `audio_tracks`。都可选，v1 草稿原样有效；有对白时旁白和字幕可省。规则和引用检查通过 `shot_texts` 扫描所有观众能看到或听到的文字（旁白、字幕、屏幕文字、每句对白、每个 overlay）。
+- **时间引擎（阶段 2）**：说话时长按语言算（中文 4.2 字/秒、英文 2.6 词/秒），括号内是音效不计时，“……/——”各加 0.3 秒，“（停顿0.5s）”按写明的加。用了 v2 时间字段的分镜取最长的一项：旁白、字幕、最后一句对白结束、最后一个 overlay 消失、`action_sec ÷ playback_rate`；`playback_rate` 只缩短动作画面，不加快说话。估算返回每镜 `driver`（谁决定了时长）和全片 `timeline`。有 `script_structure` 时按段对比计划 `time_range` 和实际起止；`strict` 格式下每段误差 ≤ `beat_tolerance_sec`（0.5 秒）才算通过。
+
+v1 草稿的估算结果和字段完全不变（fixture 01–12 重新生成后逐字节一致）；13 只多了 `advisory` 的逐段对比。
+
 ## 工具
 
 | 工具 | 输入 | 输出 |

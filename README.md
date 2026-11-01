@@ -4,7 +4,7 @@
 >
 > GitHub：https://github.com/Qulucas/short-video-script-agent
 >
-> 提交版本：tag `v1.2`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
+> 提交版本：tag `v1.3`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
 >
 > 一句话：把“生成脚本”做成可审计的闭环——模型选动作，工具算时长、查规则、验引用，检查结果再驱动下一轮修改或明确失败。
 
@@ -22,7 +22,7 @@ python -m src.cli run \
   --provider fixture \
   --out examples/01_normal_30s
 
-# 3. 一次跑完 13 个 fixture 场景（写到 runs/，不覆盖已提交证据）
+# 3. 一次跑完 14 个 fixture 场景（写到 runs/，不覆盖已提交证据）
 python -m src.cli batch --cases examples/cases --provider fixture --out-root runs
 
 # 4. 测试
@@ -43,10 +43,11 @@ pytest -q
 | fixture 正常生成、38→28、P01 引用 | 已完成 |
 | 缺关键信息、无素材、工具失败、超时长不可满足 | 已完成 |
 | 规则违规修正、60 秒动作对照、非法动作、检查哈希绑定 | 已完成 |
-| 13 个 fixture 场景输入、result/trace/output/draft_revisions | 已完成 |
+| 14 个 fixture 场景输入、result/trace/output/draft_revisions | 已完成 |
+| 内容格式 + 脚本 v2 + 时间引擎（对白/音效/屏幕文字动画/动作时长/逐段计时） | 已完成（fixture 14 + live 14） |
 | 制作模式：角色设定/段落结构/视觉规范进入 prompt，制作字段 + `check_production` + 写作技能 + `storyboard.md` | 已完成（fixture 13 + live 13） |
-| `pytest -q` | **80 passed, 1 deselected** |
-| **7 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩、制作模式** |
+| `pytest -q` | **107 passed, 1 deselected** |
+| **8 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩、制作模式、POV 搞笑短剧** |
 
 必选验收场景除“缺关键信息”（入口确定性校验，不经过模型）外都有 live 版本，对照表见 [docs/03-evaluation.md](docs/03-evaluation.md)。重点：
 
@@ -85,7 +86,7 @@ pytest -q
 - `finish(completed)` 必须满足：当前稿有绑定 `draft_hash` 的时长/规则/引用检查，时长和规则通过，事实可追溯；输入带创作方向（制作模式）时还要 `check_production` 通过。
 - `needs_input` / `unmet_constraints` / `incomplete` / `failed` 各有独立 `stop_reason` 和退出码。
 
-## 13 个 fixture 场景
+## 14 个 fixture 场景
 
 | 文件 | 预期 |
 |---|---|
@@ -101,6 +102,7 @@ pytest -q
 | `10_adversarial_claim` | 删除“还能自动生成字幕”后 completed |
 | `11_tool_call_limit` | 16 次工具调用后 incomplete/tool_call_limit_reached |
 | `12_seeded_draft_38s` | 用户给 38.0s 初稿 → 压缩到 28.0s → completed |
+| `14_comedy_pov` | `format=comedy_pov_sketch`，不检索素材；首稿保留原 punchline 台词 → 估算 35.5s、punchline 段止点 +5.5s → 压缩台词、补口头禅 → 30.0s，5 段时间与计划完全一致 → completed |
 | `13_creative_brief` | 读 2 个技能 → 首稿时长/规则/引用都过但 `check_production` 报 31 个问题 → 补齐制作字段、口头禅 → completed，输出 `storyboard.md` |
 
 ## 制作模式（给视频生成模型用）
@@ -108,6 +110,14 @@ pytest -q
 输入里带 `character_setting` / `script_structure` / `visual_notes` / `text_overlay_hints` 任一项时，Agent 按段落写分镜，每镜带景别、运镜、角色动作和表情、屏幕文字、音效、BGM、转场，并额外输出 [storyboard.md](examples/13_creative_brief/storyboard.md)。设计和取舍见 [docs/02-solution.md](docs/02-solution.md#制作模式创作方向制作字段和写作技能)。
 
 创作方向不是事实来源：计划台词里素材不支持的功能（如“AI 字幕一键识别”）会被删掉或改写，要保留就先在 `data/materials.json` 补真实素材。
+
+### 内容格式与脚本 v2
+
+- `format` 选内容类型（`data/formats.json`）：`promo_talking_head`（默认，产品口播，必须有产品 claim）或 `comedy_pov_sketch`（剧情短剧：素材可选、允许 `claim_scope="fiction"` 的剧情玩笑、逐段计时严格）。
+- 分镜可用结构化字段：多人 `dialogue`（含画外音、语气、`at_sec`、语速）、带时间和方位的 `sfx`、带动画的 `overlays`、`action_sec` / `playback_rate`、`perspective`（POV/反打）、`lens_fx`、`lighting`、`character_state`，草稿级 `audio_tracks`。
+- 时间引擎按语言算说话时长（中文 4.2 字/秒，英文 2.6 词/秒），括号里的音效不计时，“……”和写明的停顿加时长；返回全片 timeline 和每段计划/估算偏差。
+- 输入 JSON 写错会报行列和可能原因；键名不区分大小写、支持常见别名；不认识的字段保留在 `creative_brief.extra`，不再静默丢弃。
+- 模板：[examples/templates/comedy_pov.json](examples/templates/comedy_pov.json)。后续阶段见 [docs/06-roadmap.md](docs/06-roadmap.md)。
 
 ## 事实与时长护栏
 
@@ -133,10 +143,11 @@ pytest -q
 - [测试结果与限制](docs/03-evaluation.md)
 - [AI 使用记录](docs/04-ai-usage.md)
 - [复盘](docs/05-retrospective.md)
+- [路线图：剧情短剧级精度](docs/06-roadmap.md)
 
 ## 已知限制
 
-1. **live 结果不稳定**：7 条 live 各跑一次，不保证每次同一路径；fixture 才是可重复证据。05-live 中观察到 rationale 数字与 observation 不符、内容镜用占位句凑时长，见 docs/03。
+1. **live 结果不稳定**：8 条 live 各跑一次，不保证每次同一路径；fixture 才是可重复证据。05-live 中观察到 rationale 数字与 observation 不符、内容镜用占位句凑时长，见 docs/03。
 2. 时长是估算，不是 TTS 实测。
 3. claim 扫描是启发式，复杂语义改写仍需人工复核。
 4. `material_ids` 是白名单；正常案例使用 P01，避免 P04 污染。

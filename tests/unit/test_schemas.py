@@ -61,3 +61,43 @@ def test_production_fields_must_be_strings():
     draft = json.loads((ROOT / "fixtures" / "drafts" / "v2_28s.json").read_text(encoding="utf-8"))
     draft["shots"][0]["camera"] = ["推近"]
     assert any("camera" in e for e in validate_draft(draft))
+
+
+def _v2():
+    return json.loads((ROOT / "fixtures" / "drafts" / "comedy_v2.json").read_text(encoding="utf-8"))
+
+
+def test_v2_comedy_draft_is_valid():
+    assert validate_draft(_v2()) == []
+
+
+def test_v2_field_errors_are_specific():
+    draft = _v2()
+    shot = draft["shots"][0]
+    shot["perspective"] = "drone"
+    shot["dialogue"][0].pop("speaker")
+    shot["playback_rate"] = 0
+    shot["overlays"][0]["at_sec"] = -1
+    shot["camera"] = {"move": "push", "handheld": "yes"}
+    draft["audio_tracks"]["bgm"][0].pop("style")
+    errors = validate_draft(draft)
+    for fragment in ("perspective", "dialogue[0].speaker", "playback_rate", "overlays[0].at_sec",
+                     "camera.handheld", "audio_tracks.bgm[0].style"):
+        assert any(fragment in e for e in errors), fragment
+
+
+def test_silent_action_shot_needs_only_action_sec():
+    draft = _v2()
+    shot = draft["shots"][1]
+    shot.pop("dialogue")
+    assert validate_draft(draft) == []
+    shot["action_sec"] = 0
+    assert any("action_sec" in e for e in validate_draft(draft))
+
+
+def test_sfx_may_mix_strings_and_cues():
+    draft = _v2()
+    draft["shots"][0]["sfx"] = ["厨房环境声", {"cue": "咀嚼", "at_sec": 0.2}]
+    assert validate_draft(draft) == []
+    draft["shots"][0]["sfx"] = [{"at_sec": 0.2}]
+    assert any("sfx[0].cue" in e for e in validate_draft(draft))
