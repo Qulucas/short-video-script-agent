@@ -2,18 +2,19 @@
 
 目标样例：[examples/templates/comedy_pov.json](../examples/templates/comedy_pov.json)（POV 搞笑短剧，多人对白、画外音、带时间的音效、动画屏幕文字、变速、角色状态延续）。
 
-## 已完成（阶段 0–3）
+## 已完成（阶段 0–3.1）
 
 | 阶段 | 内容 | 位置 |
 |---|---|---|
 | 0 输入 | JSON 报错带行列和原因；键名大小写/别名；`camera_notes`/`audio_notes`；未知字段进 `extra`；`format`；`fiction` | `src/cli.py`、`src/schemas.py`、`data/formats.json` |
 | 1 脚本 v2 | `dialogue`/`sfx`/`overlays`/`action_sec`/`playback_rate`/`perspective`/`lens_fx`/`lighting`/`character_state`/`fulfills`、`audio_tracks` | `src/schemas.py` |
 | 2 时间引擎 | 按语言计时、括号音效不计、停顿、timeline、逐段计划 vs 估算、`strict` 格式进闸门 | `src/tools/duration.py` |
+| 3.1 检查加固 | 段落 visual 条目（引号原文、数字作锚点）；词重合不足改为复核项；`language` 节检查画面描述中英混写；口头禅必须是角色本人的 dialogue；dialogue 脚本里的 narration 需要 Narrator | `src/tools/brief.py`；live 14-p3 终稿被拒（有测试） |
 | 3 brief 检查 | `check_brief`：coverage（条目 id、原文锚点、`fulfills`/`waivers`）、fidelity（语言、锁定台词、`deviations`）、continuity（说话人、角色点名、代词、状态延续）、timeline（音效越界、屏幕文字可读、台词重叠、BGM 覆盖）、pov；`review` 人工复核项；喜剧格式进闸门；`lighting` 进喜剧必填字段 | `src/tools/brief.py` |
 
 live 14（`examples/14_comedy_pov-live/`）是阶段 0–2 后的基线：逐段计时全中、v2 字段用得充分，但闸门通过的稿子仍漏掉原 punchline 笑点、“300g”气泡、“3.2 次/秒”、BGM 换场时间，并把英文改成了中文。阶段 3 完成后这份稿子会被 `check_brief` 拦下（有测试）。
 
-live 14-p3（`examples/14_comedy_pov-live-p3/`）是阶段 3 后的重跑，暴露的问题已排进下表：
+live 14-p3（`examples/14_comedy_pov-live-p3/`）是阶段 3 后的重跑，暴露的问题（前三条已在 3.1 完成）：
 - 词重合判断会被“抄原文”刷过去（中英混写的 visual）→ 阶段 3.1：visual/lighting 语言一致性检查，非锚点条目的重合度改为人工复核项而不是唯一依据；
 - 口头禅放进无说话人的 narration → 阶段 3.1：有 `dialogue` 的脚本里，口头禅必须出现在角色本人的台词里；
 - 段落 visual/audio 里的细节（“300g”）没有条目 id → 阶段 3.1：把 `script_structure` 每段的 visual 也拆成条目（引号原文、数字作锚点）；
@@ -23,7 +24,6 @@ live 14-p3（`examples/14_comedy_pov-live-p3/`）是阶段 3 后的重跑，暴�
 
 | 阶段 | 内容 | 完成标准 |
 |---|---|---|
-| 3.1 检查加固 | 上面三条 | live 14-p3 的终稿会被拦下 |
 | 4 模型评审 | `review_draft`：按喜剧节奏、升级、笑点清晰度、角色声音、画面具体度打分并给修改建议；只记录、不进闸门，最多 2 次 | trace 中可见，分数写入 result |
 | 5 生成方式 | `write_outline` 先出节拍表并过覆盖/时间检查；`patch_draft` 局部修改；预算 32 步 / 26 次工具 / 4 次写稿 / 8 次补丁；显式 `max_tokens` 和截断 JSON 修复 | 修 0.2 秒不再整稿重写 |
 | 6 技能 | `comedy_sketch_structure`、`pov_cinematography`、`physical_comedy_timing`、`anime_idol_acting`、`sound_design_cues`、`ui_overlay_gags`、`character_bible`、`exemplar_comedy_pov`；技能声明 `formats`/`recommended`；`MAX_SKILL_LOADS` 3→5；技能里引用的数字与估算常量一致的测试 | 喜剧格式自动推荐对应技能 |

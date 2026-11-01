@@ -1,6 +1,6 @@
 # Whale Maiden's Carbohydrate Sampling Incident
 
-- run_id: `20261101T045602Z-a4c4ca`
+- run_id: `20261101T050854Z-d64f23`
 - status: `completed`
 - stop_reason: `null`
 - provider: `fixture`
@@ -37,7 +37,7 @@
 | duration | True | 30.0s / 28.0s–30.0s |
 | rules | True | 0 个违规 |
 | citations | True | 0 个不支持 claim |
-| brief | True | 0 个问题（coverage ✓、fidelity ✓、continuity ✓、timeline ✓、pov ✓）；2 条待人工确认 |
+| brief | True | 0 个问题（coverage ✓、fidelity ✓、continuity ✓、language ✓、timeline ✓、pov ✓）；2 条待人工确认 |
 | production | True | 0 个问题 |
 
 ## 风险

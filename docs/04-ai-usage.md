@@ -14,12 +14,14 @@
 
 第五轮（Claude Code，Claude Opus 5.5）：按路线图实现阶段 3 的 `check_brief`（覆盖、台词保真、角色连贯、时间线、POV、人工复核项），喜剧格式进闸门；重做喜剧 fixture 让首稿在五节各失败一次；加测试证明 v1.3 的 live 14 稿会被拒绝；live 14 第一次重跑因模型一次回复两个 JSON 动作而中断，随后把这类回复改为交回模型重试，再重跑一次（由 Claude Code 在本机用仓库 `.env` 配置执行）。
 
+第六轮（Claude Code，Claude Opus 5.5）：按 live 14-p3 暴露的问题实现阶段 3.1：段落 visual 条目、词重合降为复核项、描述语言混写检查、口头禅必须是角色台词、dialogue 脚本里的 narration 需要 Narrator；加测试证明 14-p3 终稿会被拒。本轮没有跑 live。
+
 ## 使用范围
 
 | 范围 | AI 参与 | 验证 |
 |---|---|---|
 | 方案 | 根据审查意见修订 `docs/00-plan.md` | 人工审查意见逐条对照 |
-| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 127 passed |
+| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 130 passed |
 | 测试 | 单元、集成、场景测试 | 实际运行 |
 | 示例 | 14 个 fixture case + 9 条 live 的 result/trace/output | 实际运行生成 |
 | 文档 | README、docs/01–05 | 对照实际输出复核 |
@@ -41,14 +43,14 @@
 - live 04/04b/05/12：工具持续失败→incomplete、瞬时失败→重试恢复、BR-03 驱动改稿后 unmet、38.0s 初稿→28.4s；
 - live 13：制作模式，按 5 段写 6 镜、制作字段齐全、29.4s completed；
 - live 14：POV 搞笑短剧，首稿 30.0s、逐段计时全中，但漏了部分 brief 要求（docs/03 有记录）；
-- fixture 14 个场景、127 个离线测试通过。
+- fixture 14 个场景、130 个离线测试通过。
 
 ## 未验证/未完成
 
 - live 9 条各跑一次，不是稳定性评测；
 - 真实 TTS 时长：未接入；
 - 人工对 12 个场景文案的质量评审：未做；
-- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.4` 为准。
+- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.5` 为准。
 
 ## 防伪声明
 

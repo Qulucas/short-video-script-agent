@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from src.tools.duration import CUE_RE, OVERLAY_MIN_SEC, reading_sec
 
-# Evidence thresholds (token recall of the brief text found in the draft text).
+# Evidence thresholds (token recall of the brief text found in the draft text). Below COVERAGE_MIN_RECALL a
+# claimed item is only flagged for review: blocking on a word-overlap score taught the model to paste brief
+# sentences into its descriptions (live 14-p3). Quoted text and numbers stay blocking.
 COVERAGE_MIN_RECALL = 0.3
 FIDELITY_MIN_RECALL = 0.6
 # A deviation reason must name the check that forced the change.
@@ -31,6 +33,13 @@ WRONG_PRONOUNS = {
     "she": re.compile(r"\b(?:he|him|his|he's)\b|他", re.I),
     "he": re.compile(r"\b(?:she|her|hers|she's)\b|她", re.I),
 }
+# A description field is mixed-language when both scripts carry real content: at least this many units each
+# (English words; Chinese characters / 1.5) and the smaller is at least MIX_MIN_SHARE of the larger.
+MIX_MIN_UNITS = 4
+MIX_MIN_SHARE = 0.1
+DESCRIPTION_FIELDS = ("visual", "lighting", "character_action", "expression", "camera", "lens_fx", "transition")
+LOANWORDS = {"pov", "bgm", "sfx", "ui", "logo", "app", "ai", "ok", "cg", "vs", "bpm", "led", "rgb", "vlog"}
+NARRATOR_NAMES = {"narrator", "旁白", "画外音", "voice-over", "voiceover"}
 PRONOUN_ALIASES = {"she": "she", "her": "she", "她": "she", "he": "he", "him": "he", "他": "he"}
 
 
@@ -101,6 +110,14 @@ def brief_items(creative: Dict[str, Any]) -> List[Dict[str, Any]]:
     for sub, values in (creative.get("audio_notes") or {}).items():
         for i, text in enumerate(values):
             add("audio_notes.%s[%d]" % (sub, i), text)
+    # A beat's own visual is delivered by the shots of that beat; only its quoted text and numbers
+    # ("Sample quantity: 300g", "1.5x") are checkable, so it is an item only when it has some.
+    for beat in creative.get("script_structure") or []:
+        before = len(items)
+        add("script_structure.%s.visual" % beat.get("beat"), beat.get("visual") or "")
+        items[-1]["beat"] = beat.get("beat")
+        if not items[-1]["quotes"] and not items[-1]["numbers"]:
+            del items[before:]
     return items
 
 
@@ -169,7 +186,8 @@ def _shot_scope(shot: Dict[str, Any]) -> str:
     return flatten(shot, skip=("id", "claims", "fulfills", "claim_scope"))
 
 
-def _coverage(draft: Dict[str, Any], creative: Dict[str, Any], issues: List[Dict[str, Any]]) -> None:
+def _coverage(draft: Dict[str, Any], creative: Dict[str, Any], issues: List[Dict[str, Any]],
+              review: List[Dict[str, Any]]) -> None:
     items = brief_items(creative)
     ids = {i["id"] for i in items} | {b.get("beat") for b in creative.get("script_structure") or []}
     shots = draft.get("shots", [])
@@ -180,7 +198,12 @@ def _coverage(draft: Dict[str, Any], creative: Dict[str, Any], issues: List[Dict
             _issue(issues, "coverage", "UNKNOWN_ITEM", "未知的 brief 条目 id：%s" % ref, item=ref)
     whole = " ".join([_shot_scope(s) for s in shots] + [flatten(draft.get("audio_tracks"))])
     for item in items:
-        holders = [s for s in shots if item["id"] in (s.get("fulfills") or [])]
+        if item.get("beat"):
+            holders = [s for s in shots if s.get("beat") == item["beat"]]
+            if not holders:
+                continue      # a missing beat is check_production's BEAT_MISSING
+        else:
+            holders = [s for s in shots if item["id"] in (s.get("fulfills") or [])]
         if not holders and item["id"] not in draft_level:
             if item["id"] not in waived:
                 _issue(issues, "coverage", "ITEM_UNCOVERED", "没有分镜落实，也没有 waiver：%s" % item["text"],
@@ -194,8 +217,9 @@ def _coverage(draft: Dict[str, Any], creative: Dict[str, Any], issues: List[Dict
             _issue(issues, "coverage", "ANCHOR_MISSING", "落实 %s 的分镜里缺少原文：%s" % (item["id"], "、".join(missing)),
                    **where)
         elif not item["quotes"] and not item["numbers"] and recall(item["text"], scope) < COVERAGE_MIN_RECALL:
-            _issue(issues, "coverage", "EVIDENCE_WEAK", "声称落实 %s 但内容对不上（重合度 %.2f）：%s" % (
-                item["id"], recall(item["text"], scope), item["text"]), **where)
+            review.append(dict({"shot_id": where["shot_ids"][0], "code": "COVERAGE_UNVERIFIED", "text": item["text"],
+                                "message": "声称落实 %s，但文字重合度只有 %.2f，请人工确认是否真的做到" % (
+                                    item["id"], recall(item["text"], scope))}, **where))
 
 
 def _spoken_text(shots: Iterable[Dict[str, Any]], speaker_filter: Optional[Set[str]] = None) -> str:
@@ -221,6 +245,11 @@ def _fidelity(draft: Dict[str, Any], creative: Dict[str, Any], output_language: 
         _issue(issues, "fidelity", "LANGUAGE_MISMATCH",
                "计划台词是 %s，草稿台词是 %s；要换语言请在输入里设 output_language" % (expected, actual))
         return
+    catchphrase = ((creative.get("character_setting") or {}).get("catchphrase") or "")
+    canonical = set(known_speakers(creative)["canonical"])
+    if catchphrase and _uses_dialogue(draft) and compact(catchphrase) not in compact(_spoken_text(shots, canonical)):
+        _issue(issues, "fidelity", "CATCHPHRASE_NOT_SPOKEN",
+               "口头禅要出现在角色本人的 dialogue 里（不是 narration、字幕或屏幕文字）：%s" % catchphrase)
     deviations = [d for d in draft.get("deviations") or [] if isinstance(d, dict)]
     for line in planned:
         beat_text = _spoken_text(s for s in shots if s.get("beat") == line["beat"])
@@ -241,6 +270,10 @@ def _fidelity(draft: Dict[str, Any], creative: Dict[str, Any], output_language: 
                    "deviation 的 reason 要写明是哪项检查要求改的（如 beat timing、BR-01、citation）", **where)
 
 
+def _uses_dialogue(draft: Dict[str, Any]) -> bool:
+    return any(s.get("dialogue") for s in draft.get("shots", []))
+
+
 def _continuity(draft: Dict[str, Any], creative: Dict[str, Any], issues: List[Dict[str, Any]]) -> None:
     speakers = known_speakers(creative)
     character = creative.get("character_setting") or {}
@@ -258,6 +291,10 @@ def _continuity(draft: Dict[str, Any], creative: Dict[str, Any], issues: List[Di
                     who, speakers["canonical"][0] if speakers["canonical"] else "角色名"), shot_id=sid)
             else:
                 _issue(issues, "continuity", "UNKNOWN_SPEAKER", "说话人 %s 不在角色名/别名/cast 中" % who, shot_id=sid)
+        if shot.get("narration") and _uses_dialogue(draft) and not cast & NARRATOR_NAMES:
+            _issue(issues, "continuity", "NARRATION_UNATTRIBUTED",
+                   "脚本用 dialogue 分配说话人，但这镜的 narration 没有说话人（配音不知道由谁读）；"
+                   "改成 dialogue，或在 cast 里加 Narrator", shot_id=sid)
         if names and not any(n.lower() in str(shot.get("visual") or "").lower() for n in names):
             _issue(issues, "continuity", "VISUAL_NO_CHARACTER",
                    "visual 没写出角色名（视频模型逐镜独立生成，需要每镜点名）", shot_id=sid)
@@ -287,6 +324,32 @@ def _continuity(draft: Dict[str, Any], creative: Dict[str, Any], issues: List[Di
                        shot_id=shot.get("id"))
         # What this shot shows is what carries on; a dropped item is reported once, not in every later shot.
         carried = list(dict.fromkeys(present))
+
+
+def _language_units(text: str, names: Sequence[str]) -> Tuple[float, int]:
+    for quoted in _quotes(text):
+        text = text.replace(quoted, " ")
+    for name in sorted((n for n in names if n), key=len, reverse=True):
+        text = re.sub(re.escape(name), " ", text, flags=re.I)
+    en = [w for w in re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", text) if len(w) > 1 and w.lower() not in LOANWORDS]
+    return len(re.findall(r"[\u4e00-\u9fff]", text)) / 1.5, len(en)
+
+
+def _language_mix(draft: Dict[str, Any], creative: Dict[str, Any], product_name: str,
+                  issues: List[Dict[str, Any]]) -> None:
+    """Descriptions a video model reads should be in one language; pasted brief sentences are not."""
+    speakers = known_speakers(creative)
+    names = speakers["canonical"] + speakers["aliases"] + speakers["cast"] + [product_name]
+    for shot in draft.get("shots", []):
+        mixed = []
+        for field in DESCRIPTION_FIELDS:
+            zh, en = _language_units(flatten(shot.get(field)), names)
+            if min(zh, en) >= MIX_MIN_UNITS and min(zh, en) / max(zh, en) >= MIX_MIN_SHARE:
+                mixed.append(field)
+        if mixed:
+            _issue(issues, "language", "MIXED_LANGUAGE",
+                   "%s 中英混写；画面描述用一种语言写（引号里的屏幕文字、角色名不算）" % "、".join(mixed),
+                   shot_id=shot.get("id"))
 
 
 def _timeline(draft: Dict[str, Any], estimate: Dict[str, Any], issues: List[Dict[str, Any]]) -> None:
@@ -364,19 +427,21 @@ def _review(draft: Dict[str, Any], product_name: str) -> List[Dict[str, Any]]:
 def check_brief(draft: Dict[str, Any], creative: Dict[str, Any], estimate: Dict[str, Any],
                 product_name: str = "", output_language: str = "",
                 pov_min_ratio: Optional[float] = None) -> Dict[str, Any]:
-    """Does the draft deliver the brief? Coverage, fidelity, continuity, timeline, POV; plus review flags.
+    """Does the draft deliver the brief? Coverage, fidelity, continuity, language, timeline, POV; plus review flags.
 
     Deterministic and text-based: it can tell a requirement or a line is missing or changed,
     not whether the result is funny.
     """
     issues: List[Dict[str, Any]] = []
-    _coverage(draft, creative, issues)
+    review: List[Dict[str, Any]] = []
+    _coverage(draft, creative, issues, review)
     _fidelity(draft, creative, output_language, issues)
     _continuity(draft, creative, issues)
+    _language_mix(draft, creative, product_name, issues)
     _timeline(draft, estimate, issues)
     _pov(draft, pov_min_ratio, issues)
     sections = {}
-    for name in ("coverage", "fidelity", "continuity", "timeline", "pov"):
+    for name in ("coverage", "fidelity", "continuity", "language", "timeline", "pov"):
         mine = [i for i in issues if i["section"] == name]
         sections[name] = {"pass": not mine, "issues": len(mine)}
     return {
@@ -384,7 +449,7 @@ def check_brief(draft: Dict[str, Any], creative: Dict[str, Any], estimate: Dict[
         "pass": not issues,
         "sections": sections,
         "issues": issues,
-        "review": _review(draft, product_name),
+        "review": review + _review(draft, product_name),
         "waivers": [w for w in draft.get("waivers") or [] if isinstance(w, dict)],
         "deviations": [d for d in draft.get("deviations") or [] if isinstance(d, dict)],
         "items": [i["id"] for i in brief_items(creative)],

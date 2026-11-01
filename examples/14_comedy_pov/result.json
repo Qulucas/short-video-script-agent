@@ -1,5 +1,5 @@
 {
-  "run_id": "20261101T045602Z-a4c4ca",
+  "run_id": "20261101T050854Z-d64f23",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -802,6 +802,10 @@
           "pass": true,
           "issues": 0
         },
+        "language": {
+          "pass": true,
+          "issues": 0
+        },
         "timeline": {
           "pass": true,
           "issues": 0
@@ -857,7 +861,9 @@
         "audio_notes.sfx[1]",
         "audio_notes.sfx[2]",
         "audio_notes.sfx[3]",
-        "audio_notes.sfx[4]"
+        "audio_notes.sfx[4]",
+        "script_structure.panic_reaction.visual",
+        "script_structure.tag.visual"
       ],
       "revision": 2,
       "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"

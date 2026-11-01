@@ -58,6 +58,8 @@
 | audio_notes.sfx[2] | S3 |
 | audio_notes.sfx[3] | S6 |
 | audio_notes.sfx[4] | S6 |
+| script_structure.panic_reaction.visual | — |
+| script_structure.tag.visual | — |
 
 - **台词改动**（punchline）：Cough. I'm just checking the semantic integrity of the rice. The DeepSeek taste model requires a large amount of training data, you know. Don't look at me like that. → (clears throat) Ahem. Semantic integrity check. DeepSeek's taste model needs data. Don't look at me like that.。原因：beat timing: estimate_duration put the planned line at 20.0-31.5s against the planned 20-26s
 - **待人工确认**（S6）：用了 DeepSeek 的品牌元素（logo/界面），确认有使用权

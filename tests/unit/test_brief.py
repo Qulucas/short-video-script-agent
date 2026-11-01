@@ -30,7 +30,10 @@ def _codes(result, section=None):
 
 def test_items_get_stable_ids_and_anchors():
     items = {i["id"]: i for i in brief_items(CREATIVE)}
-    assert len(items) == 17
+    assert len(items) == 19
+    assert items["script_structure.tag.visual"]["quotes"] == ["Carbohydrate sampling completed ✅ Sample quantity: 300g"]
+    assert items["script_structure.panic_reaction.visual"]["numbers"] == [1.5]
+    assert "script_structure.setup.visual" not in items          # nothing quoted or numeric to check
     assert items["text_overlay_hints[0]"]["quotes"] == ["Carbohydrate Sampling in Progress..."]
     assert items["text_overlay_hints[0]"]["numbers"] == [0.0, 67.0]          # "0-5s:" prefix is not an anchor
     assert items["text_overlay_hints[2]"]["quotes"] == ["Generating Excuses...", "Semantic Integrity Check"]
@@ -57,9 +60,9 @@ def test_good_draft_passes_every_section():
 def test_first_draft_trips_each_section_once():
     result = _run(_load("fixtures/drafts/comedy_v1.json"))
     assert {k for k, v in result["sections"].items() if not v["pass"]} == {
-        "coverage", "fidelity", "continuity", "timeline", "pov"}
-    assert {"ITEM_UNCOVERED", "LINE_CHANGED", "NON_CANONICAL_SPEAKER", "STATE_DROPPED", "SFX_OUT_OF_SHOT",
-            "BGM_GAP", "POV_FACE_SHOWN"} <= _codes(result)
+        "coverage", "fidelity", "continuity", "language", "timeline", "pov"}
+    assert {"ITEM_UNCOVERED", "LINE_CHANGED", "CATCHPHRASE_NOT_SPOKEN", "NON_CANONICAL_SPEAKER", "STATE_DROPPED",
+            "MIXED_LANGUAGE", "SFX_OUT_OF_SHOT", "BGM_GAP", "POV_FACE_SHOWN"} <= _codes(result)
 
 
 def test_live_14_draft_is_rejected():
@@ -69,6 +72,16 @@ def test_live_14_draft_is_rejected():
     assert "ITEM_UNCOVERED" in _codes(result, "coverage") and "UNKNOWN_ITEM" in _codes(result, "coverage")
     assert _codes(result, "fidelity") == {"LANGUAGE_MISMATCH"}
     assert "UNKNOWN_SPEAKER" in _codes(result, "continuity")
+
+
+def test_live_14_p3_final_draft_is_rejected():
+    """The v1.4 live re-run passed check_brief by pasting brief sentences into Chinese descriptions,
+    kept the catchphrase in speakerless narration, and dropped the 300g bubble."""
+    result = _run(_load("examples/14_comedy_pov-live-p3/draft_revisions/v4.json"))
+    found = {(i["code"], i.get("item") or i.get("shot_id")) for i in result["issues"]}
+    assert ("ANCHOR_MISSING", "script_structure.tag.visual") in found
+    assert ("NARRATION_UNATTRIBUTED", "S4") in found and "CATCHPHRASE_NOT_SPOKEN" in _codes(result)
+    assert {sid for code, sid in found if code == "MIXED_LANGUAGE"} == {"S1", "S2", "S3", "S6"}
 
 
 def test_translation_is_allowed_when_asked_for():
@@ -84,7 +97,9 @@ def test_anchor_and_evidence_are_checked_in_the_fulfilling_shot():
     result = _run(draft)
     found = {(i["code"], i.get("item")) for i in result["issues"]}
     assert ("ANCHOR_MISSING", "text_overlay_hints[1]") in found
-    assert ("EVIDENCE_WEAK", "visual_notes[3]") in found
+    # weak word overlap no longer blocks (it rewarded pasting brief text); it goes to review instead
+    assert not any(i["code"] == "EVIDENCE_WEAK" for i in result["issues"])
+    assert ("COVERAGE_UNVERIFIED", "visual_notes[3]") in {(f["code"], f.get("item")) for f in result["review"]}
 
 
 def test_locked_lines_and_deviation_reasons():
@@ -131,3 +146,21 @@ def test_unknown_fulfills_ids_are_reported():
 def test_recall_uses_stems_and_ignores_stopwords():
     assert recall("the hands blurred", "her hand blurs") == pytest.approx(1.0)
     assert recall("全片暖黄灯光", "暖黄色的灯光") > 0.3
+
+
+def test_mixed_language_ignores_names_quotes_and_loanwords():
+    draft = _load("fixtures/drafts/comedy_v2.json")
+    draft["shots"][0]["visual"] = "DeepSeek Whale Maiden 背对镜头站在料理台后偷吃米饭，头顶弹出「Carbohydrate Sampling in Progress」，POV 视角"
+    draft["shots"][0]["lighting"] = "暖黄顶光，BGM 进入前的安静厨房"
+    assert "MIXED_LANGUAGE" not in _codes(_run(draft))
+    draft["shots"][0]["visual"] += "，in POV shots the background behind her is blurred"
+    assert ("MIXED_LANGUAGE", "S1") in {(i["code"], i.get("shot_id")) for i in _run(draft)["issues"]}
+
+
+def test_narration_needs_a_narrator_in_dialogue_scripts():
+    creative = copy.deepcopy(CREATIVE)
+    draft = _load("fixtures/drafts/comedy_v2.json")
+    draft["shots"][1]["narration"] = "Meanwhile, in the kitchen..."
+    assert "NARRATION_UNATTRIBUTED" in _codes(_run(draft, creative))
+    creative["cast"] = creative["cast"] + ["Narrator"]
+    assert "NARRATION_UNATTRIBUTED" not in _codes(_run(draft, creative))

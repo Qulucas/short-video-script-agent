@@ -227,7 +227,7 @@
             "beat": "panic_reaction",
             "claim_scope": "generic",
             "perspective": "pov",
-            "visual": "The camera stumbles back a step; DeepSeek Whale Maiden follows it, still stuffing rice in, bowl tilted toward the lens so the last grains slide in, cheeks round as a hamster's and rice grains stuck all over the collar of her T-shirt.",
+            "visual": "The camera stumbles back a step; DeepSeek Whale Maiden follows it, still stuffing rice in, bowl tilted toward the lens so the last grains slide in, cheeks round as a hamster's and rice grains stuck all over the collar of her T-shirt.（镜头晃动，饭粒糊在镜头边缘，她一边嚼一边往前追）",
             "shot_size": "close-up",
             "camera": {
               "move": "handheld retreat, small shakes",
@@ -426,7 +426,7 @@
       "observation": {
         "ok": true,
         "revision": 1,
-        "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7",
+        "draft_hash": "sha256:b71a45d2aabfe12dbad326faeee76e82157e20162a1253dc7dc1675e8e00ad80",
         "diff": {
           "from": 0,
           "to": 1,
@@ -444,7 +444,7 @@
       },
       "next": "estimate_duration",
       "draft_revision": 1,
-      "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
+      "draft_hash": "sha256:b71a45d2aabfe12dbad326faeee76e82157e20162a1253dc7dc1675e8e00ad80"
     },
     {
       "n": 2,
@@ -760,11 +760,11 @@
         "beats_pass": false,
         "window_pass": false,
         "revision": 1,
-        "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
+        "draft_hash": "sha256:b71a45d2aabfe12dbad326faeee76e82157e20162a1253dc7dc1675e8e00ad80"
       },
       "next": "check_brief",
       "draft_revision": 1,
-      "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
+      "draft_hash": "sha256:b71a45d2aabfe12dbad326faeee76e82157e20162a1253dc7dc1675e8e00ad80"
     },
     {
       "n": 3,
@@ -781,11 +781,15 @@
           },
           "fidelity": {
             "pass": false,
-            "issues": 1
+            "issues": 2
           },
           "continuity": {
             "pass": false,
             "issues": 2
+          },
+          "language": {
+            "pass": false,
+            "issues": 1
           },
           "timeline": {
             "pass": false,
@@ -805,6 +809,11 @@
           },
           {
             "section": "fidelity",
+            "code": "CATCHPHRASE_NOT_SPOKEN",
+            "message": "口头禅要出现在角色本人的 dialogue 里（不是 narration、字幕或屏幕文字）：No, I didn't steal it! This is carrying out a carbohydrate sampling mission!"
+          },
+          {
+            "section": "fidelity",
             "code": "LINE_CHANGED",
             "message": "计划台词被改写或删掉，但没有 deviations 记录（保留度 0.00）",
             "beat": "tag",
@@ -821,6 +830,12 @@
             "code": "STATE_DROPPED",
             "message": "角色状态“two rice grains on her lips”消失了，没有写进 cleared",
             "shot_id": "S6"
+          },
+          {
+            "section": "language",
+            "code": "MIXED_LANGUAGE",
+            "message": "visual 中英混写；画面描述用一种语言写（引号里的屏幕文字、角色名不算）",
+            "shot_id": "S4"
           },
           {
             "section": "timeline",
@@ -878,18 +893,20 @@
           "audio_notes.sfx[1]",
           "audio_notes.sfx[2]",
           "audio_notes.sfx[3]",
-          "audio_notes.sfx[4]"
+          "audio_notes.sfx[4]",
+          "script_structure.panic_reaction.visual",
+          "script_structure.tag.visual"
         ],
         "revision": 1,
-        "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
+        "draft_hash": "sha256:b71a45d2aabfe12dbad326faeee76e82157e20162a1253dc7dc1675e8e00ad80"
       },
       "next": "write_draft",
       "draft_revision": 1,
-      "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
+      "draft_hash": "sha256:b71a45d2aabfe12dbad326faeee76e82157e20162a1253dc7dc1675e8e00ad80"
     },
     {
       "n": 4,
-      "rationale": "总长 35.5s 超过 30.0s；punchline 段估算 20.0–31.5s、计划 20.0–26.0s（止点偏差 +5.5s），压缩该段台词并记进 deviations；口头禅不在任何计划段落里，放进 panic_reaction；check_brief 报 BGM_GAP、BGM_SHORT、ITEM_UNCOVERED、LINE_CHANGED、NON_CANONICAL_SPEAKER、POV_FACE_SHOWN、SFX_OUT_OF_SHOT、STATE_DROPPED，逐条修正",
+      "rationale": "总长 35.5s 超过 30.0s；punchline 段估算 20.0–31.5s、计划 20.0–26.0s（止点偏差 +5.5s），压缩该段台词并记进 deviations；口头禅不在任何计划段落里，放进 panic_reaction；check_brief 报 BGM_GAP、BGM_SHORT、CATCHPHRASE_NOT_SPOKEN、ITEM_UNCOVERED、LINE_CHANGED、MIXED_LANGUAGE、NON_CANONICAL_SPEAKER、POV_FACE_SHOWN、SFX_OUT_OF_SHOT、STATE_DROPPED，逐条修正",
       "action": "write_draft",
       "args": {
         "title": "Whale Maiden's Carbohydrate Sampling Incident",
@@ -1772,6 +1789,10 @@
             "pass": true,
             "issues": 0
           },
+          "language": {
+            "pass": true,
+            "issues": 0
+          },
           "timeline": {
             "pass": true,
             "issues": 0
@@ -1827,7 +1848,9 @@
           "audio_notes.sfx[1]",
           "audio_notes.sfx[2]",
           "audio_notes.sfx[3]",
-          "audio_notes.sfx[4]"
+          "audio_notes.sfx[4]",
+          "script_structure.panic_reaction.visual",
+          "script_structure.tag.visual"
         ],
         "revision": 2,
         "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
