@@ -5,39 +5,11 @@ from typing import Any, Dict, List, Optional
 
 from src.config import FIXTURES_DIR
 from src.providers.base import Provider
-from src.schemas import DRAFT_KEYS
 from src.tools.duration import MIN_SHOT_SEC
 
 
-def _load(name: str, kind: str = "drafts") -> Dict[str, Any]:
-    return json.loads((FIXTURES_DIR / kind / (name + ".json")).read_text(encoding="utf-8"))
-
-
-def _patches_to(current: Dict[str, Any], target: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """The patch_draft ops that turn ``current`` into ``target``, field by field."""
-    ops: List[Dict[str, Any]] = []
-    cur = {s["id"]: s for s in current.get("shots", [])}
-    tgt_ids = [s["id"] for s in target.get("shots", [])]
-    for sid in cur:
-        if sid not in tgt_ids:
-            ops.append({"remove_shot": sid})
-    prev = None
-    for shot in target.get("shots", []):
-        old = cur.get(shot["id"])
-        if old is None:
-            ops.append({"insert_shot": shot, "after": prev})
-        else:
-            sets = {k: v for k, v in shot.items() if old.get(k) != v}
-            unsets = [k for k in old if k not in shot]
-            if sets or unsets:
-                ops.append(dict({"shot": shot["id"], "set": sets}, **({"unset": unsets} if unsets else {})))
-        prev = shot["id"]
-    keys = ("title",) + DRAFT_KEYS
-    sets = {k: target[k] for k in keys if k in target and current.get(k) != target[k]}
-    unsets = [k for k in keys if k in current and k not in target]
-    if sets or unsets:
-        ops.append(dict({"draft": True, "set": sets}, **({"unset": unsets} if unsets else {})))
-    return ops
+def _load(name: str) -> Dict[str, Any]:
+    return json.loads((FIXTURES_DIR / "drafts" / (name + ".json")).read_text(encoding="utf-8"))
 
 
 def _act(rationale: str, action: str, args: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -73,21 +45,13 @@ class FixtureProvider(Provider):
     def __init__(self, brief: Dict[str, Any]):
         self.brief = brief
         self.scenario = brief.get("scenario", "normal")
-        self.reviews = 0
-
-    def review(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Canned critiques for the comedy scenario; other scenarios have no critic."""
-        if self.scenario != "comedy_pov":
-            raise NotImplementedError
-        self.reviews += 1
-        return _load("comedy_r%d" % self.reviews, "reviews")
 
     def _search(self, query: str, rationale: str) -> Dict[str, Any]:
         return _act(rationale, "search_materials", {"query": query})
 
     def _write(self, name: str, rationale: str) -> Dict[str, Any]:
         draft = _load(name)
-        return _act(rationale, "write_draft", {k: v for k, v in draft.items() if k in ("title", "shots") + DRAFT_KEYS})
+        return _act(rationale, "write_draft", {"title": draft["title"], "shots": draft["shots"]})
 
     def decide(self, state: Dict[str, Any]) -> Dict[str, Any]:
         scenario = self.scenario
@@ -109,116 +73,6 @@ class FixtureProvider(Provider):
         if scenario == "tool_limit":
             return _act("反复检查引用（观察到 %s），测试工具调用上限" % (obs.get("error_code") or "无错误"),
                         "check_citations")
-
-        if scenario == "comedy_pov":
-            fmt = state.get("format") or {}
-            outline = state.get("outline_check")
-            if not draft and not (outline or {}).get("pass"):
-                if outline is None:
-                    return _act("strict 格式要先出大纲：6 镜按 5 段排时间，把 brief 条目分到分镜",
-                                "write_outline", _load("comedy_v1", "outlines"))
-                return _act("大纲检查报 %s，补上 waiver 后重交" % "、".join(
-                    "%s %s" % (i["code"], i.get("item") or "") for i in outline.get("issues", [])),
-                    "write_outline", _load("comedy_v2", "outlines"))
-            if not draft:
-                return self._write("comedy_v1", "大纲通过（计划 %s）；format=%s，materials_required=%s：不陈述产品能力就不需要素材；"
-                                   "先按 5 段计划原样写台词，再看估算" % (_sec(outline["total_sec"]), fmt.get("name"),
-                                                                       str(fmt.get("materials_required")).lower()))
-            if est is None:
-                return _act("估算 revision %d（beat_timing=%s）" % (state.get("draft_revision", 0), fmt.get("beat_timing")),
-                            "estimate_duration")
-            brief_check = checks.get("brief")
-            patched = state.get("patches", 0) > 0
-            if not brief_check and not patched:
-                return _act("估算 pass=%s；同一版也先跑 check_brief，一次改稿把时间和 brief 问题一起修"
-                            % str(est.get("pass")).lower(), "check_brief")
-            if brief_check and (not est.get("pass") or not brief_check.get("pass")) and not patched:
-                late = [b for b in est.get("beats", []) if not b.get("pass")]
-                first = late[0] if late else {}
-                codes = sorted({i["code"] for i in brief_check.get("issues", [])})
-                ops = _patches_to(draft, _load("comedy_v2"))
-                return _act("总长 %s 超过 %s；%s 段估算 %s–%ss、计划 %s–%ss（止点偏差 %+.1fs），"
-                            "压缩该段台词并记进 deviations；口头禅不在任何计划段落里，放进 panic_reaction；"
-                            "check_brief 报 %s。只改出问题的地方：%d 条补丁" % (
-                                       _sec(est["total_sec"]), _sec(est["max_sec"]), first.get("beat"),
-                                       (first.get("actual") or [0, 0])[0], (first.get("actual") or [0, 0])[1],
-                                       first.get("planned", [0, 0])[0], first.get("planned", [0, 0])[1],
-                                       first.get("delta_end", 0.0), "、".join(codes), len(ops)),
-                            "patch_draft", {"patches": ops})
-            if not est.get("pass"):
-                return _act("改稿后仍未通过，结束并说明", "finish", {
-                    "status": "unmet_constraints", "stop_reason": "duration_cannot_meet",
-                    "blocking_reason": "段落时间仍超出计划。", "options": ["放宽段落时间", "删减台词"],
-                    "summary": "段落时间无法满足。",
-                })
-            if not checks.get("rules"):
-                return _act("时长 %s，%d 段时间误差都在 ±%ss 内，检查规则" % (
-                    _sec(est["total_sec"]), len(est.get("beats", [])), est.get("beat_tolerance_sec")), "check_rules")
-            if not checks.get("citations"):
-                return _act("规则通过，检查引用（fiction 分镜只列出不校验）", "check_citations")
-            if not checks.get("production"):
-                return _act("引用 pass=%s，列出 %d 处 fiction 说法；检查制作字段" % (
-                    str(checks["citations"].get("pass")).lower(), len(checks["citations"].get("fiction_claims", []))),
-                    "check_production")
-            if checks["production"].get("pass") and not checks.get("brief"):
-                return _act("制作字段通过，检查 brief 覆盖、台词保真和连贯性", "check_brief")
-            review = state.get("last_review")
-            if checks["production"].get("pass") and checks["brief"].get("pass"):
-                if not review or review.get("draft_hash") != state.get("draft_hash"):
-                    if state.get("reviews", 0) < 2 and (review is None or state.get("patches", 0) > 1):
-                        return _act("确定性检查全部通过；请独立评审看节奏和笑点（只供参考）", "review_draft")
-                elif review.get("suggestions") and state.get("patches", 0) < 2:
-                    tip = review["suggestions"][0]
-                    return _act("评审 %s/5，%s：%s。采纳这一条（%s），其余不改" % (
-                        review["overall"], tip["shot_id"], tip["issue"], tip["edit"]), "patch_draft", {"patches": [
-                            {"shot": "S2", "set": {"sfx[1].at_sec": 3.6, "dialogue[0].at_sec": 3.4}}]})
-                return _act("时长、段落时间、规则、引用、制作字段、brief 全部通过；评审 %s/5；%d 条交给用户确认"
-                            % (review["overall"] if review else "—", len(checks["brief"].get("review", []))), "finish", {
-                    "status": "completed", "summary": "POV 搞笑短剧脚本完成：6 镜按 5 段，段落时间与计划一致。",
-                })
-            return _act("制作字段未补齐，结束并说明", "finish", {
-                "status": "unmet_constraints", "stop_reason": "needs_review",
-                "blocking_reason": "check_production 仍有问题。", "options": ["人工补齐制作字段"],
-                "summary": "制作字段未补齐。",
-            })
-
-        if scenario == "production":
-            creative = self.brief.get("creative_brief") or {}
-            loaded = state.get("loaded_skills") or {}
-            production = checks.get("production")
-            if not state.get("materials"):
-                return self._search(self.brief.get("material_query") or "字幕", "先检索素材，creative_brief 里的产品说法要有来源")
-            if "short_video_structure" not in loaded:
-                return _act("creative_brief 有 %d 个段落、目标 %s，先读段落结构和字数预算"
-                            % (len(creative.get("script_structure", [])), _sec(self.brief["target_duration_sec"])),
-                            "load_skill", {"name": "short_video_structure"})
-            if creative.get("character_setting") and "virtual_character_direction" not in loaded:
-                return _act("有角色设定 %s，读取角色表演指导" % creative["character_setting"].get("name", ""),
-                            "load_skill", {"name": "virtual_character_direction"})
-            if not draft:
-                return self._write("prod_v1", "检索到 %d 条素材；按 5 个段落写首稿，删掉素材不支持的“AI字幕/一键识别”"
-                                   % len(state.get("materials", [])))
-            if est is None:
-                return _act("估算 revision %d 时长" % state.get("draft_revision", 0), "estimate_duration")
-            if not checks.get("rules"):
-                return _act("时长 %s，检查规则" % _sec(est["total_sec"]), "check_rules")
-            if not checks.get("citations"):
-                return _act("规则通过，检查引用", "check_citations")
-            if not production:
-                return _act("引用 pass=%s，检查制作字段" % str(checks["citations"].get("pass")).lower(), "check_production")
-            if not production.get("pass") and writes < 2:
-                codes = sorted({i.get("code") for i in production.get("issues", [])})
-                return self._write("prod_v2", "check_production 报 %d 个问题（%s）；补齐景别/运镜/角色动作/转场/BGM，"
-                                   "CTA 改回原样口头禅" % (len(production.get("issues", [])), "、".join(codes)))
-            if est.get("pass") and checks["rules"].get("pass") and checks["citations"].get("pass") and production.get("pass"):
-                return _act("时长 %s、规则、引用、制作字段全部通过，输出" % _sec(est["total_sec"]), "finish", {
-                    "status": "completed", "summary": "制作模式脚本已完成：5 个段落、角色动作和制作字段齐全。",
-                })
-            return _act("制作字段仍未补齐，结束并说明", "finish", {
-                "status": "unmet_constraints", "stop_reason": "needs_review",
-                "blocking_reason": "check_production 仍有问题。", "options": ["人工补齐制作字段"],
-                "summary": "制作字段未补齐。",
-            })
 
         if scenario == "tool_failure":
             if not obs.get("ok") and obs.get("error_code") == "TIMEOUT":

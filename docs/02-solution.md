@@ -25,11 +25,11 @@ CLI -> 输入校验 -> Orchestrator -> Provider.decide
 
 - 执行模型选的动作；
 - 把工具结果原样回灌；
-- 维护 `MAX_STEPS=32`、`MAX_TOOL_CALLS=26`、`MAX_QUERY_REWRITES=2`、`MAX_DRAFT_WRITES=4`、`MAX_PATCHES=8`、`MAX_OUTLINES=3`（集中在 `src/limits.py`，prompt 的剩余预算也从这里算）；
+- 维护 `MAX_STEPS=20`、`MAX_TOOL_CALLS=16`、`MAX_QUERY_REWRITES=2`、`MAX_DRAFT_WRITES=4`（集中在 `src/limits.py`，prompt 的剩余预算也从这里算）；
 - 在 `finish` 前做完成闸门；
 - 写 Trace。
 
-`MAX_TOOL_CALLS` 故意小于 `MAX_STEPS`：被闸门拒绝的 `finish` 和解析失败只消耗步数、不消耗工具调用，所以两条上限都能真实触发（`08_step_limit` 触发步数上限，`11_tool_call_limit` 触发工具上限）。早期版本是 20/24，每步最多一次工具调用，工具上限永远到不了；后来是 20/16，喜剧格式多了两项检查后 live 14-p3 用到 19 步、16 次，现在是 32/26。
+`MAX_TOOL_CALLS` 故意小于 `MAX_STEPS`：被闸门拒绝的 `finish` 和解析失败只消耗步数、不消耗工具调用，所以两条上限都能真实触发（`08_step_limit` 触发步数上限，`11_tool_call_limit` 触发工具上限）。早期版本是 20/24，每步最多一次工具调用，工具上限永远到不了。
 
 完成闸门要求当前 revision 的 estimate/rules/citations 都绑定同一个 `draft_hash`，防止“检查旧稿、提交新稿”。
 
@@ -49,109 +49,7 @@ system prompt 还写明了估算公式（4.2 字/秒 + 0.3s 停顿、每镜 ≥1
 
 输入可以带一份 `initial_draft`（`{title, shots}`）。编排器在第 0 步把它校验后装为 revision 1（Trace 动作为 `seed_draft`，不计入模型写稿次数）；校验失败时不安装，错误作为 observation 交给模型。这对应“可编辑脚本”的需求，也让参考示例（38 秒初稿 → 压缩 → 28 秒左右）能用真实模型复现：初稿固定，压缩决策由模型做。
 
-## 制作模式：创作方向、制作字段和写作技能
-
-起因：用户用带角色设定、5 段结构和视觉规范的输入跑 live，得到的脚本只有泛泛的使用建议。排查发现不是模型写得差，而是：
-
-1. `normalize_brief` 和 prompt 只透传固定字段，`character_setting` / `script_structure` / `visual_notes` / `text_overlay_hints` 全被丢掉，模型根本没看到；
-2. 分镜只有 `visual/narration/subtitle` 三个文本字段，没有景别、运镜、角色动作、屏幕文字、音效、转场的位置，视频生成模型无从执行；
-3. 引用检查把“提升”这个词本身当成效果数字，题目里的“提升信息密度”一出现就被拒，模型只好绕开主题。
-
-改动：
-
-- **`creative_brief`**（`src/schemas.py`）：上述四个字段收进一个块，`script_structure` 规范成有序段落列表，原样进入 prompt。它是创作方向，不是事实来源，不加入 BRIEF 伪来源。
-- **制作字段**：分镜可选 `beat/shot_size/camera/character_action/expression/on_screen_text/sfx/bgm/transition`，都不影响时长估算。`on_screen_text` 观众看得到，所以同样过规则和引用检查。
-- **`check_production`**（`src/tools/production.py`）：确定性检查，按 brief 决定必填字段（有段落就要 `beat`，有角色就要动作和表情；景别、运镜、转场总是必填，最后一镜不需要转场），并检查段落覆盖与顺序、口头禅原样出现（忽略标点）、`visual` 至少 12 字、至少一镜指定 BGM。只列问题，不改稿。制作模式下完成闸门要求它绑定当前 `draft_hash` 且通过；普通输入不受影响。
-- **写作技能包**（`data/skills/*.md`、`src/skills.py`）：段落结构与字数预算、钩子写法、虚拟角色表演、字幕与屏幕文字、交给视频模型的字段词表。prompt 只放索引（id/标题/适用场景），模型用 `load_skill` 按需读取正文，读过的正文留在之后每轮的 `loaded_skills` 里。读本地文件不算外部工具，所以只消耗步数、不消耗工具调用，单独上限 `MAX_SKILL_LOADS=3`。
-- **`storyboard.md`**（`src/render.py`）：逐镜制作单。视频模型各镜独立生成，所以每镜提示词都重复角色外观。
-- **效果数字误报**：引用检查只在出现量化效果（`30%`、`三成`、`2倍`、“提升…30%”）时要求 data 来源；不带数字的“提升信息密度”是建议，不拦。“产品 + 提升”仍按产品事实处理。
-
-用户计划台词里的“AI 字幕 / 一键识别语音 / 自动生成字幕 / 完播率完全不一样”在素材里都没有依据，制作模式不会放行，Agent 会删掉或改成通用表达。要用这些说法，需要先在 `data/materials.json` 补真实的产品事实。
-
-## 内容格式、脚本 v2 和时间引擎
-
-起因：用户给了一份 POV 搞笑短剧的目标脚本（多人对白、画外音、带时间的音效、进度条式屏幕文字、1.5 倍速、镜头被米粒糊住）。按原设计它根本跑不起来：JSON 有语法错误；`Topic` 大写读不到；`camera_notes`/`audio_notes` 被白名单丢掉；素材检索为空直接 `needs_input`；即使写出来，闸门也要求一条产品 claim；英文台词按 4.2 词/秒算，严重低估。
-
-- **输入（阶段 0）**：`cli.load_input` 报 JSON 的行列和可能原因；`normalize_keys` 让键名不区分大小写并走别名表，改名写进 `assumptions`；识别 `camera_notes`/`audio_notes`，其余未知字段进 `creative_brief.extra`（模型可见，但不单独开启制作模式）。
-- **格式**（`data/formats.json`、`src/formats.py`）：`format` 决定是否必须有产品 claim、素材是否必需、是否允许 `fiction`、逐段计时是 `strict` 还是 `advisory`、额外必填的制作字段。`scenario` 仍只给 fixture 选策略，不再兼任内容类型。
-- **fiction**：剧情里角色的玩笑式说法（“口味模型需要训练数据”）不是产品事实，`claim_scope="fiction"` 的分镜不做引用校验，但提到产品名的句子（去掉角色名后）进 `fiction_claims` 和 `FICTION_CLAIMS` 风险，留给人工确认。品牌规则照常检查。默认格式里写 `fiction` 会被 `write_draft` 拒绝。
-- **脚本 v2（阶段 1）**：分镜可选 `dialogue`、`sfx`（字符串或带时间/方位的对象）、`overlays`、`action_sec`、`playback_rate`、`perspective`、`camera`（字符串或 `{move, handheld}`）、`lens_fx`、`lighting`、`character_state`、`fulfills`，草稿级 `audio_tracks`。都可选，v1 草稿原样有效；有对白时旁白和字幕可省。规则和引用检查通过 `shot_texts` 扫描所有观众能看到或听到的文字（旁白、字幕、屏幕文字、每句对白、每个 overlay）。
-- **时间引擎（阶段 2）**：说话时长按语言算（中文 4.2 字/秒、英文 2.6 词/秒），括号内是音效不计时，“……/——”各加 0.3 秒，“（停顿0.5s）”按写明的加。用了 v2 时间字段的分镜取最长的一项：旁白、字幕、最后一句对白结束、最后一个 overlay 消失、`action_sec ÷ playback_rate`；`playback_rate` 只缩短动作画面，不加快说话。估算返回每镜 `driver`（谁决定了时长）和全片 `timeline`。有 `script_structure` 时按段对比计划 `time_range` 和实际起止；`strict` 格式下每段误差 ≤ `beat_tolerance_sec`（0.5 秒）才算通过。
-
-v1 草稿的估算结果和字段完全不变（fixture 01–12 重新生成后逐字节一致）；13 只多了 `advisory` 的逐段对比。
-
-## 喜剧技能包（阶段 6）
-
-`data/skills/` 新增 8 个技能：`comedy_sketch_structure`（铺垫→事件→升级→笑点→尾巴、三次法则、反应留白）、`pov_cinematography`（观众即主角、手可以入画脸不能、反打和打破第四面墙）、`physical_comedy_timing`（定格、变速、双重反应、音效卡点的时长账）、`anime_idol_acting`（漫画符号、语气标签）、`sound_design_cues`（环境声/BGM/音效/画外音分层、喜剧里的静音）、`ui_overlay_gags`（进度条、状态气泡、系统提示的可读性）、`character_bible`（名字、代词、状态延续、口头禅）、`exemplar_comedy_pov`（用户样例里“被抓→定格”一镜的完整写法和逐字段注释）。
-
-技能头部新增 `formats`（适用的格式，`all` 表示全部）和 `recommend`（推荐给哪些格式）。模型看到的索引只列出适用于当前格式的技能，推荐的排在前面并标 `recommended: true`；`load_skill` 也只接受这些技能，读取上限从 3 提到 5（正好覆盖喜剧格式的 5 个推荐技能）。技能里写的语速、阅读速度、屏幕文字最短时长等数字有测试保证与估算器常量一致；范例分镜本身是一个能通过 `validate_draft` 的 v2 分镜。
-
-## 交付文件（阶段 7）：`src/export.py`
-
-制作模式的运行除了 `storyboard.md`，还在 `exports/` 下生成：
-
-| 文件 | 用途 | 内容 |
-|---|---|---|
-| `shots.json` | 视频生成模型 | 每镜一段提示词（重复角色外观）、负面提示词（POV/反打镜头加“不要出现主角的脸，包括倒影”）、按平台的画幅（抖音 9:16）、按模型最长片段（默认 10 秒，可改 5 秒）切成的 clips、后期要加的屏幕文字 |
-| `voice_script.json` | 配音 / TTS | 每句台词的说话人、去掉括号音效后的文本、语气、是否画外、语速、起止时间；纯拟声（“...（吞咽）”）标 `nonverbal` |
-| `subtitles.srt` | 字幕 | 按台词时间生成，跳过纯拟声 |
-| `cue_sheet.csv` | 剪辑 / 音频 | 音效（时刻、方位、质感）、BGM/环境声分段、屏幕文字起止、转场，按时间排序 |
-| `character_sheet.md` | 角色一致性 | 角色设定、cast、每镜动作/表情/状态、全片视觉规范 |
-
-`storyboard.md` 每镜后面多了一张事件时间线表（对白、音效、屏幕文字的绝对时间）。这些文件全部由 `result.json` 推出，不调用模型；`python -m src.cli export --run 运行目录 [--clip-sec 5]` 可以从任何保存的运行重新生成。
-
-## 评测（阶段 8）：`src/eval/score.py`
-
-`python -m src.eval.score --label 名称=目录模式[,目录模式...] --out 报告路径` 给一组运行目录打分。它读每个运行的终稿（`draft_revisions/v{N}.json`；未完成的运行用 `last_state` 里的 revision，老结果没写时用磁盘上最新的一版），按金标准 brief 和当前版本的估算、`check_brief`、`check_production` 重新检查，输出覆盖率（含 waiver）、最大段落误差、计划台词保留度、各节问题数、是否全部通过、步数和工具调用等，再汇总均值、最值、标准差和目标达成数。重新检查而不是读运行当时的结果，是因为老版本的检查更弱，读旧结论会高估旧版本。
-
-评测暴露的成本问题：每次补丁后要逐项重跑 5 项检查（5 次工具调用），v1.6 的 run3 因此正好用完 26 次。阶段 8.1 加了 `check_all`：一次工具调用按依赖顺序跑完完成闸门需要的全部检查（估算 → 规则 → 引用 → 制作模式下的 `check_production` → strict 格式下的 `check_brief`），每项结果照常绑定当前 `draft_hash`，闸门不变；观察结果只给失败项的细节。单项检查仍然可用。
-
-评测还暴露了一个设计问题：动作修复上限原来按整个运行累计（2 次），长运行里零星的坏回复会把已经做完的运行终止。现在按**连续**失败计算，任何一次有效动作都清零；`incomplete` 的结果也会写出停在哪个 revision 和各项检查的状态。
-
-## 模型评审（阶段 4）：`review_draft`
-
-起因：live 14-p5 通过了全部确定性检查，但主人的吐槽被压成半句、punchline 的“语义完整性”笑点只留在屏幕文字里。“压缩后还好不好笑”是确定性规则判断不了的。
-
-- `review_draft` 另起一次**独立的**模型调用（`Provider.review`），用单独的审稿人 system prompt（`src/tools/review.py`），只给 brief、角色、段落、计划台词、当前稿、deviations 和当前稿的逐段计时，**不给**作者的 rationale 和历史，避免审稿人被作者的自我解释带偏。
-- 审稿人按 5 个维度打 1–5 分（comedic_timing、escalation、punchline_clarity、character_voice、visual_specificity），给一句总评和最多 5 条指向具体分镜/字段的修改建议；输出经 `validate_review` 校验，格式不对返回 `REVIEW_INVALID`。
-- **只供参考**：不进完成闸门；每次评审绑定 revision 和 `draft_hash`，之后再改稿则在结果里标 `stale`。评审计工具调用，最多 2 次（`MAX_REVIEWS`）。结果写进 `result.model_review`、`MODEL_REVIEW` 风险项和 `output.md`/`storyboard.md` 的“模型评审”一节。
-- prompt 建议在各项检查通过后评审一次，挑值得做的建议用 `patch_draft` 改，再重新检查；不采纳的建议不必改。
-- fixture 的审稿人是固定文本（`fixtures/reviews/`），只证明流程：评审 → 采纳一条建议的补丁 → 重新检查 → 第二次评审。
-
-取舍：用同一个模型自评，独立性有限；分数在不同运行间会波动。所以它只能做“提示作者再看一眼哪里”，不能当作完成条件，也不能当作质量指标汇报。
-
-## 先大纲、再正文、小改用补丁（阶段 5）
-
-起因：live 14-p3 为了修 `check_brief` 报的几个字段，两次整稿重写，19 步、16 次工具调用、4 次写稿全部用完；14-live 更早时为了 0.2 秒也整稿重写。
-
-- **`write_outline`**（`src/tools/outline.py`）：每镜只写 id、beat、计划时长、一句 gist 和 `fulfills`，外加 `waivers`。检查分镜数、段落顺序和覆盖、每段计划起止（同 `beat_tolerance_sec`）、计划总时长、brief 条目有没有分到分镜。喜剧格式（`brief_checks=strict` 且有 `script_structure`）要求大纲通过后才能 `write_draft`，否则 `OUTLINE_REQUIRED`；默认格式不要求。大纲时长是模型自己的预算，正文仍以 `estimate_duration` 为准。
-- **`patch_draft`**（`src/tools/patch.py`）：按路径改单个分镜的字段（`dialogue[0].line`、`camera.handheld`），插入或删除分镜，改草稿级字段（`title`、`audio_tracks`、`fulfills`、`waivers`、`deviations`）。任一操作失败则整个补丁不生效；结果照常过 schema、`fiction` 和来源校验，生成新 revision，之前的检查全部作废。diff 里标 `via: patch`，观察结果里有 `touched`。
-- **预算**：32 步 / 26 次工具调用 / 4 次整稿 / 8 次补丁 / 3 次大纲。
-- **provider**：显式发送 `max_tokens`（reasoner 默认 32768，其他 8192，可用 `LLM_MAX_TOKENS` 改）；`finish_reason=length` 的截断回复和格式不对的回复一样，作为 `INVALID_ACTION` 交回模型。
-- 模型可见的 `history` 里，`check_brief` 记下失败的节，补丁记下改了哪些分镜。
-
-## brief 检查（阶段 3）：`check_brief`
-
-起因：live 14 的稿子通过了全部 v1.3 检查，却丢了原 punchline 笑点、“300g”气泡、“3.2 次/秒”、BGM 换场时间，还把英文改成了中文。字段齐不齐、时间准不准都查不出“brief 有没有被落实”。
-
-`check_brief`（`src/tools/brief.py`）是一次工具调用，分六节，任一节有问题即不通过；`format.brief_checks=strict`（喜剧格式）时完成闸门要求它绑定当前 `draft_hash` 且通过，默认格式下可以调用但不强制。需要先有当前稿的估算（用到每镜时长和 timeline）。
-
-| 节 | 查什么 | 关键规则 |
-|---|---|---|
-| coverage | brief 每一条要求是否落实 | `visual_notes`/`text_overlay_hints`/`camera_notes`/`audio_notes.*` 每条有稳定 id（如 `text_overlay_hints[1]`），prompt 里给出。落实它的分镜在 `fulfills` 写 id，全片性要求写在草稿顶层 `fulfills`；引号原文和数字（去掉“0-5s:”时间前缀）必须原样出现在落实它的分镜里，否则 `ANCHOR_MISSING`；没有原文锚点的条目，词重合度 <0.3 时只进 `review`（`COVERAGE_UNVERIFIED`），不阻断。每个段落自己的 visual 里如果有引号原文或数字（如 “Sample quantity: 300g”、“1.5x”），也是一个条目 `script_structure.<段落>.visual`，由该段落的分镜自动承担。做不到就写 `waivers`，会列给用户 |
-| fidelity | 计划台词有没有被保留 | 从 `script_structure.audio` 里拆出台词：按“ / ”分段，括号是音效，除非括号里引用了已知说话人（“(owner, off screen: '...')”）。语言默认要与计划台词一致（`output_language` 可改）；用了 `dialogue` 时口头禅必须是角色本人的一句 dialogue（`CATCHPHRASE_NOT_SPOKEN`）；`locked` 段落或 `locked_lines` 必须逐字保留；其余台词保留度（词重合）<0.6 时必须有 `deviations` 记录，reason 要写出是哪项检查要求的（beat timing、BR-01、citation 等关键词） |
-| continuity | 角色是否前后一致 | 说话人必须是角色名原文或 `cast`（别名报 `NON_CANONICAL_SPEAKER`）；用了 `dialogue` 的脚本里 `narration` 没有说话人，报 `NARRATION_UNATTRIBUTED`（除非 cast 里有 Narrator）；每镜 visual 要写出角色名；`pronoun` 声明后，配角台词里不能用错代词；`character_state` 的条目必须延续到后面每一镜，或写进 `cleared` |
-| language | 画面描述是否一种语言 | visual、lighting、character_action、expression、camera、lens_fx、transition 每个字段里，去掉角色名、引号原文和 POV/BGM/UI/logo 这类通用词后，中英文都有实质内容（各 ≥4 个单位，少的一方 ≥ 多的一方的 10%）就报 `MIXED_LANGUAGE` |
-| timeline | 时间上是否成立 | 音效不能超出本镜时长；屏幕文字显示时长要够读；同一说话人的台词不能重叠；`audio_tracks.bgm` 从 0 覆盖到片尾，中间无空档 |
-| pov | 视角规则 | POV 分镜占比 ≥ `pov_min_ratio`（喜剧格式 0.6）；POV 镜头不能出现主角的脸；写了“反打”就要 `perspective: reverse` |
-
-另有 `review`：身材/外貌评价、品牌 logo 或仿界面，只列出、不阻断，进入 `CONTENT_REVIEW` 风险。`waivers` 和 `deviations` 也分别进入 `BRIEF_WAIVERS` / `BRIEF_DEVIATIONS`，并在 `storyboard.md` 的“Brief 落实情况”里逐条列出。
-
-阶段 3.1 的调整来自 live 14-p3：模型为过“词重合”把 brief 英文原句抄进中文画面描述，口头禅放进没有说话人的 narration，tag 段的“300g”因为不在条目里而丢失。所以词重合降为复核项（不再奖励抄原文），另加描述语言检查、口头禅说话人检查和段落 visual 条目。
-
-取舍：这些都是文本层面的确定性检查。它能判断某条要求、某句台词是不是缺了或被改了，判断不了好不好笑；词重合和关键词判断也会有漏判和误判，阈值集中在 `src/tools/brief.py` 顶部。默认格式不强制，是因为口播里改台词多半是为了事实准确，逐句保真不适用。
-
-## 工具
+## 五个工具
 
 | 工具 | 输入 | 输出 |
 |---|---|---|
@@ -160,7 +58,6 @@ v1 草稿的估算结果和字段完全不变（fixture 01–12 重新生成后�
 | `estimate_duration` | 当前稿 | 逐镜时长、总时长、pass |
 | `check_rules` | 当前稿 + 已绑定估算 | 违规列表、needs_review |
 | `check_citations` | 当前稿 + 素材 | unsupported claims |
-| `check_production` | 当前稿 + creative_brief | 缺失字段、段落/口头禅/visual/BGM 问题（仅制作模式必需） |
 
 ## 终态
 

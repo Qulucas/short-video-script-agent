@@ -1,6 +1,6 @@
 # 8 秒讲清字幕
 
-- run_id: `20261101T051640Z-062959`
+- run_id: `20261031T120412Z-20ff56`
 - status: `unmet_constraints`
 - stop_reason: `duration_cannot_meet`
 - provider: `fixture`

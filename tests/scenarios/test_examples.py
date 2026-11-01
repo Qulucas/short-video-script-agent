@@ -38,8 +38,6 @@ EXPECTED = {
     "10_adversarial_claim": "completed",
     "11_tool_call_limit": "incomplete",
     "12_seeded_draft_38s": "completed",
-    "13_creative_brief": "completed",
-    "14_comedy_pov": "completed",
 }
 
 

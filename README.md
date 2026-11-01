@@ -4,7 +4,7 @@
 >
 > GitHub：https://github.com/Qulucas/short-video-script-agent
 >
-> 提交版本：tag `v1.7`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
+> 提交版本：tag `v1.1`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
 >
 > 一句话：把“生成脚本”做成可审计的闭环——模型选动作，工具算时长、查规则、验引用，检查结果再驱动下一轮修改或明确失败。
 
@@ -22,7 +22,7 @@ python -m src.cli run \
   --provider fixture \
   --out examples/01_normal_30s
 
-# 3. 一次跑完 14 个 fixture 场景（写到 runs/，不覆盖已提交证据）
+# 3. 一次跑完 12 个 fixture 场景（写到 runs/，不覆盖已提交证据）
 python -m src.cli batch --cases examples/cases --provider fixture --out-root runs
 
 # 4. 测试
@@ -43,20 +43,15 @@ pytest -q
 | fixture 正常生成、38→28、P01 引用 | 已完成 |
 | 缺关键信息、无素材、工具失败、超时长不可满足 | 已完成 |
 | 规则违规修正、60 秒动作对照、非法动作、检查哈希绑定 | 已完成 |
-| 14 个 fixture 场景输入、result/trace/output/draft_revisions | 已完成 |
-| 内容格式 + 脚本 v2 + 时间引擎（对白/音效/屏幕文字动画/动作时长/逐段计时） | 已完成（fixture 14 + live 14） |
-| 重复评测：`src/eval/score.py` 按同一金标准重打分；喜剧用例 v1.6、阶段 8.1、阶段 6–7 后 live 各跑 3 次（[报告](examples/eval/comedy_pov/report.md)） | 已完成：阶段 8.1 后完成 3/3、终稿全部达标，平均 12.7 步、9.3 次工具调用（v1.6：2/3，24.7 步、19.7 次）；加技能包后仍 3/3 达标，但台词保留度 0.88→0.76 |
-| brief 落实检查 `check_brief`（覆盖、台词保真、角色连贯、描述语言、时间线、POV、人工复核项） | 已完成（fixture 14、live 14-p3；拒绝 v1.3 的 live 14 稿和 v1.4 的 live 14-p3 终稿） |
-| 制作模式：角色设定/段落结构/视觉规范进入 prompt，制作字段 + `check_production` + 写作技能 + `storyboard.md` | 已完成（fixture 13 + live 13） |
-| `pytest -q` | **171 passed, 1 deselected** |
-| **11 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩、制作模式、POV 搞笑短剧（阶段 3 前、阶段 3 后、阶段 5 后、阶段 4 后各一次）** |
+| 12 个 fixture 场景输入、result/trace/output/draft_revisions | 已完成 |
+| `pytest -q` | **58 passed, 1 deselected** |
+| **6 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩** |
 
 必选验收场景除“缺关键信息”（入口确定性校验，不经过模型）外都有 live 版本，对照表见 [docs/03-evaluation.md](docs/03-evaluation.md)。重点：
 
 - [12_seeded_draft_38s-live](examples/12_seeded_draft_38s-live/)：题目参考示例的真实模型版本，用户 38.0s 初稿 → 模型压缩 → 28.4s，P01 在 S2；
 - [04_tool_failure-live](examples/04_tool_failure-live/) vs [04b_tool_transient-live](examples/04b_tool_transient-live/)：同一输入只差故障次数，模型分别停止（`incomplete`）和重试恢复（`completed`）；
-- [05_unmet_duration-live](examples/05_unmet_duration-live/)：模型自己算出规则下限 9.0s > 8.0s 并给出放宽选项；
-- [13_creative_brief-live](examples/13_creative_brief-live/storyboard.md)：带角色设定和 5 段结构的输入，输出逐镜制作单（景别、运镜、角色动作、屏幕文字、音效、BGM、转场）。
+- [05_unmet_duration-live](examples/05_unmet_duration-live/)：模型自己算出规则下限 9.0s > 8.0s 并给出放宽选项。
 
 复现命令见 [examples/LIVE_RUNBOOK.md](examples/LIVE_RUNBOOK.md)。
 
@@ -72,13 +67,7 @@ pytest -q
 | 时长估算 | `src/tools/duration.py` | 旁白 + 字幕阅读时长，十分之一秒整数累加 |
 | 规则检查 | `src/tools/rules.py` | `demo_default` / `strict_disclaimer`，BR-01~05 |
 | 引用校验 | `src/tools/citations.py` | source/quote/claim 覆盖、对抗性夹带扫描 |
-| 交付文件 | `src/export.py` | `exports/`：视频模型提示词、配音稿、SRT 字幕、音效表、角色表；`cli export` 可从保存的运行重建 |
-| 评测 | `src/eval/score.py` | 按金标准 brief 和当前检查给运行重新打分并汇总 |
-| 模型评审 | `src/tools/review.py` | 独立的审稿调用，5 维打分 + 修改建议；只供参考，不进闸门 |
-| 制作检查 | `src/tools/production.py` | 制作模式：必填制作字段、段落覆盖与顺序、口头禅、visual 细节、BGM |
-| brief 检查 | `src/tools/brief.py` | brief 每条要求是否落实、计划台词是否保留、角色/时间线/POV 是否连贯；人工复核项 |
-| 写作技能 | `src/skills.py`、`data/skills/*.md` | 13 个写作技能包（5 个通用/口播、8 个喜剧/POV），按格式推荐，模型用 `load_skill` 按需读取 |
-| Trace/Render | `src/trace.py`、`src/render.py` | 步骤记录、`result.json`/`output.md`/`storyboard.md` |
+| Trace/Render | `src/trace.py`、`src/render.py` | 步骤记录、`result.json`/`output.md` |
 
 ## Agent 决策循环
 
@@ -86,13 +75,13 @@ pytest -q
 模型选动作 -> 工具执行 -> observation 回灌 -> 模型决定下一步 -> ... -> finish
 ```
 
-- 动作：`search_materials` / `write_outline` / `write_draft` / `patch_draft` / `estimate_duration` / `check_rules` / `check_citations` / `check_production` / `check_brief` / `check_all` / `review_draft` / `load_skill` / `finish`
+- 动作：`search_materials` / `write_draft` / `estimate_duration` / `check_rules` / `check_citations` / `finish`
 - 每次动作必须带 `rationale`，Trace 原样记录；不记录模型内部思维链。
-- `MAX_STEPS=32`，`MAX_TOOL_CALLS=26`，`MAX_DRAFT_WRITES=4`，`MAX_PATCHES=8`，`MAX_OUTLINES=3`（`src/limits.py`）；任一到顶返回 `incomplete`，两条上限各有一个场景实际触发。
-- `finish(completed)` 必须满足：当前稿有绑定 `draft_hash` 的时长/规则/引用检查，时长和规则通过，事实可追溯；输入带创作方向（制作模式）时还要 `check_production` 通过。
+- `MAX_STEPS=20`，`MAX_TOOL_CALLS=16`，`MAX_DRAFT_WRITES=4`（`src/limits.py`）；任一到顶返回 `incomplete`，两条上限各有一个场景实际触发。
+- `finish(completed)` 必须满足：当前稿有绑定 `draft_hash` 的时长/规则/引用检查，时长和规则通过，事实可追溯。
 - `needs_input` / `unmet_constraints` / `incomplete` / `failed` 各有独立 `stop_reason` 和退出码。
 
-## 14 个 fixture 场景
+## 12 个 fixture 场景
 
 | 文件 | 预期 |
 |---|---|
@@ -106,24 +95,8 @@ pytest -q
 | `08_step_limit` | 反复过早 finish 被闸门拒绝 → incomplete/step_limit_reached |
 | `09_unmet_rules` | P04 触发 BR-01，unmet/rules_cannot_meet |
 | `10_adversarial_claim` | 删除“还能自动生成字幕”后 completed |
-| `11_tool_call_limit` | 26 次工具调用后 incomplete/tool_call_limit_reached |
+| `11_tool_call_limit` | 16 次工具调用后 incomplete/tool_call_limit_reached |
 | `12_seeded_draft_38s` | 用户给 38.0s 初稿 → 压缩到 28.0s → completed |
-| `14_comedy_pov` | `format=comedy_pov_sketch`，不检索素材；大纲第一次漏分 camera_notes[1] → 补 waiver 通过；首稿 punchline 段止点 +5.5s，`check_brief` 六节各报问题 → 一次 `patch_draft` 修 5 镜和草稿级字段 → 30.0s，5 段时间与计划一致，`check_brief` 通过 → 模型评审建议多定格 0.4s → 第二个补丁 → 重查通过 → completed |
-| `13_creative_brief` | 读 2 个技能 → 首稿时长/规则/引用都过但 `check_production` 报 31 个问题 → 补齐制作字段、口头禅 → completed，输出 `storyboard.md` |
-
-## 制作模式（给视频生成模型用）
-
-输入里带 `character_setting` / `script_structure` / `visual_notes` / `text_overlay_hints` 任一项时，Agent 按段落写分镜，每镜带景别、运镜、角色动作和表情、屏幕文字、音效、BGM、转场，并额外输出 [storyboard.md](examples/13_creative_brief/storyboard.md)。设计和取舍见 [docs/02-solution.md](docs/02-solution.md#制作模式创作方向制作字段和写作技能)。
-
-创作方向不是事实来源：计划台词里素材不支持的功能（如“AI 字幕一键识别”）会被删掉或改写，要保留就先在 `data/materials.json` 补真实素材。
-
-### 内容格式与脚本 v2
-
-- `format` 选内容类型（`data/formats.json`）：`promo_talking_head`（默认，产品口播，必须有产品 claim）或 `comedy_pov_sketch`（剧情短剧：素材可选、允许 `claim_scope="fiction"` 的剧情玩笑、逐段计时严格）。
-- 分镜可用结构化字段：多人 `dialogue`（含画外音、语气、`at_sec`、语速）、带时间和方位的 `sfx`、带动画的 `overlays`、`action_sec` / `playback_rate`、`perspective`（POV/反打）、`lens_fx`、`lighting`、`character_state`，草稿级 `audio_tracks`。
-- 时间引擎按语言算说话时长（中文 4.2 字/秒，英文 2.6 词/秒），括号里的音效不计时，“……”和写明的停顿加时长；返回全片 timeline 和每段计划/估算偏差。
-- 输入 JSON 写错会报行列和可能原因；键名不区分大小写、支持常见别名；不认识的字段保留在 `creative_brief.extra`，不再静默丢弃。
-- 模板：[examples/templates/comedy_pov.json](examples/templates/comedy_pov.json)。后续阶段见 [docs/06-roadmap.md](docs/06-roadmap.md)。
 
 ## 事实与时长护栏
 
@@ -139,7 +112,7 @@ pytest -q
 - 运行环境是 Python 3.9.6，因此用标准库 `dataclasses/json/urllib` 实现，**未引入 Pydantic/httpx**；schema 校验手写在 `src/schemas.py`。这降低了评审安装成本，代价是错误信息不如 Pydantic 丰富。
 - `fixture` 是可重复回归；live 已实际运行，但真实模型有不确定性。
 - `v3_32s` 实际为 32.2 秒；`unmet_9s` 实际为 9.4 秒；`v60_58s` 为 58.5 秒。测试断言使用实际值。
-- 为容纳 live 模型的额外改稿尝试，步数/写稿预算从方案里的 16/3 调整为 20/4，喜剧格式加入 `check_production`/`check_brief` 后再调到 32 步 / 26 次工具调用，另加 8 次补丁、3 次大纲；工具调用上限始终低于步数上限，保证可触发。
+- 为容纳 live 模型的额外改稿尝试，步数/写稿预算从方案里的 16/3 调整为 20/4；工具调用上限 16，低于步数上限，保证可触发。
 - 未实现 UI、部署、多 Agent、真实 TTS。
 
 ## 文档
@@ -149,11 +122,10 @@ pytest -q
 - [测试结果与限制](docs/03-evaluation.md)
 - [AI 使用记录](docs/04-ai-usage.md)
 - [复盘](docs/05-retrospective.md)
-- [路线图：剧情短剧级精度](docs/06-roadmap.md)
 
 ## 已知限制
 
-1. **live 结果不稳定**：11 条 live 各跑一次，不保证每次同一路径；fixture 才是可重复证据。05-live 中观察到 rationale 数字与 observation 不符、内容镜用占位句凑时长，见 docs/03。
+1. **live 结果不稳定**：6 条 live 各跑一次，不保证每次同一路径；fixture 才是可重复证据。05-live 中观察到 rationale 数字与 observation 不符、内容镜用占位句凑时长，见 docs/03。
 2. 时长是估算，不是 TTS 实测。
 3. claim 扫描是启发式，复杂语义改写仍需人工复核。
 4. `material_ids` 是白名单；正常案例使用 P01，避免 P04 污染。

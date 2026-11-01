@@ -8,32 +8,14 @@
 
 第二轮使用 Claude Code（Claude Opus 5.5）按考核标准做了一次评审，并按评审结果修改：工具调用上限不可达（20 步 / 24 次 → 改为 16 次并加场景 11）、fixture 05 重复写同一稿却声称“压缩”（改为真实压缩 + 用规则数据算下限）、必选场景只有 fixture 证据（新增 4 条 live：工具持续失败、瞬时失败、时长不可满足、38s 初稿压缩）、模型看不到规则集内容和动作历史（加入 prompt）、新增 `initial_draft` 输入。该轮的 live 运行由 Claude Code 在本机用仓库 `.env` 配置执行。
 
-第三轮（Claude Code，Claude Opus 5.5）：用户用自己的 `my_case.json`（角色设定 + 5 段结构 + 视觉规范）跑 live，反馈脚本太简单、视频生成 AI 无法照做。AI 排查出根因是输入白名单丢掉了创作方向、分镜没有制作字段、引用检查把“提升”误判为效果数字，随后实现：`creative_brief` 透传、9 个可选制作字段、`check_production` 及其闸门、5 个写作技能包和 `load_skill` 动作、`storyboard.md`、收窄效果数字判断；新增 fixture 13 和 live 13（由 Claude Code 在本机用仓库 `.env` 配置执行一次）。
-
-第四轮（Claude Code，Claude Opus 5.5）：用户给出 POV 搞笑短剧的目标脚本，要求达到同等精度。AI 先测出它在当前版本入口就失败的原因（JSON 语法、大写键名、白名单丢 `camera_notes`/`audio_notes`、素材为空、强制产品 claim、英文语速），给出 8 阶段方案（[06-roadmap.md](06-roadmap.md)），按用户要求实现阶段 0–2：输入报错与键名归一、`format` 与 `fiction`、脚本 v2 字段、按语言和结构计时与逐段计时；新增喜剧模板、fixture 14 和 live 14（由 Claude Code 在本机用仓库 `.env` 配置执行一次）。
-
-第五轮（Claude Code，Claude Opus 5.5）：按路线图实现阶段 3 的 `check_brief`（覆盖、台词保真、角色连贯、时间线、POV、人工复核项），喜剧格式进闸门；重做喜剧 fixture 让首稿在五节各失败一次；加测试证明 v1.3 的 live 14 稿会被拒绝；live 14 第一次重跑因模型一次回复两个 JSON 动作而中断，随后把这类回复改为交回模型重试，再重跑一次（由 Claude Code 在本机用仓库 `.env` 配置执行）。
-
-第六轮（Claude Code，Claude Opus 5.5）：按 live 14-p3 暴露的问题实现阶段 3.1：段落 visual 条目、词重合降为复核项、描述语言混写检查、口头禅必须是角色台词、dialogue 脚本里的 narration 需要 Narrator；加测试证明 14-p3 终稿会被拒。本轮没有跑 live。
-
-第七轮（Claude Code，Claude Opus 5.5）：实现阶段 5：`write_outline`（喜剧格式写正文前必须通过）、`patch_draft` 局部修改、预算调到 32 步 / 26 次工具调用并加补丁和大纲上限、provider 显式 `max_tokens` 并把截断回复交回模型；喜剧 fixture 改为大纲 → 首稿 → 补丁；live 14 重跑一次（由 Claude Code 在本机用仓库 `.env` 配置执行），从 trace 发现并修复大纲检查拒收段落 visual 条目的 bug。
-
-第八轮（Claude Code，Claude Opus 5.5）：实现阶段 4 的 `review_draft`（独立审稿调用、5 维打分和修改建议，只供参考、不进闸门），喜剧 fixture 演示“评审 → 采纳一条建议 → 重查 → 再评审”。live 14 第一次重跑在第 5 步因网络连接被重置中断，随后给 provider 加传输层重试（`LLM_RETRIES`），再重跑一次（由 Claude Code 在本机用仓库 `.env` 配置执行）。
-
-第九轮（Claude Code，Claude Opus 5.5）：实现阶段 8 的打分器 `src/eval/score.py`，喜剧用例 live 并行跑 3 次（由 Claude Code 在本机用仓库 `.env` 配置执行）；从结果发现修复上限按累计计算会终止已做完的运行、incomplete 结果不写 revision，两处都已修。
-
-第十轮（Claude Code，Claude Opus 5.5）：阶段 8.1，加 `check_all`（一次工具调用跑完全部闸门检查），按修复后的版本再并行跑 3 次 live 并重新打分（由 Claude Code 在本机用仓库 `.env` 配置执行）。
-
-第十一轮（Claude Code，Claude Opus 5.5）：阶段 6（8 个喜剧/POV 技能包、按格式推荐、读取上限 5）和阶段 7（`exports/` 下的视频模型提示词、配音稿、SRT、音效表、角色表，`cli export`），之后再并行跑 3 次 live 检查技能包没有带来退步（由 Claude Code 在本机用仓库 `.env` 配置执行）。
-
 ## 使用范围
 
 | 范围 | AI 参与 | 验证 |
 |---|---|---|
 | 方案 | 根据审查意见修订 `docs/00-plan.md` | 人工审查意见逐条对照 |
-| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 171 passed |
+| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 58 passed |
 | 测试 | 单元、集成、场景测试 | 实际运行 |
-| 示例 | 14 个 fixture case + 11 条单次 live + 6 次重复评测的 result/trace/output | 实际运行生成 |
+| 示例 | 12 个 fixture case + 6 条 live 的 result/trace/output | 实际运行生成 |
 | 文档 | README、docs/01–05 | 对照实际输出复核 |
 
 ## 个人贡献需要补充的部分
@@ -42,7 +24,7 @@
 
 1. 逐行理解 `src/orchestrator.py` 的完成闸门和预算；
 2. 检查 `src/tools/citations.py` 的启发式是否符合预期；
-3. 核对 11 条 live trace，确认模型确实根据 observation 改稿；
+3. 核对 6 条 live trace，确认模型确实根据 observation 改稿；
 4. 检查示例文案和品牌规则是否符合实际产品；
 5. 填写实际投入时间、未完成部分和个人复盘。
 
@@ -51,16 +33,14 @@
 - live 路径 A：`deepseek-reasoner`，20.7s→29.2s→引用失败→28.3s，completed；
 - live 路径 B：三次空检索后 `needs_input`；
 - live 04/04b/05/12：工具持续失败→incomplete、瞬时失败→重试恢复、BR-03 驱动改稿后 unmet、38.0s 初稿→28.4s；
-- live 13：制作模式，按 5 段写 6 镜、制作字段齐全、29.4s completed；
-- live 14：POV 搞笑短剧，首稿 30.0s、逐段计时全中，但漏了部分 brief 要求（docs/03 有记录）；
-- fixture 14 个场景、171 个离线测试通过。
+- fixture 12 个场景、58 个离线测试通过。
 
 ## 未验证/未完成
 
-- 喜剧用例在 v1.6、阶段 8.1 后、阶段 6–7 后各重复 3 次，其余 live 各跑一次；3 次只能看出量级，不是统计意义上的稳定性评测；
+- live 6 条各跑一次，不是稳定性评测；
 - 真实 TTS 时长：未接入；
 - 人工对 12 个场景文案的质量评审：未做；
-- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.7` 为准。
+- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.1` 为准。
 
 ## 防伪声明
 

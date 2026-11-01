@@ -1,5 +1,5 @@
 {
-  "run_id": "20261101T051640Z-062959",
+  "run_id": "20261031T120412Z-20ff56",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -21,8 +21,8 @@
     "material_ids 为素材白名单"
   ],
   "limits": {
-    "max_steps": 32,
-    "max_tool_calls": 26
+    "max_steps": 20,
+    "max_tool_calls": 16
   },
   "draft_revision": 2,
   "draft_hash": "sha256:3a5a0712ff0e0df89c918f79e77f108502f72d12ad3643eb14297f80c9528d0a",

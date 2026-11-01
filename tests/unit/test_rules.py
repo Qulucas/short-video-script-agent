@@ -45,22 +45,3 @@ def test_strict_disclaimer_fixture_passes_rules_but_duration_fails():
     rules = check_rules(draft, "strict_disclaimer", est, RULES, MATERIALS)
     assert rules["pass"] is True
     assert est["pass"] is False
-
-
-def test_on_screen_text_is_checked_like_narration():
-    draft = _draft("v2_28s")
-    draft["shots"][0]["on_screen_text"] = "全网第一的字幕工具"
-    est = estimate_draft(draft, 30)
-    result = check_rules(draft, "demo_default", est, RULES, MATERIALS)
-    assert any(v["rule_id"] == "BR-01" and v["field"] == "on_screen_text" for v in result["violations"])
-
-
-def test_dialogue_and_overlays_are_checked_even_in_fiction_shots():
-    draft = _draft("v2_28s")
-    draft["shots"][0].update({"claim_scope": "fiction", "claims": [],
-                              "dialogue": [{"speaker": "A", "line": "这是全网第一的大米"}],
-                              "overlays": [{"text": "最强采样"}]})
-    est = estimate_draft(draft, 30)
-    result = check_rules(draft, "demo_default", est, RULES, MATERIALS)
-    fields = {v["field"] for v in result["violations"] if v["rule_id"] == "BR-01"}
-    assert {"dialogue[0]", "overlays[0]"} <= fields

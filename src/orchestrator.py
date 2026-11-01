@@ -8,26 +8,18 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from src.config import DATA_DIR, load_json
-from src.formats import DEFAULT_FORMAT, format_config
-from src.limits import (MAX_ACTION_REPAIRS, MAX_DRAFT_WRITES, MAX_OUTLINES, MAX_PATCHES,
-                        MAX_QUERY_REWRITES, MAX_REVIEWS, MAX_SKILL_LOADS, MAX_STEPS, MAX_TOOL_CALLS)
+from src.limits import (MAX_ACTION_REPAIRS, MAX_DRAFT_WRITES, MAX_QUERY_REWRITES,
+                        MAX_STEPS, MAX_TOOL_CALLS)
 from src.render import exit_code_for
-from src.schemas import DRAFT_KEYS, draft_hash, normalize_brief, parse_action, validate_draft
-from src.skills import list_skills, load_skill
-from src.tools.brief import brief_items, check_brief, planned_lines
+from src.schemas import draft_hash, normalize_brief, parse_action, validate_draft
 from src.tools.citations import check_citations
 from src.tools.duration import estimate_draft
 from src.tools.errors import ToolError
 from src.tools.materials import FaultInjector, MaterialsTool
-from src.tools.outline import check_outline
-from src.tools.patch import apply_patches
-from src.tools.review import review_context, validate_review
-from src.tools.production import check_production
 from src.tools.rules import check_rules
 from src.trace import TraceRecorder
 
 HISTORY_WINDOW = 8
-EMPTY_CHECKS = {"duration": None, "rules": None, "citations": None, "production": None, "brief": None}
 
 
 class ModelError(Exception):
@@ -89,7 +81,6 @@ class Orchestrator:
     def __init__(self, brief: Dict[str, Any], provider: Any):
         self.brief = brief
         self.provider = provider
-        self.format = format_config(brief.get("format", ""))
         self.materials = load_json(DATA_DIR / "materials.json")
         self.rules_config = load_json(DATA_DIR / "brand_rules.json")
         self.materials_tool = MaterialsTool(self.materials, FaultInjector(brief.get("faults")))
@@ -103,30 +94,17 @@ class Orchestrator:
             "draft_revision": 0,
             "draft_hash": None,
             "last_estimate": None,
-            "last_checks": dict(EMPTY_CHECKS),
+            "last_checks": {"duration": None, "rules": None, "citations": None},
             "last_observation": {"ok": True, "error_code": None},
             "search_attempts": 0,
             "tool_calls": 0,
             "draft_writes": 0,
-            "patches": 0,
-            "outlines": 0,
-            "outline": None,
-            "outline_check": None,
-            "reviews": 0,
-            "last_review": None,
             "action_repairs": 0,
             "revisions": [],
             "step": 0,
             "trace_errors": [],
             "history": [],
             "rule_set": self._rule_set_view(brief.get("brand_rule_set", "")),
-            "format": self.format,
-            "brief_items": [{"id": i["id"], "text": i["text"], "must_contain": i["quotes"] + ["%g" % n for n in i["numbers"]]}
-                            for i in brief_items(brief.get("creative_brief") or {})],
-            "planned_lines": planned_lines(brief.get("creative_brief") or {}),
-            "skills_available": list_skills(fmt=self.format["name"]),
-            "loaded_skills": {},
-            "skill_loads": 0,
         }
         self.trace = TraceRecorder(
             provider=provider.name,
@@ -149,63 +127,6 @@ class Orchestrator:
             "required_segments": rule_set.get("required_segments", []),
         }
 
-    @property
-    def production_mode(self) -> bool:
-        """Creative direction means the script goes to a video model, so check_production gates completion.
-
-        Unrecognized input fields alone (``creative_brief.extra``) do not switch it on.
-        """
-        return any(k != "extra" for k in (self.brief.get("creative_brief") or {}))
-
-    def _draft_from(self, source: Dict[str, Any]) -> Dict[str, Any]:
-        draft = {"title": source.get("title"), "shots": source.get("shots")}
-        for key in DRAFT_KEYS:
-            if source.get(key) is not None:
-                draft[key] = source[key]
-        return draft
-
-    @property
-    def brief_checks_strict(self) -> bool:
-        return self.production_mode and self.format.get("brief_checks") == "strict"
-
-    def _scope_errors(self, draft: Dict[str, Any]) -> List[str]:
-        if self.format.get("allow_fiction"):
-            return []
-        return ["%s: claim_scope=fiction 只能用于娱乐类 format（当前 %s）" % (s.get("id"), self.format["name"])
-                for s in draft.get("shots", []) if isinstance(s, dict) and s.get("claim_scope") == "fiction"]
-
-    def _estimate(self, draft: Dict[str, Any]) -> Dict[str, Any]:
-        beats = (self.brief.get("creative_brief") or {}).get("script_structure")
-        return estimate_draft(draft, float(self.brief["target_duration_sec"]), beats=beats,
-                              beat_tolerance_sec=float(self.format.get("beat_tolerance_sec", 0.5)),
-                              beat_timing=self.format.get("beat_timing", "advisory"))
-
-    def _load_skill(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        name = str(args.get("name") or "").strip()
-        if name in self.state["loaded_skills"]:
-            return {"ok": True, "skill": name, "already_loaded": True}
-        if self.state["skill_loads"] >= MAX_SKILL_LOADS:
-            return {"ok": False, "error_code": "SKILL_LOAD_LIMIT",
-                    "message": "最多读取 %d 个技能" % MAX_SKILL_LOADS, "retryable": False}
-        available = [s["id"] for s in self.state["skills_available"]]
-        skill = load_skill(name) if name in available else None    # only skills that apply to this format
-        if skill is None:
-            return {"ok": False, "error_code": "SKILL_NOT_FOUND", "retryable": True,
-                    "available": [s["id"] for s in self.state["skills_available"]]}
-        self.state["skill_loads"] += 1
-        self.state["loaded_skills"][name] = skill["body"]
-        return {"ok": True, "skill": name, "title": skill.get("title", ""), "chars": len(skill["body"])}
-
-    def _last_state(self) -> Dict[str, Any]:
-        """Where an unfinished run stopped: the revision on disk and which checks it had passed."""
-        checks = self.state["last_checks"]
-        return {
-            "draft_revision": self.state["draft_revision"] or None,
-            "draft_hash": self.state["draft_hash"],
-            "checks": {k: (v.get("pass") if v and v.get("draft_hash", self.state["draft_hash"]) == self.state["draft_hash"]
-                           else None) for k, v in checks.items()},
-        }
-
     def _record_error(self, code: str, message: str) -> None:
         self.state["trace_errors"].append({"code": code, "message": message})
 
@@ -218,23 +139,13 @@ class Orchestrator:
             item["query"] = args.get("query")
         if name == "finish":
             item["status"] = args.get("status")
-        if name == "load_skill":
-            item["skill"] = args.get("name")
-        if observation.get("touched"):
-            item["touched"] = observation["touched"]
-        if observation.get("sections"):
-            item["failing"] = [k for k, v in observation["sections"].items() if not v.get("pass")]
-        if name == "check_all":
-            item["failing"] = observation.get("failing")
-        for key in ("error_code", "revision", "total_sec", "pass", "beats_pass", "total", "missing"):
+        for key in ("error_code", "revision", "total_sec", "pass", "total", "missing"):
             if observation.get(key) is not None:
                 item[key] = observation[key]
         if observation.get("violations"):
             item["violations"] = [v.get("rule_id") for v in observation["violations"]]
         if observation.get("unsupported_claims"):
             item["unsupported"] = [u.get("code") for u in observation["unsupported_claims"]]
-        if observation.get("issues"):
-            item["issues"] = sorted({i.get("code") for i in observation["issues"]})
         self.state["history"] = (self.state["history"] + [item])[-HISTORY_WINDOW:]
 
     def _seed_draft(self) -> None:
@@ -242,8 +153,8 @@ class Orchestrator:
         seed = self.brief.get("initial_draft")
         if not seed:
             return
-        draft = self._draft_from(seed)
-        errors = validate_draft(draft) or self._scope_errors(draft)
+        draft = {"title": seed.get("title"), "shots": seed.get("shots")}
+        errors = validate_draft(draft)
         known = set(m["id"] for m in self.visible_materials) | {"BRIEF"}
         if not errors:
             for shot in draft["shots"]:
@@ -265,85 +176,10 @@ class Orchestrator:
         self.trace.add(0, "载入用户提供的初稿作为 revision 1（不计入模型写稿次数）", "seed_draft", obs, 1, h)
         self.state["last_observation"] = obs
 
-    @property
-    def outline_required(self) -> bool:
-        return self.brief_checks_strict and bool((self.brief.get("creative_brief") or {}).get("script_structure"))
-
-    def _draft_errors(self, draft: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        errors = validate_draft(draft) or self._scope_errors(draft)
-        if errors:
-            return {"ok": False, "error_code": "DRAFT_SCHEMA", "errors": errors, "retryable": True}
-        known = set(m["id"] for m in self.visible_materials) | {"BRIEF"}
-        for shot in draft["shots"]:
-            for claim in shot.get("claims", []):
-                if claim.get("source_id") not in known:
-                    return {"ok": False, "error_code": "UNKNOWN_SOURCE",
-                            "message": "未知来源: " + str(claim.get("source_id")), "retryable": True}
-        return None
-
-    def _install(self, draft: Dict[str, Any], via: str = "write") -> Dict[str, Any]:
-        """Make ``draft`` the new revision; every earlier check is now stale."""
-        prev = self.state["current_draft"]
-        prev_rev = self.state["draft_revision"]
-        rev = prev_rev + 1
-        h = draft_hash(draft)
-        diff = _rev_diff(prev, draft, prev_rev, rev)
-        if via != "write":
-            diff["via"] = via
-        self.state["current_draft"] = draft
-        self.state["draft_revision"] = rev
-        self.state["draft_hash"] = h
-        self.state["last_estimate"] = None
-        self.state["last_checks"] = dict(EMPTY_CHECKS)
-        self.state["revisions"].append({"revision": rev, "draft": copy.deepcopy(draft), "diff": diff})
-        return {"ok": True, "revision": rev, "draft_hash": h, "diff": diff}
-
     def _execute_tool(self, action: Dict[str, Any]) -> Dict[str, Any]:
-        self.state["tool_calls"] += 1
-        return self._dispatch(action)
-
-    def _applicable_checks(self) -> List[str]:
-        names = ["estimate_duration", "check_rules", "check_citations"]
-        if self.production_mode:
-            names.append("check_production")
-        if self.brief_checks_strict:
-            names.append("check_brief")
-        return names
-
-    def _check_all(self) -> Dict[str, Any]:
-        """Run every check the completion gate needs, in dependency order, as one tool call.
-
-        Each sub-check stores its result exactly as if it had been called on its own, so the gate
-        is unchanged. The observation keeps details only for checks that failed.
-        """
-        if not self.state["current_draft"]:
-            return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
-        summary: Dict[str, Any] = {}
-        for name in self._applicable_checks():
-            obs = self._dispatch({"name": name, "args": {}})
-            entry: Dict[str, Any] = {"pass": bool(obs.get("ok")) and bool(obs.get("pass"))}
-            if name == "estimate_duration":
-                entry.update({k: obs.get(k) for k in ("total_sec", "min_sec", "max_sec") if k in obs})
-                if not entry["pass"]:
-                    entry["beats"] = [b for b in obs.get("beats", []) if not b.get("pass")]
-                    entry["shots"] = obs.get("shots")
-            elif not entry["pass"]:
-                for key in ("error_code", "violations", "needs_review", "unsupported_claims", "issues", "sections"):
-                    if obs.get(key):
-                        entry[key] = obs[key]
-            if name == "check_brief" and obs.get("review"):
-                entry["review"] = obs["review"]
-            summary[name] = entry
-        failing = [k for k, v in summary.items() if not v["pass"]]
-        return {"ok": True, "pass": not failing, "failing": failing, "checks": summary,
-                "revision": self.state["draft_revision"], "draft_hash": self.state["draft_hash"]}
-
-    def _dispatch(self, action: Dict[str, Any]) -> Dict[str, Any]:
         name = action["name"]
         args = action.get("args", {})
-
-        if name == "check_all":
-            return self._check_all()
+        self.state["tool_calls"] += 1
 
         if name == "search_materials":
             if self.state["search_attempts"] >= 1 + MAX_QUERY_REWRITES:
@@ -364,54 +200,41 @@ class Orchestrator:
             result["empty"] = len(result.get("items", [])) == 0
             return result
 
-        if name == "write_outline":
-            if self.state["outlines"] >= MAX_OUTLINES:
-                return {"ok": False, "error_code": "OUTLINE_LIMIT",
-                        "message": "最多提交 %d 次大纲" % MAX_OUTLINES, "retryable": False}
-            self.state["outlines"] += 1
-            result = check_outline(args, self.brief.get("creative_brief") or {},
-                                   float(self.brief["target_duration_sec"]),
-                                   float(self.format.get("beat_tolerance_sec", 0.5)))
-            self.state["outline"] = copy.deepcopy(args)
-            self.state["outline_check"] = result
-            return {"ok": True, **result}
-
         if name == "write_draft":
             if self.state["draft_writes"] >= MAX_DRAFT_WRITES:
                 self._record_error("DRAFT_WRITE_LIMIT", "草稿写入超过上限")
                 return {"ok": False, "error_code": "DRAFT_WRITE_LIMIT",
                         "message": "最多写入 %d 次草稿" % MAX_DRAFT_WRITES, "retryable": False}
-            if self.outline_required and not (self.state["outline_check"] or {}).get("pass"):
-                return {"ok": False, "error_code": "OUTLINE_REQUIRED", "retryable": True,
-                        "message": "这个格式要先 write_outline 并通过，再写正文"}
-            draft = self._draft_from(args)
-            error = self._draft_errors(draft)
-            if error:
-                return error
-            self.state["draft_writes"] += 1
-            return self._install(draft)
-
-        if name == "patch_draft":
-            if not self.state["current_draft"]:
-                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
-            if self.state["patches"] >= MAX_PATCHES:
-                self._record_error("PATCH_LIMIT", "补丁次数超过上限")
-                return {"ok": False, "error_code": "PATCH_LIMIT",
-                        "message": "最多 %d 次补丁" % MAX_PATCHES, "retryable": False}
-            draft, errors, touched = apply_patches(self.state["current_draft"], args.get("patches"))
+            draft = {"title": args.get("title"), "shots": args.get("shots")}
+            errors = validate_draft(draft)
             if errors:
-                return {"ok": False, "error_code": "PATCH_INVALID", "errors": errors, "retryable": True}
-            error = self._draft_errors(draft)
-            if error:
-                return error
-            self.state["patches"] += 1
-            return dict(self._install(draft, via="patch"), touched=touched)
+                return {"ok": False, "error_code": "DRAFT_SCHEMA", "errors": errors, "retryable": True}
+            known = set(m["id"] for m in self.visible_materials) | {"BRIEF"}
+            for shot in draft["shots"]:
+                for claim in shot.get("claims", []):
+                    if claim.get("source_id") not in known:
+                        return {"ok": False, "error_code": "UNKNOWN_SOURCE",
+                                "message": "未知来源: " + str(claim.get("source_id")),
+                                "retryable": True}
+            prev = self.state["current_draft"]
+            prev_rev = self.state["draft_revision"]
+            rev = prev_rev + 1
+            h = draft_hash(draft)
+            diff = _rev_diff(prev, draft, prev_rev, rev)
+            self.state["current_draft"] = draft
+            self.state["draft_revision"] = rev
+            self.state["draft_hash"] = h
+            self.state["last_estimate"] = None
+            self.state["last_checks"] = {"duration": None, "rules": None, "citations": None}
+            self.state["draft_writes"] += 1
+            self.state["revisions"].append({"revision": rev, "draft": copy.deepcopy(draft), "diff": diff})
+            return {"ok": True, "revision": rev, "draft_hash": h, "diff": diff}
 
         if name == "estimate_duration":
             draft = self.state["current_draft"]
             if not draft:
                 return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
-            est = self._estimate(draft)
+            est = estimate_draft(draft, float(self.brief["target_duration_sec"]))
             est["revision"] = self.state["draft_revision"]
             est["draft_hash"] = self.state["draft_hash"]
             self.state["last_estimate"] = est
@@ -449,56 +272,6 @@ class Orchestrator:
             self.state["last_checks"]["citations"] = result
             return {"ok": True, **result}
 
-        if name == "check_brief":
-            draft = self.state["current_draft"]
-            est = self.state["last_estimate"]
-            if not draft:
-                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
-            if not est or est.get("draft_hash") != self.state["draft_hash"]:
-                return {"ok": False, "error_code": "ESTIMATE_REQUIRED",
-                        "message": "请先对当前 revision 估算时长", "retryable": True}
-            result = check_brief(draft, self.brief.get("creative_brief") or {}, est,
-                                 product_name=self.brief.get("product_name", ""),
-                                 output_language=self.brief.get("output_language", ""),
-                                 pov_min_ratio=self.format.get("pov_min_ratio"))
-            result["revision"] = self.state["draft_revision"]
-            result["draft_hash"] = self.state["draft_hash"]
-            self.state["last_checks"]["brief"] = result
-            return {"ok": True, **result}
-
-        if name == "review_draft":
-            if not self.state["current_draft"]:
-                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
-            if self.state["reviews"] >= MAX_REVIEWS:
-                return {"ok": False, "error_code": "REVIEW_LIMIT", "message": "最多评审 %d 次" % MAX_REVIEWS,
-                        "retryable": False}
-            self.state["reviews"] += 1
-            try:
-                raw = self.provider.review(review_context(self.state))
-            except NotImplementedError:
-                return {"ok": False, "error_code": "REVIEW_UNAVAILABLE", "message": "当前 provider 没有评审能力",
-                        "retryable": False}
-            except Exception as exc:
-                return {"ok": False, "error_code": "REVIEW_FAILED", "message": str(exc)[:200], "retryable": False}
-            review, errors = validate_review(raw)
-            if errors:
-                return {"ok": False, "error_code": "REVIEW_INVALID", "errors": errors, "retryable": False}
-            review.update(revision=self.state["draft_revision"], draft_hash=self.state["draft_hash"],
-                          advisory=True)
-            self.state["last_review"] = review
-            return {"ok": True, **review}
-
-        if name == "check_production":
-            draft = self.state["current_draft"]
-            if not draft:
-                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
-            result = check_production(draft, self.brief.get("creative_brief") or {},
-                                      self.format.get("production_fields", []))
-            result["revision"] = self.state["draft_revision"]
-            result["draft_hash"] = self.state["draft_hash"]
-            self.state["last_checks"]["production"] = result
-            return {"ok": True, **result}
-
         return {"ok": False, "error_code": "UNKNOWN_ACTION", "message": "未知动作", "retryable": False}
 
     def _required_missing(self) -> List[str]:
@@ -514,14 +287,6 @@ class Orchestrator:
         citations = st["last_checks"].get("citations")
         if not citations or citations.get("draft_hash") != st["draft_hash"]:
             missing.append("citations")
-        if self.production_mode:
-            production = st["last_checks"].get("production")
-            if not production or production.get("draft_hash") != st["draft_hash"]:
-                missing.append("production")
-        if self.brief_checks_strict:
-            brief = st["last_checks"].get("brief")
-            if not brief or brief.get("draft_hash") != st["draft_hash"]:
-                missing.append("brief")
         return missing
 
     def _validate_finish(self, action: Dict[str, Any]) -> Tuple[bool, List[str]]:
@@ -544,12 +309,7 @@ class Orchestrator:
             citations = st["last_checks"]["citations"]
             if not citations.get("pass"):
                 missing.append("citations_not_pass")
-            if self.production_mode and not st["last_checks"]["production"].get("pass"):
-                missing.append("production_not_pass")
-            if self.brief_checks_strict and not st["last_checks"]["brief"].get("pass"):
-                missing.append("brief_not_pass")
-            if self.format.get("requires_product_claim") and (
-                    self.brief.get("product_name") or self.brief.get("material_ids")):
+            if self.brief.get("product_name") or self.brief.get("material_ids"):
                 has_claim = any(
                     shot.get("claims")
                     for shot in (st["current_draft"] or {}).get("shots", [])
@@ -612,32 +372,7 @@ class Orchestrator:
 
     def _risks(self) -> List[Dict[str, str]]:
         risks = []
-        citations = self.state["last_checks"].get("citations") or {}
-        if citations.get("fiction_claims"):
-            risks.append({"code": "FICTION_CLAIMS", "severity": "warn",
-                          "message": "%d 处剧情内提到产品的玩笑式说法未做事实校验，发布前请人工确认：%s" % (
-                              len(citations["fiction_claims"]),
-                              "；".join(c["sentence"] for c in citations["fiction_claims"]))})
-        review = self.state.get("last_review")
-        if review:
-            stale = review["draft_hash"] != self.state["draft_hash"]
-            risks.append({"code": "MODEL_REVIEW", "severity": "info",
-                          "message": "模型评审（仅供参考，不影响完成判定）：总分 %.1f/5%s；%s" % (
-                              review["overall"], "，评的是 revision %d，之后又改过" % review["revision"] if stale else "",
-                              "；".join("%s %s" % (s["shot_id"], s["issue"]) for s in review["suggestions"]) or "无修改建议")})
-        brief = self.state["last_checks"].get("brief") or {}
-        if brief.get("review"):
-            risks.append({"code": "CONTENT_REVIEW", "severity": "warn",
-                          "message": "需要人工确认：" + "；".join("%s %s" % (f["shot_id"], f["message"]) for f in brief["review"])})
-        if brief.get("waivers"):
-            risks.append({"code": "BRIEF_WAIVERS", "severity": "info",
-                          "message": "未落实的 brief 条目：" + "；".join("%s（%s）" % (w.get("item"), w.get("reason"))
-                                                               for w in brief["waivers"])})
-        if brief.get("deviations"):
-            risks.append({"code": "BRIEF_DEVIATIONS", "severity": "info",
-                          "message": "改动的计划台词：" + "；".join("%s（%s）" % (d.get("beat"), d.get("reason"))
-                                                            for d in brief["deviations"])})
-        if self.format.get("materials_required") and len(self.visible_materials) <= 1:
+        if len(self.visible_materials) <= 1:
             risks.append({"code": "LIMITED_MATERIAL", "severity": "warn",
                           "message": "可用产品素材很少，脚本以使用建议为主。"})
         if not any(m.get("source_type") == "data" for m in self.visible_materials):
@@ -662,10 +397,6 @@ class Orchestrator:
             "rules": st["last_checks"].get("rules"),
             "citations": st["last_checks"].get("citations"),
         }
-        if self.production_mode:
-            checks["production"] = st["last_checks"].get("production")
-        if self.brief_checks_strict or st["last_checks"].get("brief"):
-            checks["brief"] = st["last_checks"].get("brief")
         result = {
             "run_id": self.run_id,
             "provider": self.provider.name,
@@ -697,22 +428,6 @@ class Orchestrator:
             "blocking_reason": args.get("blocking_reason"),
             "options": args.get("options", []),
         }
-        if draft.get("audio_tracks"):
-            result["audio_tracks"] = draft["audio_tracks"]
-        if draft.get("fulfills"):
-            result["fulfills"] = draft["fulfills"]
-        if est.get("timeline"):
-            result["timeline"] = est["timeline"]
-        if est.get("beats"):
-            result["beats"] = est["beats"]
-        if self.format["name"] != DEFAULT_FORMAT:
-            result["format"] = self.format["name"]
-        if st["last_review"]:
-            result["model_review"] = dict(st["last_review"], stale=st["last_review"]["draft_hash"] != st["draft_hash"])
-        if self.production_mode:
-            result["platform"] = self.brief.get("platform")
-            result["creative_brief"] = self.brief["creative_brief"]
-            result["skills_loaded"] = sorted(st["loaded_skills"])
         if status == "incomplete":
             result["last_state"] = {
                 "draft_revision": st["draft_revision"],
@@ -762,16 +477,12 @@ class Orchestrator:
                 if self.state["action_repairs"] > MAX_ACTION_REPAIRS:
                     self.trace.finalize("incomplete", "invalid_action_limit", self.state["tool_calls"])
                     result = _terminal("incomplete", "invalid_action_limit",
-                                       "连续 %d 次动作解析失败" % self.state["action_repairs"], run_id=self.run_id,
+                                       "动作解析失败超过上限", run_id=self.run_id,
                                        provider=self.provider.name, model=self.provider.model,
-                                       mode=self.provider.mode, exit_code=4, last_state=self._last_state())
+                                       mode=self.provider.mode, exit_code=4)
                     return result, self.trace.to_dict(), self.state["revisions"]
                 self.state["last_observation"] = obs
                 continue
-
-            # The repair cap is for a model stuck producing garbage, so it counts consecutive failures;
-            # an occasional bad reply in a 30-step run should not end it (eval run2 died that way at step 18).
-            self.state["action_repairs"] = 0
 
             if action["name"] == "finish":
                 ok, missing = self._validate_finish(action)
@@ -789,15 +500,6 @@ class Orchestrator:
                 result = self._finalize(action, status, stop_reason)
                 return result, self.trace.to_dict(), self.state["revisions"]
 
-            if action["name"] == "load_skill":
-                obs = self._load_skill(action.get("args", {}))
-                self.state["last_observation"] = obs
-                idx = self.trace.add(step, action.get("rationale", ""), action, obs,
-                                     self.state["draft_revision"], self.state["draft_hash"])
-                prev_trace_index = idx
-                self._remember(step, action, obs)
-                continue
-
             if self.state["tool_calls"] >= MAX_TOOL_CALLS:
                 self.trace.add(step, action.get("rationale", ""), action,
                                {"ok": False, "error_code": "TOOL_CALL_LIMIT"},
@@ -806,7 +508,7 @@ class Orchestrator:
                 result = _terminal("incomplete", "tool_call_limit_reached",
                                    "工具调用达到上限", run_id=self.run_id,
                                    provider=self.provider.name, model=self.provider.model,
-                                   mode=self.provider.mode, exit_code=4, last_state=self._last_state())
+                                   mode=self.provider.mode, exit_code=4)
                 return result, self.trace.to_dict(), self.state["revisions"]
 
             observation = self._execute_tool(action)
@@ -821,7 +523,7 @@ class Orchestrator:
                            "已达到 %d 步执行上限" % MAX_STEPS, run_id=self.run_id,
                            provider=self.provider.name, model=self.provider.model,
                            mode=self.provider.mode, exit_code=4,
-                           last_state=self._last_state())
+                           last_state={"draft_revision": self.state["draft_revision"]})
         return result, self.trace.to_dict(), self.state["revisions"]
 
 
