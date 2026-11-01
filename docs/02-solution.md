@@ -75,10 +75,10 @@ system prompt 还写明了估算公式（4.2 字/秒 + 0.3s 停顿、每镜 ≥1
 2. **时长用确定性估算**：旁白口播 + 字幕阅读取较大值，内部用十分之一秒整数累加；模型不能自报。
 3. **事实用 claim ledger**：`source_id + quote + claim.text` 三层；product scope 也不能豁免额外夹带。
 4. **规则集数据化**：`demo_default` 不要求免责声明，`strict_disclaimer` 要求 6 秒独立声明 + 3 个内容分镜，避免示例和测试互相冲突。
-5. **fixture/live 分离**：fixture 可复现流程；live 已用 `deepseek-reasoner` 跑 2 条，结果单独标注。
+5. **fixture/live 分离**：fixture 可复现流程；live 已用 `deepseek-reasoner` 跑 6 条，结果单独标注。
 
 ## 与 v2 方案的实现偏差
 
 - Python 3.9.6 环境，使用标准库而非 Pydantic/httpx；schema 校验手写。
 - `v3_32s` 实际 32.2 秒；`unmet_9s` 实际 9.4 秒；`v60_58s` 实际 58.5 秒。
-- live 已跑 2 条；为容纳 live 的额外改稿尝试，预算从 16/3 调到 20/4；没有把 fixture 说成 live。
+- live 已跑 6 条；预算为 20 步 / 16 次工具调用 / 4 次写稿；没有把 fixture 说成 live。

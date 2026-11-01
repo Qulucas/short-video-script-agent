@@ -6,7 +6,7 @@
 >
 > v2 修订：针对审查意见，已把 live trace 提升为 P0；按估算器重算了示例分镜时长；把 `MAX_STEPS` 提升到 20；明确 `demo_default` 与 `strict_disclaimer` 两套规则；模型状态加入当前草稿，动作加入 `rationale`；补齐 5 种终态契约、退出码、revision/hash 绑定和伪代码分支；并补充非法动作、规则无法满足、预算回归等测试。
 >
-> 实现备注：live 已用 `deepseek-reasoner` 跑通 2 条；为容纳 live 的额外改稿尝试，代码预算为 `MAX_STEPS=20`、`MAX_TOOL_CALLS=24`、`MAX_DRAFT_WRITES=4`，详见 README 和 `docs/02-solution.md`。
+> 实现备注：live 已用 `deepseek-reasoner` 跑通 6 条；代码预算为 `MAX_STEPS=20`、`MAX_TOOL_CALLS=16`、`MAX_DRAFT_WRITES=4`，两条上限各有场景触发；详见 README 和 `docs/02-solution.md`。
 
 ## 1. 一页结论
 
@@ -720,13 +720,13 @@ return terminal("incomplete", "step_limit_reached")
 
 ```text
 MAX_STEPS = 20
-MAX_TOOL_CALLS = 24
+MAX_TOOL_CALLS = 16
 MAX_QUERY_REWRITES = 2
 MAX_DRAFT_WRITES = 4      # 首稿 + 最多 3 次修改
 MAX_ACTION_REPAIRS = 2
 ```
 
-`MAX_STEPS=20` 是刻意留出的余量：38→32.2→28 的三稿完整路径是 12 步（检索 + 3 次写稿 + 3 次估算 + 3 次规则 + 引用 + finish），仍留有 4 步给闸门拒绝或一次查询改写。当前一动作一步，`MAX_TOOL_CALLS=24` 是第二道保险；正常路径先触发步数上限，测试 T08 断言 `step_limit_reached`。
+`MAX_STEPS=20` 是刻意留出的余量：38→32.2→28 的三稿完整路径是 12 步（检索 + 3 次写稿 + 3 次估算 + 3 次规则 + 引用 + finish），仍留有 4 步给闸门拒绝或一次查询改写。当前一动作一步，`MAX_TOOL_CALLS=16` 是独立可触发的上限；正常路径先触发步数上限，测试 T08 断言 `step_limit_reached`。
 
 达到任一上限（下面以步数为例，实际按触发的上限替换 `stop_reason` 和 message）：
 
@@ -1747,7 +1747,7 @@ README 中必须贴出实际命令、退出码含义和预期输出摘要，不�
 |---|---|
 | P0-1 live 被放到 P2 | live 路径 A/B 提升为 P0；README 首屏放 live trace；fixture 只做回归 |
 | P0-2 示例 28 秒与估算器矛盾 | 按公式重算旁白字符数，示例五个分镜为 4.2/4.9/5.8/6.3/6.8，合计 28.0；加示例自洽测试 |
-| P0-3 步数与三稿路径冲突 | `MAX_STEPS=20`、`MAX_TOOL_CALLS=24`；新增 T13 覆盖 38→32.2→28；明确 12 步完整路径 |
+| P0-3 步数与三稿路径冲突 | `MAX_STEPS=20`、`MAX_TOOL_CALLS=16`；新增 T13 覆盖 38→32.2→28；明确 12 步完整路径 |
 | P0-4 BR-03 与 28 秒示例冲突 | 拆成 `demo_default`（无免责声明）和 `strict_disclaimer`（6 秒免责声明 + 3 内容分镜）；`check_rules` 绑定估算结果 |
 | P0-5 状态缺当前草稿、decision_basis 来源不明 | 状态加入 `current_draft`；动作必填 `rationale`；`next` 后填；保存 `draft_revisions/` 和 diff |
 | P0-6 终态契约不完整、伪代码有 bug | 补 5 终态、stop_reason、退出码矩阵；伪代码处理别名/解析失败/被拒 finish；每分支写 Trace；非 completed 需证据 |

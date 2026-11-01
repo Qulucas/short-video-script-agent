@@ -18,15 +18,25 @@
 | 示例 | 12 个 fixture case + 6 条 live 的 result/trace/output | 实际运行生成 |
 | 文档 | README、docs/01–05 | 对照实际输出复核 |
 
-## 个人贡献需要补充的部分
+## 候选人贡献（可核对）
 
-以下内容 AI 不能替代候选人确认：
+以下动作由候选人完成或决策：
+
+1. 提供考核题目、验收标准、交付规范和业务目标；
+2. 提供 live 模型 API key（只写入本地 `.env`，未提交仓库），并授权真实模型调用；
+3. 要求按 P0/P1 执行、补齐审查意见、兼容 `my_case.json`、核查交付物并上传 GitHub；
+4. 指定使用 GitHub Desktop 当前账号 `Qulucas` 的公开仓库；
+5. 对阶段产出给出反馈（如要求补 live trace、补 T09/T13/T18、统一计划与实现）。
+
+AI 负责方案、代码、测试、示例和文档的初稿与执行；候选人仍需逐项复核，不能把 AI 生成当作本人独立完成。
+
+## 仍需候选人确认
 
 1. 逐行理解 `src/orchestrator.py` 的完成闸门和预算；
 2. 检查 `src/tools/citations.py` 的启发式是否符合预期；
 3. 核对 6 条 live trace，确认模型确实根据 observation 改稿；
 4. 检查示例文案和品牌规则是否符合实际产品；
-5. 填写实际投入时间、未完成部分和个人复盘。
+5. 补充本人实际投入时间和未完成部分。
 
 ## 已验证
 
@@ -40,7 +50,7 @@
 - live 6 条各跑一次，不是稳定性评测；
 - 真实 TTS 时长：未接入；
 - 人工对 12 个场景文案的质量评审：未做；
-- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.1` 为准。
+- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，最终以 tag `v1.1` 为准。
 
 ## 防伪声明
 
