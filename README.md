@@ -4,9 +4,105 @@
 >
 > GitHub：https://github.com/Qulucas/short-video-script-agent
 >
-> 提交版本：tag `v1.1`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
+> 提交版本：tag `v1.2`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
 >
 > 一句话：把“生成脚本”做成可审计的闭环——模型选动作，工具算时长、查规则、验引用，检查结果再驱动下一轮修改或明确失败。
+
+## 快速部署（本地 CLI，5 分钟）
+
+本项目是 **CLI 工具**，不需要 Web 服务、Docker 或线上部署。
+
+```bash
+# 1. 克隆仓库
+git clone https://github.com/Qulucas/short-video-script-agent.git
+cd short-video-script-agent
+
+# 2. 创建虚拟环境并安装
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements-dev.txt
+
+# 3. 先跑离线 fixture（不需要 API key）
+python -m src.cli run \
+  --input examples/01_normal_30s/input.json \
+  --provider fixture \
+  --out runs/01_fixture
+
+# 4. 查看结果
+cat runs/01_fixture/output.md
+cat runs/01_fixture/result.json
+```
+
+离线模式使用 `fixture` 测试替身，可复现但**不证明真实模型决策**；真实模型请使用下面的 `live`。
+
+### 配置 live 模型
+
+```bash
+cp .env.example .env
+```
+
+编辑 `.env`：
+
+```dotenv
+LLM_API_KEY=你的_key
+LLM_BASE_URL=https://api.deepseek.com
+LLM_MODEL=deepseek-reasoner
+LLM_TIMEOUT_SEC=180
+```
+
+`.env` 已在 `.gitignore` 中，不会提交。`deepseek-reasoner` 单步可能超过 60 秒，建议 180 秒超时。
+
+## 用 my_case.json 快速跑出视频脚本
+
+仓库提供了一个考核包装格式的完整示例：
+
+- 输入：[examples/my_case.json](examples/my_case.json)
+- 格式：外层 `{ "input": { ... } }`，内部包含主题、受众、平台、时长、风格、素材和品牌规则
+- 会自动把 `input.materials` 转成运行期素材，并把 `material_id` 作为来源 ID
+
+### 方式 A：离线 fixture（不消耗 API，不需要 key）
+
+```bash
+python -m src.cli run \
+  --input examples/my_case.json \
+  --provider fixture \
+  --out runs/my_case-fixture
+
+cat runs/my_case-fixture/result.json
+cat runs/my_case-fixture/output.md
+```
+
+### 方式 B：真实模型 live（需要 `.env`）
+
+```bash
+python -m src.cli run \
+  --input examples/my_case.json \
+  --provider live \
+  --out runs/my_case
+
+# 查看生成的脚本、检查结果和 Trace
+cat runs/my_case/output.md
+cat runs/my_case/result.json
+cat runs/my_case/trace.json
+```
+
+一次 live 运行会输出：
+
+```text
+runs/my_case/output.md    # 标题、分镜、旁白、字幕、时长、来源、检查结果
+runs/my_case/result.json  # 机器可读结果
+runs/my_case/trace.json   # 每步动作、参数、observation、rationale
+```
+
+实际运行示例（`deepseek-reasoner`）结果为 `completed`，约 29.4 秒，产品事实引用 P01，`duration/rules/citations` 三项检查通过。每次 live 输出会因模型而异，以实际 `runs/` 为准。
+
+> 如果你自己的文件叫 `my_case.json` 并放在仓库根目录，也可以直接：
+>
+> ```bash
+> python -m src.cli run --input my_case.json --provider live --out runs/my_case
+> ```
+>
+> CLI 同时兼容扁平 schema 和 `{ "input": { ... } }` 包装 schema。
 
 ## 评审入口
 
@@ -78,6 +174,76 @@ pytest -q
 | 规则检查 | `src/tools/rules.py` | `demo_default` / `strict_disclaimer`，BR-01~05 |
 | 引用校验 | `src/tools/citations.py` | source/quote/claim 覆盖、对抗性夹带扫描 |
 | Trace/Render | `src/trace.py`、`src/render.py` | 步骤记录、`result.json`/`output.md` |
+
+## 环境变量
+
+| 变量 | 必填 | 说明 |
+|---|---|---|
+| `LLM_API_KEY` | live 必填 | 模型 API key；fixture 不需要 |
+| `LLM_BASE_URL` | 否 | 默认 `https://api.deepseek.com` |
+| `LLM_MODEL` | 否 | 默认 `deepseek-chat`；live 证据使用 `deepseek-reasoner` |
+| `LLM_TIMEOUT_SEC` | 否 | 默认 60；reasoner 建议 180 |
+
+## 退出码与任务状态
+
+| status | exit code | 含义 |
+|---|---|---|
+| `completed` | 0 | 通过三项检查 |
+| `needs_input` | 2 | 缺关键字段/无素材，需补充 |
+| `unmet_constraints` | 3 | 时长或规则无法满足 |
+| `incomplete` | 4 | 步数/工具/动作修复达到上限 |
+| `failed` | 5 | 不可恢复的模型/内部错误 |
+
+## 项目结构
+
+```text
+src/                 CLI、Orchestrator、providers、tools、limits、trace、render
+tests/               单元/集成/场景/live 测试
+examples/            12 个 fixture + 6 条 live 的输入、输出、Trace
+data/                合成素材与品牌规则
+docs/                01-05 文档（需求、方案、评估、AI 使用、复盘）
+fixtures/            fixture 草稿
+scripts/             批跑脚本
+requirements.txt     运行依赖（当前仅标准库）
+requirements-dev.txt 测试依赖
+.env.example         环境变量模板
+SUBMISSION.md        URL/tag/SHA 提交信息
+```
+
+## 交付要求对照
+
+| 题目要求 | 项目证据 |
+|---|---|
+| CLI 可运行 | `python -m src.cli run ...` |
+| 至少 3 组输入/输出/Trace | `examples/` 下 12 个 fixture + 6 个 live |
+| 正常生成 | `examples/01_normal_30s/` |
+| 缺关键信息 | `examples/02_missing_duration/` |
+| 无素材 | `examples/03_no_material/`、`03_no_material-live/` |
+| 工具失败 | `examples/04_tool_failure/`、`04_tool_failure-live/` |
+| 超时长修正/明确失败 | `examples/12_seeded_draft_38s-live/`、`05_unmet_duration-live/` |
+| 两条 ReAct 路径 | 6 条 live trace，见 `examples/README.md` |
+| 步数/工具上限 | `examples/08_step_limit/`、`11_tool_call_limit/` |
+| 事实可追溯 | `result.json` 的 `sources`、`claims`、`checks.citations` |
+| AI 使用记录 | `docs/04-ai-usage.md` |
+| 最终 URL/SHA | `SUBMISSION.md`、tag `v1.2` |
+
+## 常见问题
+
+**`needs_input / missing_required_fields`**
+
+检查 JSON 是否有顶层 `topic/platform/target_duration_sec`，或是否放在 `{"input": {...}}` 内。包装格式已兼容。
+
+**`LLM_API_KEY 未配置`**
+
+live 需要 `.env`；只想跑通流程请用 `--provider fixture`。
+
+**live 很慢或超时**
+
+`deepseek-reasoner` 可能单步超过 60 秒，设置 `LLM_TIMEOUT_SEC=180`。
+
+**输出不稳定**
+
+live 是真实模型单次运行；回归请用 fixture。`examples/12_seeded_draft_38s-live` 是固定 38 秒初稿的参考路径。
 
 ## Agent 决策循环
 

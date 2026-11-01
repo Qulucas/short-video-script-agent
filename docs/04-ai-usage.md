@@ -50,7 +50,7 @@ AI 负责方案、代码、测试、示例和文档的初稿与执行；候选�
 - live 6 条各跑一次，不是稳定性评测；
 - 真实 TTS 时长：未接入；
 - 人工对 12 个场景文案的质量评审：未做；
-- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，最终以 tag `v1.1` 为准。
+- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，最终以 tag `v1.2` 为准。
 
 ## 防伪声明
 
