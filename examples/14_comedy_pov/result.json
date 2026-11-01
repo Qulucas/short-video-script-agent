@@ -1,5 +1,5 @@
 {
-  "run_id": "20261101T052516Z-be0a42",
+  "run_id": "20261101T061527Z-a0f0b2",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -1195,6 +1195,7 @@
     "advisory": true,
     "stale": false
   },
+  "platform": "douyin",
   "creative_brief": {
     "character_setting": {
       "name": "DeepSeek Whale Maiden",

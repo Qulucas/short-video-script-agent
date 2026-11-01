@@ -36,6 +36,13 @@ python -m src.cli run --input examples/live_cases/13_creative_brief.json --provi
 python -m src.cli run --input examples/live_cases/14_comedy_pov.json --provider live --out examples/14_comedy_pov-live-p4
 ```
 
+重复评测（阶段 8）：
+
+```bash
+for i in 1 2 3; do python -m src.cli run --input examples/live_cases/14_comedy_pov.json --provider live --out examples/eval/comedy_pov/run$i & done; wait
+python -m src.eval.score --label "阶段 6–7=examples/eval/comedy_pov_p6/run*" --label "阶段 8.1=examples/eval/comedy_pov_v17/run*" --label "v1.6=examples/eval/comedy_pov/run*" --out examples/eval/comedy_pov/report
+```
+
 工具故障通过输入里的 `faults` 字段注入（`src/tools/materials.py` 的 `FaultInjector`），fixture 和 live 共用同一机制。`deepseek-reasoner` 单步可能超过 60 秒，建议 `LLM_TIMEOUT_SEC=180`（喜剧格式写整稿时用过 300）。网络错误、超时、429/5xx 会自动重试 `LLM_RETRIES` 次（默认 2）。
 
 注意：live 运行会消耗 API 额度；不要在不必要时反复重跑。

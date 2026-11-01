@@ -1,0 +1,119 @@
+{
+  "title": "DeepSeek Whale Maiden's Kitchen: Carbohydrate Sampling Mission",
+  "speakers": [
+    {
+      "name": "DeepSeek Whale Maiden",
+      "lines": 7
+    },
+    {
+      "name": "Owner",
+      "lines": 1
+    }
+  ],
+  "lines": [
+    {
+      "shot_id": "S1",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "Ah! Viscosity parameter exceeded the limit... one more bite--",
+      "text": "Ah! Viscosity parameter exceeded the limit... one more bite--",
+      "delivery": "mumbling with a full mouth",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 0.3,
+      "end_sec": 4.1,
+      "index": 1,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S2",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "...",
+      "text": "...",
+      "delivery": "frozen, tiny",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 8.4,
+      "end_sec": 8.7,
+      "index": 2,
+      "nonverbal": true
+    },
+    {
+      "shot_id": "S3",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "No, no! You didn't see anything!! Cache cleaning! Carbohydrate cache!!",
+      "text": "No, no! You didn't see anything!! Cache cleaning! Carbohydrate cache!!",
+      "delivery": "panicked, muffled, mouth full",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 9.2,
+      "end_sec": 13.1,
+      "index": 3,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S4",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!",
+      "text": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!",
+      "delivery": "muffled shout, mouth full",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 14.7,
+      "end_sec": 19.7,
+      "index": 4,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S5",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "Semantic integrity check... of the rice!",
+      "text": "Semantic integrity check... of the rice!",
+      "delivery": "fake dignified",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 20.5,
+      "end_sec": 23.2,
+      "index": 5,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S5",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "DeepSeek taste model... don't look!",
+      "text": "DeepSeek taste model... don't look!",
+      "delivery": "mumbling, then small",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 23.4,
+      "end_sec": 25.7,
+      "index": 6,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S6",
+      "speaker": "Owner",
+      "raw": "...gotten fatter again.",
+      "text": "...gotten fatter again.",
+      "delivery": "low, deadpan, off-screen",
+      "offscreen": true,
+      "rate": 1.0,
+      "start_sec": 26.0,
+      "end_sec": 27.5,
+      "index": 7,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S6",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "Just cache... go away!",
+      "text": "Just cache... go away!",
+      "delivery": "flustered but sweet",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 27.5,
+      "end_sec": 29.4,
+      "index": 8,
+      "nonverbal": false
+    }
+  ]
+}

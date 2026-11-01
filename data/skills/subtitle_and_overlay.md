@@ -2,6 +2,8 @@
 id: subtitle_and_overlay
 title: 字幕、屏幕文字和关键词高亮
 when: 写 subtitle / on_screen_text，或 creative_brief 里有字幕样式、text_overlay_hints 时
+formats: all
+recommend: promo_talking_head
 ---
 ## 三种文字分开写
 

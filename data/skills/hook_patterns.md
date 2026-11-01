@@ -2,6 +2,8 @@
 id: hook_patterns
 title: 开头 3 秒钩子写法
 when: 写第一个分镜、或钩子段被删短后需要重写时
+formats: promo_talking_head
+recommend: promo_talking_head
 ---
 ## 五种可复用的钩子
 

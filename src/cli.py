@@ -11,7 +11,8 @@ from src.orchestrator import run_case
 from src.providers.base import ModelError
 from src.providers.fixture import FixtureProvider
 from src.providers.openai_compat import OpenAICompatProvider
-from src.render import write_artifacts
+from src.export import write_exports
+from src.render import render_storyboard, write_artifacts
 from src.schemas import normalize_brief
 
 _JSON_HINTS = [
@@ -110,6 +111,23 @@ def cmd_batch(args: argparse.Namespace) -> int:
     return worst
 
 
+def cmd_export(args: argparse.Namespace) -> int:
+    """Rebuild storyboard.md and exports/ from a saved run, e.g. with a different clip length."""
+    run = Path(args.run)
+    try:
+        result = json.loads((run / "result.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        print("ERROR: " + str(exc), file=sys.stderr)
+        return 2
+    if not result.get("shots"):
+        print("ERROR: %s 没有分镜可导出" % run, file=sys.stderr)
+        return 2
+    (run / "storyboard.md").write_text(render_storyboard(result), encoding="utf-8")
+    files = write_exports(run, result, float(args.clip_sec))
+    print(json.dumps({"out": str(run / "exports"), "files": files}, ensure_ascii=False, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Short-video script agent CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -125,6 +143,11 @@ def build_parser() -> argparse.ArgumentParser:
     batch.add_argument("--provider", choices=["fixture", "live"], default="fixture")
     batch.add_argument("--out-root", default="runs")
     batch.set_defaults(func=cmd_batch)
+
+    export = sub.add_parser("export", help="rebuild storyboard and production files from a saved run")
+    export.add_argument("--run", required=True)
+    export.add_argument("--clip-sec", default=10, type=float, help="max clip length of the video model (5 or 10)")
+    export.set_defaults(func=cmd_export)
     return parser
 
 

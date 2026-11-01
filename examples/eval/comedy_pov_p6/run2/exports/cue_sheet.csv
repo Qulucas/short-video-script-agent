@@ -1,0 +1,27 @@
+type,start_sec,end_sec,shot_id,track,description,position,notes
+bgm,0,5,,bgm,"kitchen ambience: boiling water + distant TV, warm and quiet",,fade in
+overlay,0.0,4.7,S1,overlay,Carbohydrate Sampling in Progress...,,
+sfx,0.1,,S1,sfx,"moist, loud chewing: ba-jie ba-jie, with POV-distance reverb",center,"wet, close, sticky"
+transition,4.8,,S1,picture,cut,,
+bgm,5,26,,bgm,"fast-paced choral track, comedic chase energy",,hard cut
+sfx,5.2,,S2,sfx,"two crisp taps on the table: dong, dong",right,"crisp, close, wood"
+sfx,8.0,,S2,sfx,loud guilty gulp,center,"dry, sudden"
+transition,8.6,,S2,picture,jump cut into the speed-up,,
+overlay,9.1,13.4,S3,overlay,Emergency Swallow Protocol Activated 3.2 times per second,,
+sfx,9.1,,S3,sfx,spring boing plus a subjective heartbeat under the speed-up,center,"cartoonish, tight"
+sfx,10.2,,S3,sfx,chopsticks clattering against the bowl,center,"fast, rattling"
+transition,14.1,,S3,picture,whip pan,,
+sfx,14.3,,S4,sfx,heavy swallow followed by a bowl knocking the counter behind her back,center,"close, clumsy"
+sfx,19.0,,S4,sfx,tiny nervous squeak of the hair accessory,left,"high, small"
+transition,19.7,,S4,picture,cut,,
+sfx,19.8,,S5,sfx,"clear throat, cough",center,"dry, close"
+overlay,19.9,22.1,S5,overlay,Generating Excuses...,,
+overlay,22.1,25.7,S5,overlay,Semantic Integrity Check,,
+sfx,22.5,,S5,sfx,fabric rustle as she straightens up,center,soft
+overlay,25.7,30.0,S6,overlay,DeepSeek Whale Maiden · Daily Sampling Log,,
+transition,25.7,,S5,picture,cut,,
+bgm,26,30,,bgm,"quiet awkward silence, single room tone",,fade out
+overlay,26.2,29.9,S6,overlay,Carbohydrate sampling completed ✅ Sample quantity: 300g,,
+sfx,26.2,,S6,sfx,UI pop chime,center,"clean, digital"
+sfx,29.1,,S6,sfx,boop~ plus glass friction as the palm meets the lens,center,"soft, close"
+transition,30.0,,S6,picture,fade to black,,

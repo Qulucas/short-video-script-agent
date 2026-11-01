@@ -1,0 +1,29 @@
+{
+  "from": 3,
+  "to": 4,
+  "removed_shots": [],
+  "added_shots": [],
+  "changed_shots": [
+    {
+      "id": "S1",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "S3",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "S5",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "S6",
+      "before": "",
+      "after": ""
+    }
+  ],
+  "via": "patch"
+}

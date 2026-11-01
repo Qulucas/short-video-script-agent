@@ -1,5 +1,5 @@
 {
-  "run_id": "20261101T051640Z-0a8eb4",
+  "run_id": "20261101T061527Z-efb314",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -387,6 +387,7 @@
       "pass": false
     }
   ],
+  "platform": "douyin",
   "creative_brief": {
     "character_setting": {
       "name": "DeepSeek鲸鱼娘",

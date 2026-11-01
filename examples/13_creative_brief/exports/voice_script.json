@@ -1,0 +1,76 @@
+{
+  "title": "鲸鱼娘教你用字幕留住观众",
+  "speakers": [
+    {
+      "name": "Narrator",
+      "lines": 5
+    }
+  ],
+  "lines": [
+    {
+      "shot_id": "S1",
+      "speaker": "Narrator",
+      "raw": "视频没人看完？可能是你的信息密度不够！",
+      "text": "视频没人看完？可能是你的信息密度不够！",
+      "delivery": "",
+      "offscreen": null,
+      "rate": 1.0,
+      "start_sec": 0.0,
+      "end_sec": 4.4,
+      "index": 1,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S2",
+      "speaker": "Narrator",
+      "raw": "刷视频谁会一直开着声音？没有字幕，观众很快就会划走。",
+      "text": "刷视频谁会一直开着声音？没有字幕，观众很快就会划走。",
+      "delivery": "",
+      "offscreen": null,
+      "rate": 1.0,
+      "start_sec": 4.4,
+      "end_sec": 10.2,
+      "index": 2,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S3",
+      "speaker": "Narrator",
+      "raw": "小影支持字幕，把每句的重点直接放到画面上，关键词用亮色标出来。",
+      "text": "小影支持字幕，把每句的重点直接放到画面上，关键词用亮色标出来。",
+      "delivery": "",
+      "offscreen": null,
+      "rate": 1.0,
+      "start_sec": 10.2,
+      "end_sec": 17.2,
+      "index": 3,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S4",
+      "speaker": "Narrator",
+      "raw": "你看，同一段素材，加上字幕以后，静音刷到也能一眼看懂重点。",
+      "text": "你看，同一段素材，加上字幕以后，静音刷到也能一眼看懂重点。",
+      "delivery": "",
+      "offscreen": null,
+      "rate": 1.0,
+      "start_sec": 17.2,
+      "end_sec": 23.5,
+      "index": 4,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S5",
+      "speaker": "Narrator",
+      "raw": "潜入信息深海，捞取创作干货~我是鲸鱼娘，我们下次见！",
+      "text": "潜入信息深海，捞取创作干货~我是鲸鱼娘，我们下次见！",
+      "delivery": "",
+      "offscreen": null,
+      "rate": 1.0,
+      "start_sec": 23.5,
+      "end_sec": 29.1,
+      "index": 5,
+      "nonverbal": false
+    }
+  ]
+}

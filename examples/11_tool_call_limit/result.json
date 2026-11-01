@@ -9,9 +9,16 @@
   },
   "last_state": {
     "draft_revision": null,
-    "checks": null
+    "draft_hash": null,
+    "checks": {
+      "duration": null,
+      "rules": null,
+      "citations": null,
+      "production": null,
+      "brief": null
+    }
   },
-  "run_id": "20261101T051640Z-8fcc3a",
+  "run_id": "20261101T061527Z-ad1883",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline"

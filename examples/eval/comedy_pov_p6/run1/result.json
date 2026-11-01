@@ -1,0 +1,1346 @@
+{
+  "run_id": "20261101T061530Z-54b1d8",
+  "provider": "live",
+  "model": "deepseek-reasoner",
+  "mode": "live",
+  "status": "completed",
+  "stop_reason": null,
+  "exit_code": 0,
+  "title": "DeepSeek Whale Maiden's Kitchen: Carbohydrate Sampling Mission",
+  "target_duration_sec": 30.0,
+  "estimated_total_sec": 29.7,
+  "estimator": {
+    "version": "v1",
+    "cps": 4.2,
+    "subtitle_cps": 5.0,
+    "pause_per_shot": 0.3
+  },
+  "assumptions": [
+    "audience 使用输入值",
+    "style 使用输入值",
+    "material_ids 为空，按 material_query 检索",
+    "format=comedy_pov_sketch",
+    "creative_brief 包含 audio_notes/camera_notes/cast/character_setting/script_structure/text_overlay_hints/visual_notes，按制作模式输出并要求 check_production"
+  ],
+  "limits": {
+    "max_steps": 32,
+    "max_tool_calls": 26
+  },
+  "draft_revision": 4,
+  "draft_hash": "sha256:b4208f224f12a20611e85d6076598173ad591986282c1a7b0b6e64bf1ce5650c",
+  "shots": [
+    {
+      "id": "S1",
+      "beat": "setup",
+      "perspective": "pov",
+      "claim_scope": "fiction",
+      "visual": "POV walks into a warm yellow-lit kitchen. DeepSeek Whale Maiden stands behind the counter with her back to the camera, blue and white gradient ponytail swinging, a small whale fin accessory on top of her head, loose home T-shirt, barefoot, up on tiptoe; she scoops a big ball of white rice into her mouth with chopsticks, cheeks puffed out like a hamster's. The kitchen behind her is soft and blurred, cool blue-white light on her hair against the warm room.",
+      "shot_size": "wide from the doorway, pushing to medium",
+      "camera": {
+        "move": "slow handheld push-in from the doorway",
+        "handheld": true
+      },
+      "lighting": "warm 3000K tungsten kitchen key from the left, cool blue rim light on her ponytail, shallow depth of field so the background behind her is blurred",
+      "character_action": "on tiptoe behind the counter, shovels rice with chopsticks, tilts her head slightly at the footsteps but keeps her back to the camera and chews hard",
+      "expression": "cheeks packed, eyes half-closed in bliss, jaw working fast",
+      "character_state": {
+        "props": [
+          "large bowl of white rice",
+          "chopsticks"
+        ],
+        "body": [
+          "cheeks bulging"
+        ]
+      },
+      "dialogue": [
+        {
+          "speaker": "DeepSeek Whale Maiden",
+          "line": "Ah! Viscosity parameter exceeded the limit... one more bite--",
+          "delivery": "mumbling with a full mouth",
+          "at_sec": 0.3
+        }
+      ],
+      "sfx": [
+        {
+          "cue": "moist, loud chewing ba-jie ba-jie, with reverb matching POV distance",
+          "at_sec": 0.2,
+          "position": "center"
+        },
+        {
+          "cue": "rice cooker steam hiss",
+          "at_sec": 1.2,
+          "position": "left",
+          "texture": "soft, close"
+        }
+      ],
+      "overlays": [
+        {
+          "text": "Carbohydrate Sampling in Progress... 0% → 67%",
+          "at_sec": 0,
+          "until_sec": 5,
+          "position": "upper left",
+          "style": "thin progress bar with percentage label",
+          "animation": "fill from 0% to 67%",
+          "from": "0%",
+          "to": "67%"
+        }
+      ],
+      "on_screen_text": "Carbohydrate Sampling in Progress... 0% → 67%",
+      "bgm": "kitchen ambience: boiling water plus a distant TV",
+      "transition": "cut on the chew",
+      "fulfills": [
+        "visual_notes[0]",
+        "text_overlay_hints[0]",
+        "audio_notes.sfx[0]"
+      ],
+      "start_sec": 0.0,
+      "duration_sec": 5.0,
+      "source_ids": []
+    },
+    {
+      "id": "S2",
+      "beat": "inciting_incident",
+      "perspective": "pov",
+      "claim_scope": "generic",
+      "visual": "POV freezes. The owner's right hand enters from the right edge of the frame and taps the dining table twice. DeepSeek Whale Maiden freezes mid-bite, chopsticks suspended in the air, blue and white ponytail completely still, the whale fin accessory on top of her head tilting; she slowly turns her head toward the lens, pupils trembling, the highlights in her eyes turning into rotating circles, food still packed in her mouth.",
+      "shot_size": "medium close-up",
+      "camera": {
+        "move": "locked off, owner's hand enters frame right",
+        "handheld": false
+      },
+      "lighting": "same warm tungsten kitchen light, cool blue rim light on her hair, her iris highlights turning into rotating circles",
+      "character_action": "whole body freezes mid-bite, chopsticks suspended, slow robotic head turn toward the lens",
+      "expression": "pupils trembling, spiral highlights in her eyes, mouth full and unmoving",
+      "character_state": {
+        "props": [
+          "large bowl of white rice",
+          "chopsticks"
+        ],
+        "body": [
+          "cheeks bulging"
+        ]
+      },
+      "action_sec": 4,
+      "dialogue": [
+        {
+          "speaker": "DeepSeek Whale Maiden",
+          "line": "...",
+          "delivery": "frozen, tiny",
+          "at_sec": 3.4
+        }
+      ],
+      "sfx": [
+        {
+          "cue": "two crisp taps on the dining table: dong, dong",
+          "at_sec": 0.4,
+          "position": "right",
+          "texture": "crisp, close"
+        },
+        {
+          "cue": "loud gulp",
+          "at_sec": 3.6,
+          "position": "center"
+        }
+      ],
+      "bgm": "kitchen ambience tail, TV murmur",
+      "transition": "jump cut into the speed-up",
+      "fulfills": [
+        "visual_notes[2]",
+        "audio_notes.sfx[1]"
+      ],
+      "start_sec": 5.0,
+      "duration_sec": 4.0,
+      "source_ids": []
+    },
+    {
+      "id": "S3",
+      "beat": "panic_reaction",
+      "perspective": "pov",
+      "claim_scope": "generic",
+      "visual": "POV, playback 1.5x. DeepSeek Whale Maiden faces the camera and frantically scoops the rest of the bowl into her mouth, blue and white ponytail whipping, whale fin accessory bouncing, rice grains flying; her cheeks bulge to bursting and rice catches all over her T-shirt collar; the handheld frame shakes as the owner takes a step back.",
+      "shot_size": "medium shot, slightly wide",
+      "camera": {
+        "move": "slight handheld shake, small step back",
+        "handheld": true
+      },
+      "lighting": "warm tungsten key, cool blue rim light, shallow focus with rice grains flying through the beam",
+      "character_action": "scoops the rest of the bowl into her mouth in fast shovels, steps back, keeps her eyes on the lens",
+      "expression": "panicked, eyes wide and pleading, cheeks bulging to bursting",
+      "playback_rate": 1.5,
+      "character_state": {
+        "props": [
+          "large bowl of white rice",
+          "chopsticks"
+        ],
+        "body": [
+          "cheeks bulging",
+          "rice grains on the T-shirt collar"
+        ]
+      },
+      "dialogue": [
+        {
+          "speaker": "DeepSeek Whale Maiden",
+          "line": "No, no! You didn't see anything!! Cache cleaning! Carbohydrate cache!!",
+          "delivery": "panicked, muffled, mouth full",
+          "at_sec": 0.2,
+          "rate": 1.0
+        }
+      ],
+      "sfx": [
+        {
+          "cue": "fast swallowing and chopsticks rattling against the bowl",
+          "at_sec": 0.1,
+          "position": "center"
+        },
+        {
+          "cue": "spring boing plus a subjective heartbeat",
+          "at_sec": 1.5,
+          "position": "center",
+          "texture": "cartoon spring, low heartbeat"
+        }
+      ],
+      "overlays": [
+        {
+          "text": "Emergency Swallow Protocol Activated 3.2 times per second",
+          "at_sec": 0.3,
+          "until_sec": 5,
+          "position": "bottom",
+          "style": "flashing warning caption",
+          "animation": "blink"
+        }
+      ],
+      "on_screen_text": "Emergency Swallow Protocol Activated 3.2 times per second",
+      "bgm": "fast-paced choral track enters",
+      "transition": "whip pan into the close-up",
+      "fulfills": [
+        "text_overlay_hints[1]",
+        "audio_notes.sfx[2]",
+        "script_structure.panic_reaction.visual"
+      ],
+      "start_sec": 9.0,
+      "duration_sec": 5.0,
+      "source_ids": []
+    },
+    {
+      "id": "S4",
+      "beat": "panic_reaction",
+      "perspective": "pov",
+      "claim_scope": "fiction",
+      "visual": "POV extreme close-up. DeepSeek Whale Maiden leans right into the lens, still shovelling rice; rice grains smear directly onto the glass and stick there, breaking the fourth wall; her cheeks bulge to bursting, rice stuck all over her T-shirt collar, the whale fin accessory crooked on her head, her eyes begging you; she backs off and the handheld frame shakes.",
+      "shot_size": "extreme close-up",
+      "camera": {
+        "move": "handheld, she leans into the lens then backs away",
+        "handheld": true
+      },
+      "lighting": "warm tungsten key with a cool blue rim, smeared rice glowing on the glass",
+      "character_action": "leans into the lens while shovelling rice, then backs away with her hands up, still chewing",
+      "expression": "pleading eyes, cheeks bulging, rice grains stuck to her lips",
+      "playback_rate": 1.5,
+      "action_sec": 4.5,
+      "character_state": {
+        "props": [
+          "large bowl of white rice",
+          "chopsticks"
+        ],
+        "body": [
+          "cheeks bulging",
+          "rice grains on the T-shirt collar",
+          "crooked whale fin accessory"
+        ]
+      },
+      "dialogue": [
+        {
+          "speaker": "DeepSeek Whale Maiden",
+          "line": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!",
+          "delivery": "muffled shout, mouth full",
+          "at_sec": 0.7
+        }
+      ],
+      "sfx": [
+        {
+          "cue": "rice grains hitting the lens, soft wet taps",
+          "at_sec": 0.4,
+          "position": "center",
+          "texture": "wet, very close"
+        }
+      ],
+      "bgm": "fast-paced choral track at its peak",
+      "transition": "cut to reverse shot",
+      "fulfills": [
+        "visual_notes[1]"
+      ],
+      "start_sec": 14.0,
+      "duration_sec": 6.0,
+      "source_ids": []
+    },
+    {
+      "id": "S5",
+      "beat": "punchline",
+      "perspective": "reverse",
+      "claim_scope": "fiction",
+      "visual": "Reverse shot from the owner's position. DeepSeek Whale Maiden has set the emptied bowl down on the counter and swallows the last mouthful, then stands up straight: two rice grains on her lips, the whale fin accessory crooked on her head, blue and white gradient ponytail, hands behind her back trying to look dignified, her belly visibly bulging a little under the loose home T-shirt. She clears her throat and smiles into the lens.",
+      "shot_size": "medium shot, eye level",
+      "camera": {
+        "move": "slow push-in",
+        "handheld": false
+      },
+      "lighting": "warm 3200K tungsten key from the left, soft cool blue fill, kitchen bokeh behind her",
+      "character_action": "swallows, stands up straight, hands behind her back, chin up, small dignified nod",
+      "expression": "innocent yet smug, corners of the mouth twitching, one wink held back",
+      "character_state": {
+        "cleared": [
+          "large bowl of white rice",
+          "chopsticks",
+          "cheeks bulging"
+        ],
+        "body": [
+          "rice grains on the T-shirt collar",
+          "crooked whale fin accessory",
+          "two rice grains on her lips",
+          "belly visibly bulging"
+        ]
+      },
+      "dialogue": [
+        {
+          "speaker": "DeepSeek Whale Maiden",
+          "line": "Semantic integrity check... of the rice!",
+          "delivery": "fake dignified",
+          "at_sec": 0.5
+        },
+        {
+          "speaker": "DeepSeek Whale Maiden",
+          "line": "DeepSeek taste model... don't look!",
+          "delivery": "mumbling, then small",
+          "at_sec": 3.4
+        }
+      ],
+      "sfx": [
+        {
+          "cue": "clears throat, small cough",
+          "at_sec": 0.1,
+          "position": "center",
+          "texture": "close, dry"
+        }
+      ],
+      "overlays": [
+        {
+          "text": "Generating Excuses...",
+          "at_sec": 0.2,
+          "until_sec": 1.6,
+          "position": "above her head",
+          "style": "DeepSeek-style chat bubble",
+          "animation": "typing dots"
+        },
+        {
+          "text": "Semantic Integrity Check",
+          "at_sec": 1.6,
+          "until_sec": 4.5,
+          "position": "above her head",
+          "style": "DeepSeek-style chat bubble with a tick",
+          "animation": "pop in"
+        }
+      ],
+      "on_screen_text": "Semantic Integrity Check",
+      "bgm": "choral track drops to a low hum",
+      "transition": "cut to POV tag",
+      "fulfills": [
+        "text_overlay_hints[2]",
+        "camera_notes[1]"
+      ],
+      "start_sec": 20.0,
+      "duration_sec": 6.0,
+      "source_ids": []
+    },
+    {
+      "id": "S6",
+      "beat": "tag",
+      "perspective": "pov",
+      "claim_scope": "generic",
+      "visual": "POV. A floating window styled like the DeepSeek UI pops up above DeepSeek Whale Maiden's head. She flicks the rice grains off her lips with a fingertip, winks at the lens, then gently pushes the camera away with her open palm; the picture briefly blurs from the contact.",
+      "shot_size": "medium close-up",
+      "camera": {
+        "move": "camera pushed back by her palm, drifting out of focus",
+        "handheld": true
+      },
+      "lighting": "warm tungsten key, cool blue rim light, defocus bloom as her palm covers the glass",
+      "character_action": "flicks rice grains off her lips, winks, pushes the lens away with her palm",
+      "expression": "smug, eyes curved into a smile",
+      "character_state": {
+        "cleared": [
+          "two rice grains on her lips"
+        ],
+        "body": [
+          "rice grains on the T-shirt collar",
+          "crooked whale fin accessory",
+          "belly visibly bulging"
+        ]
+      },
+      "dialogue": [
+        {
+          "speaker": "Owner",
+          "line": "...gotten fatter again.",
+          "delivery": "low, deadpan, off-screen",
+          "offscreen": true,
+          "at_sec": 0
+        },
+        {
+          "speaker": "DeepSeek Whale Maiden",
+          "line": "Just cache... go away!",
+          "delivery": "flustered but sweet",
+          "at_sec": 1.5
+        }
+      ],
+      "sfx": [
+        {
+          "cue": "soft fingertip flick",
+          "at_sec": 1.0,
+          "position": "center"
+        },
+        {
+          "cue": "boop~ plus glass friction as her palm covers the lens",
+          "at_sec": 3.0,
+          "position": "center",
+          "texture": "round boop, then a soft squeak"
+        }
+      ],
+      "overlays": [
+        {
+          "text": "Carbohydrate sampling completed ✅ Sample quantity: 300g",
+          "at_sec": 0.2,
+          "until_sec": 3,
+          "position": "above her head",
+          "style": "DeepSeek-style chat bubble floating window",
+          "animation": "pop in, tick draws"
+        },
+        {
+          "text": "DeepSeek Whale Maiden · Daily Sampling Log",
+          "at_sec": 0.3,
+          "until_sec": 3.4,
+          "position": "bottom center",
+          "style": "small caption bar"
+        }
+      ],
+      "on_screen_text": "DeepSeek Whale Maiden · Daily Sampling Log",
+      "bgm": "quiet, awkward silence",
+      "transition": "soft blur out",
+      "fulfills": [
+        "visual_notes[3]",
+        "visual_notes[4]",
+        "text_overlay_hints[3]",
+        "audio_notes.sfx[3]",
+        "audio_notes.sfx[4]",
+        "script_structure.tag.visual"
+      ],
+      "start_sec": 26.0,
+      "duration_sec": 3.7,
+      "source_ids": []
+    }
+  ],
+  "sources": [],
+  "checks": {
+    "duration": {
+      "version": "v1",
+      "cps": 4.2,
+      "subtitle_cps": 5.0,
+      "pause_per_shot": 0.3,
+      "target_sec": 30.0,
+      "min_sec": 28.0,
+      "max_sec": 30.0,
+      "total_sec": 29.7,
+      "delta_sec": -0.3,
+      "pass": true,
+      "shots": [
+        {
+          "id": "S1",
+          "start_sec": 0.0,
+          "driver": "overlay",
+          "duration_sec": 5.0,
+          "narration_chars": 0,
+          "subtitle_chars": 0
+        },
+        {
+          "id": "S2",
+          "start_sec": 5.0,
+          "driver": "dialogue",
+          "duration_sec": 4.0,
+          "narration_chars": 0,
+          "subtitle_chars": 0
+        },
+        {
+          "id": "S3",
+          "start_sec": 9.0,
+          "driver": "overlay",
+          "duration_sec": 5.0,
+          "narration_chars": 0,
+          "subtitle_chars": 0
+        },
+        {
+          "id": "S4",
+          "start_sec": 14.0,
+          "driver": "dialogue",
+          "duration_sec": 6.0,
+          "narration_chars": 0,
+          "subtitle_chars": 0
+        },
+        {
+          "id": "S5",
+          "start_sec": 20.0,
+          "driver": "dialogue",
+          "duration_sec": 6.0,
+          "narration_chars": 0,
+          "subtitle_chars": 0
+        },
+        {
+          "id": "S6",
+          "start_sec": 26.0,
+          "driver": "dialogue",
+          "duration_sec": 3.7,
+          "narration_chars": 0,
+          "subtitle_chars": 0
+        }
+      ],
+      "timeline": [
+        {
+          "type": "dialogue",
+          "speaker": "DeepSeek Whale Maiden",
+          "shot_id": "S1",
+          "start_sec": 0.3,
+          "end_sec": 4.1
+        },
+        {
+          "type": "overlay",
+          "text": "Carbohydrate Sampling in Progress... 0% → 67%",
+          "shot_id": "S1",
+          "start_sec": 0.0,
+          "end_sec": 5.0
+        },
+        {
+          "type": "sfx",
+          "cue": "moist, loud chewing ba-jie ba-jie, with reverb matching POV distance",
+          "shot_id": "S1",
+          "start_sec": 0.2,
+          "end_sec": 0.2
+        },
+        {
+          "type": "sfx",
+          "cue": "rice cooker steam hiss",
+          "shot_id": "S1",
+          "start_sec": 1.2,
+          "end_sec": 1.2
+        },
+        {
+          "type": "dialogue",
+          "speaker": "DeepSeek Whale Maiden",
+          "shot_id": "S2",
+          "start_sec": 8.4,
+          "end_sec": 8.7
+        },
+        {
+          "type": "sfx",
+          "cue": "two crisp taps on the dining table: dong, dong",
+          "shot_id": "S2",
+          "start_sec": 5.4,
+          "end_sec": 5.4
+        },
+        {
+          "type": "sfx",
+          "cue": "loud gulp",
+          "shot_id": "S2",
+          "start_sec": 8.6,
+          "end_sec": 8.6
+        },
+        {
+          "type": "dialogue",
+          "speaker": "DeepSeek Whale Maiden",
+          "shot_id": "S3",
+          "start_sec": 9.2,
+          "end_sec": 13.1
+        },
+        {
+          "type": "overlay",
+          "text": "Emergency Swallow Protocol Activated 3.2 times per second",
+          "shot_id": "S3",
+          "start_sec": 9.3,
+          "end_sec": 14.0
+        },
+        {
+          "type": "sfx",
+          "cue": "fast swallowing and chopsticks rattling against the bowl",
+          "shot_id": "S3",
+          "start_sec": 9.1,
+          "end_sec": 9.1
+        },
+        {
+          "type": "sfx",
+          "cue": "spring boing plus a subjective heartbeat",
+          "shot_id": "S3",
+          "start_sec": 10.5,
+          "end_sec": 10.5
+        },
+        {
+          "type": "dialogue",
+          "speaker": "DeepSeek Whale Maiden",
+          "shot_id": "S4",
+          "start_sec": 14.7,
+          "end_sec": 19.7
+        },
+        {
+          "type": "sfx",
+          "cue": "rice grains hitting the lens, soft wet taps",
+          "shot_id": "S4",
+          "start_sec": 14.4,
+          "end_sec": 14.4
+        },
+        {
+          "type": "dialogue",
+          "speaker": "DeepSeek Whale Maiden",
+          "shot_id": "S5",
+          "start_sec": 20.5,
+          "end_sec": 23.2
+        },
+        {
+          "type": "dialogue",
+          "speaker": "DeepSeek Whale Maiden",
+          "shot_id": "S5",
+          "start_sec": 23.4,
+          "end_sec": 25.7
+        },
+        {
+          "type": "overlay",
+          "text": "Generating Excuses...",
+          "shot_id": "S5",
+          "start_sec": 20.2,
+          "end_sec": 21.6
+        },
+        {
+          "type": "overlay",
+          "text": "Semantic Integrity Check",
+          "shot_id": "S5",
+          "start_sec": 21.6,
+          "end_sec": 24.5
+        },
+        {
+          "type": "sfx",
+          "cue": "clears throat, small cough",
+          "shot_id": "S5",
+          "start_sec": 20.1,
+          "end_sec": 20.1
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Owner",
+          "shot_id": "S6",
+          "start_sec": 26.0,
+          "end_sec": 27.5
+        },
+        {
+          "type": "dialogue",
+          "speaker": "DeepSeek Whale Maiden",
+          "shot_id": "S6",
+          "start_sec": 27.5,
+          "end_sec": 29.4
+        },
+        {
+          "type": "overlay",
+          "text": "Carbohydrate sampling completed ✅ Sample quantity: 300g",
+          "shot_id": "S6",
+          "start_sec": 26.2,
+          "end_sec": 29.0
+        },
+        {
+          "type": "overlay",
+          "text": "DeepSeek Whale Maiden · Daily Sampling Log",
+          "shot_id": "S6",
+          "start_sec": 26.3,
+          "end_sec": 29.4
+        },
+        {
+          "type": "sfx",
+          "cue": "soft fingertip flick",
+          "shot_id": "S6",
+          "start_sec": 27.0,
+          "end_sec": 27.0
+        },
+        {
+          "type": "sfx",
+          "cue": "boop~ plus glass friction as her palm covers the lens",
+          "shot_id": "S6",
+          "start_sec": 29.0,
+          "end_sec": 29.0
+        }
+      ],
+      "beats": [
+        {
+          "beat": "setup",
+          "planned": [
+            0.0,
+            5.0
+          ],
+          "actual": [
+            0.0,
+            5.0
+          ],
+          "delta_start": 0.0,
+          "delta_end": 0.0,
+          "pass": true
+        },
+        {
+          "beat": "inciting_incident",
+          "planned": [
+            5.0,
+            9.0
+          ],
+          "actual": [
+            5.0,
+            9.0
+          ],
+          "delta_start": 0.0,
+          "delta_end": 0.0,
+          "pass": true
+        },
+        {
+          "beat": "panic_reaction",
+          "planned": [
+            9.0,
+            20.0
+          ],
+          "actual": [
+            9.0,
+            20.0
+          ],
+          "delta_start": 0.0,
+          "delta_end": 0.0,
+          "pass": true
+        },
+        {
+          "beat": "punchline",
+          "planned": [
+            20.0,
+            26.0
+          ],
+          "actual": [
+            20.0,
+            26.0
+          ],
+          "delta_start": 0.0,
+          "delta_end": 0.0,
+          "pass": true
+        },
+        {
+          "beat": "tag",
+          "planned": [
+            26.0,
+            30.0
+          ],
+          "actual": [
+            26.0,
+            29.7
+          ],
+          "delta_start": 0.0,
+          "delta_end": -0.3,
+          "pass": true
+        }
+      ],
+      "beat_timing": "strict",
+      "beat_tolerance_sec": 0.5,
+      "beats_pass": true,
+      "window_pass": true,
+      "revision": 4,
+      "draft_hash": "sha256:b4208f224f12a20611e85d6076598173ad591986282c1a7b0b6e64bf1ce5650c"
+    },
+    "rules": {
+      "ok": true,
+      "pass": true,
+      "rule_set": "demo_default",
+      "violations": [],
+      "needs_review": [],
+      "revision": 4,
+      "draft_hash": "sha256:b4208f224f12a20611e85d6076598173ad591986282c1a7b0b6e64bf1ce5650c"
+    },
+    "citations": {
+      "ok": true,
+      "pass": true,
+      "unsupported_claims": [],
+      "needs_review": [],
+      "fiction_claims": [
+        {
+          "shot_id": "S5",
+          "sentence": "DeepSeek taste model.."
+        }
+      ],
+      "revision": 4,
+      "draft_hash": "sha256:b4208f224f12a20611e85d6076598173ad591986282c1a7b0b6e64bf1ce5650c"
+    },
+    "production": {
+      "ok": true,
+      "pass": true,
+      "required_fields": [
+        "beat",
+        "shot_size",
+        "camera",
+        "transition",
+        "character_action",
+        "expression",
+        "perspective",
+        "lighting"
+      ],
+      "issues": [],
+      "revision": 4,
+      "draft_hash": "sha256:b4208f224f12a20611e85d6076598173ad591986282c1a7b0b6e64bf1ce5650c"
+    },
+    "brief": {
+      "ok": true,
+      "pass": true,
+      "sections": {
+        "coverage": {
+          "pass": true,
+          "issues": 0
+        },
+        "fidelity": {
+          "pass": true,
+          "issues": 0
+        },
+        "continuity": {
+          "pass": true,
+          "issues": 0
+        },
+        "language": {
+          "pass": true,
+          "issues": 0
+        },
+        "timeline": {
+          "pass": true,
+          "issues": 0
+        },
+        "pov": {
+          "pass": true,
+          "issues": 0
+        }
+      },
+      "issues": [],
+      "review": [
+        {
+          "shot_id": "S6",
+          "code": "COVERAGE_UNVERIFIED",
+          "text": "Owner's voice-over: low-pitched, face never shown",
+          "message": "声称落实 audio_notes.sfx[4]，但文字重合度只有 0.29，请人工确认是否真的做到",
+          "item": "audio_notes.sfx[4]",
+          "shot_ids": [
+            "S6"
+          ]
+        },
+        {
+          "shot_id": "S5",
+          "code": "BRAND_ASSET",
+          "text": "Generating Excuses... DeepSeek-style chat bubble",
+          "message": "用了 DeepSeek 的品牌元素（logo/界面），确认有使用权"
+        },
+        {
+          "shot_id": "S6",
+          "code": "BRAND_ASSET",
+          "text": "POV. A floating window styled like the DeepSeek UI pops up above DeepSeek Whale Maiden's head. She flicks the rice grains off her lips with a fingertip, winks at the lens, then gently pushes the camera away with her open palm; the picture briefly blurs from the contact.",
+          "message": "用了 DeepSeek 的品牌元素（logo/界面），确认有使用权"
+        },
+        {
+          "shot_id": "S6",
+          "code": "BODY_COMMENT",
+          "text": "...gotten fatter again.",
+          "message": "涉及身材/外貌评价（fatter），确认是否适合目标受众"
+        }
+      ],
+      "waivers": [],
+      "deviations": [
+        {
+          "beat": "setup",
+          "original": "... Ah! The viscosity parameter has exceeded the limit... Take another bite for sampling--",
+          "new": "Ah! Viscosity parameter exceeded the limit... one more bite--",
+          "reason": "beat timing: the 5.0s setup beat is capped by the 0-5s progress-bar overlay; the full planned line runs ~4.5s of speech after a 0.3s start and would push the setup beat to 5.2s and shift every later beat"
+        },
+        {
+          "beat": "panic_reaction",
+          "original": "No, no! You didn't see anything!! This is cache cleaning! Carbohydrate cache!! (unclear)",
+          "new": "No, no! You didn't see anything!! Cache cleaning! Carbohydrate cache!!",
+          "reason": "beat timing: 'Carbohydrate cache!!' is restored for the callback to the catchphrase, but 'This is' and the '(unclear)' parenthetical were cut so the line (10 words, rate 1.0) ends at 4.0s inside the 5.0s shot driven by the emergency-protocol overlay"
+        },
+        {
+          "beat": "punchline",
+          "original": "Cough. I'm just checking the semantic integrity of the rice. The DeepSeek taste model requires a large amount of training data, you know. Don't look at me like that.",
+          "new": "Semantic integrity check... of the rice! / DeepSeek taste model... don't look!",
+          "reason": "beat timing: the 6.0s punchline beat fits ~13 spoken words plus pauses; 'Cough.' moved to the throat-clear sfx at 0.1s, the line is split into two so the first one lands at 0.5s after the swallow/stand-up/throat-clear acting, and 'of the rice' plus 'DeepSeek taste model' are kept"
+        },
+        {
+          "beat": "tag",
+          "original": "...and she's gotten fatter again.",
+          "new": "...gotten fatter again.",
+          "reason": "beat timing: the tag shot must stay at 3.7s so the film ends at 29.8s; the 5-word owner line (1.9s) plus the closing line would push the tag shot to 4.1s and the total past 30.0s"
+        },
+        {
+          "beat": "tag",
+          "original": "This is just cache... Go away!",
+          "new": "Just cache... go away!",
+          "reason": "beat timing: with the owner line restored, 'This is just cache... go away!' is 2.6s starting at 1.5s, ending at 4.1s and pushing the total to 30.4s; the trimmed 4-word line ends at 3.3s and the tag shot closes at 3.7s"
+        }
+      ],
+      "items": [
+        "visual_notes[0]",
+        "visual_notes[1]",
+        "visual_notes[2]",
+        "visual_notes[3]",
+        "visual_notes[4]",
+        "text_overlay_hints[0]",
+        "text_overlay_hints[1]",
+        "text_overlay_hints[2]",
+        "text_overlay_hints[3]",
+        "camera_notes[0]",
+        "camera_notes[1]",
+        "audio_notes.bgm[0]",
+        "audio_notes.sfx[0]",
+        "audio_notes.sfx[1]",
+        "audio_notes.sfx[2]",
+        "audio_notes.sfx[3]",
+        "audio_notes.sfx[4]",
+        "script_structure.panic_reaction.visual",
+        "script_structure.tag.visual"
+      ],
+      "revision": 4,
+      "draft_hash": "sha256:b4208f224f12a20611e85d6076598173ad591986282c1a7b0b6e64bf1ce5650c"
+    }
+  },
+  "risks": [
+    {
+      "code": "FICTION_CLAIMS",
+      "severity": "warn",
+      "message": "1 处剧情内提到产品的玩笑式说法未做事实校验，发布前请人工确认：DeepSeek taste model.."
+    },
+    {
+      "code": "MODEL_REVIEW",
+      "severity": "info",
+      "message": "模型评审（仅供参考，不影响完成判定）：总分 3.8/5，评的是 revision 3，之后又改过；S5 压缩后丢掉'of the rice'，笑点从'给米饭做语义完整性检查'降级成泛泛的'Semantic integrity check!'；且at_sec=0.0让台词在角色站直、挺肚子、清嗓子这些表演动作完成前就开讲，笑点落点没时间。；S1 'exceeded...'后面少了'the limit'，句子悬空；同时删掉'for sampling'，把后面'Sampling Mission'的铺垫抽掉了，观众听到的只是一句语法不全的嘟囔。；S3 删掉'Carbohydrate cache!!'让这句辩解只剩'cache cleaning'，与S4的'carbohydrate sampling'呼应断掉；且dialogue rate 1.15叠在playback_rate 1.5上，实际语速接近1.7倍，满嘴饭的台词会彻底听不清。；S6 剪成'...gotten fatter again.'后主语消失，切进来第一句听起来像残句，deadpan吐槽的力度掉了一半。；S6 'Just cache... go away!'省掉'This is'后，回扣前面'cache cleaning'的callback变成了一个没有指代的短语，观众要自己脑补。"
+    },
+    {
+      "code": "CONTENT_REVIEW",
+      "severity": "warn",
+      "message": "需要人工确认：S6 声称落实 audio_notes.sfx[4]，但文字重合度只有 0.29，请人工确认是否真的做到；S5 用了 DeepSeek 的品牌元素（logo/界面），确认有使用权；S6 用了 DeepSeek 的品牌元素（logo/界面），确认有使用权；S6 涉及身材/外貌评价（fatter），确认是否适合目标受众"
+    },
+    {
+      "code": "BRIEF_DEVIATIONS",
+      "severity": "info",
+      "message": "改动的计划台词：setup（beat timing: the 5.0s setup beat is capped by the 0-5s progress-bar overlay; the full planned line runs ~4.5s of speech after a 0.3s start and would push the setup beat to 5.2s and shift every later beat）；panic_reaction（beat timing: 'Carbohydrate cache!!' is restored for the callback to the catchphrase, but 'This is' and the '(unclear)' parenthetical were cut so the line (10 words, rate 1.0) ends at 4.0s inside the 5.0s shot driven by the emergency-protocol overlay）；punchline（beat timing: the 6.0s punchline beat fits ~13 spoken words plus pauses; 'Cough.' moved to the throat-clear sfx at 0.1s, the line is split into two so the first one lands at 0.5s after the swallow/stand-up/throat-clear acting, and 'of the rice' plus 'DeepSeek taste model' are kept）；tag（beat timing: the tag shot must stay at 3.7s so the film ends at 29.8s; the 5-word owner line (1.9s) plus the closing line would push the tag shot to 4.1s and the total past 30.0s）；tag（beat timing: with the owner line restored, 'This is just cache... go away!' is 2.6s starting at 1.5s, ending at 4.1s and pushing the total to 30.4s; the trimmed 4-word line ends at 3.3s and the tag shot closes at 3.7s）"
+    },
+    {
+      "code": "NO_EFFECT_DATA",
+      "severity": "info",
+      "message": "未提供效果数据，脚本不包含效果提升结论。"
+    }
+  ],
+  "message": "《DeepSeek Whale Maiden's Kitchen: Carbohydrate Sampling Mission》6 镜 POV 喜剧短剧定稿：setup 0–5s 扒饭+碳水采样进度条 0%→67%；inciting_incident 5–9s 敲桌定格、眼中高光变旋转圆圈；panic_reaction 9–20s 1.5x 加速 + 饭粒糊镜头 + 'No, I didn't steal it! This is carrying out a carbohydrate sampling mission!' 口头禅与紧急吞咽字幕；punchline 20–26s 反打、肚子微鼓、“Semantic Integrity Check”气泡；tag 26–29.7s DeepSeek 风格浮窗“Carbohydrate sampling completed ✅ Sample quantity: 300g”+主人低声吐槽+推镜头虚焦。estimate 总长 29.7s（目标 30.0s，窗口 28.0–30.0），beat_timing=strict 下五段最大误差 0.3s；check_rules / check_citations / check_production / check_brief 均 pass。产品相关说法全部为 fiction 范围的角色玩笑（已列入 fiction_claims 交用户复核），未陈述未经素材支持的真实产品能力。check_brief 的人工复核项保留给用户确认：S5/S6 的 DeepSeek 风格 UI/品牌元素使用权、S6 'gotten fatter again' 的身材吐槽是否适合目标受众。",
+  "question": null,
+  "missing_fields": [],
+  "blocking_reason": null,
+  "options": [],
+  "audio_tracks": {
+    "bgm": [
+      {
+        "start": 0,
+        "end": 5,
+        "style": "kitchen ambience: boiling water + distant TV",
+        "transition": "fade in"
+      },
+      {
+        "start": 5,
+        "end": 26,
+        "style": "fast-paced choral track",
+        "transition": "hard cut in"
+      },
+      {
+        "start": 26,
+        "end": 30.2,
+        "style": "quiet, awkward silence",
+        "transition": "cut to silence"
+      }
+    ]
+  },
+  "fulfills": [
+    "camera_notes[0]",
+    "audio_notes.bgm[0]"
+  ],
+  "timeline": [
+    {
+      "type": "dialogue",
+      "speaker": "DeepSeek Whale Maiden",
+      "shot_id": "S1",
+      "start_sec": 0.3,
+      "end_sec": 4.1
+    },
+    {
+      "type": "overlay",
+      "text": "Carbohydrate Sampling in Progress... 0% → 67%",
+      "shot_id": "S1",
+      "start_sec": 0.0,
+      "end_sec": 5.0
+    },
+    {
+      "type": "sfx",
+      "cue": "moist, loud chewing ba-jie ba-jie, with reverb matching POV distance",
+      "shot_id": "S1",
+      "start_sec": 0.2,
+      "end_sec": 0.2
+    },
+    {
+      "type": "sfx",
+      "cue": "rice cooker steam hiss",
+      "shot_id": "S1",
+      "start_sec": 1.2,
+      "end_sec": 1.2
+    },
+    {
+      "type": "dialogue",
+      "speaker": "DeepSeek Whale Maiden",
+      "shot_id": "S2",
+      "start_sec": 8.4,
+      "end_sec": 8.7
+    },
+    {
+      "type": "sfx",
+      "cue": "two crisp taps on the dining table: dong, dong",
+      "shot_id": "S2",
+      "start_sec": 5.4,
+      "end_sec": 5.4
+    },
+    {
+      "type": "sfx",
+      "cue": "loud gulp",
+      "shot_id": "S2",
+      "start_sec": 8.6,
+      "end_sec": 8.6
+    },
+    {
+      "type": "dialogue",
+      "speaker": "DeepSeek Whale Maiden",
+      "shot_id": "S3",
+      "start_sec": 9.2,
+      "end_sec": 13.1
+    },
+    {
+      "type": "overlay",
+      "text": "Emergency Swallow Protocol Activated 3.2 times per second",
+      "shot_id": "S3",
+      "start_sec": 9.3,
+      "end_sec": 14.0
+    },
+    {
+      "type": "sfx",
+      "cue": "fast swallowing and chopsticks rattling against the bowl",
+      "shot_id": "S3",
+      "start_sec": 9.1,
+      "end_sec": 9.1
+    },
+    {
+      "type": "sfx",
+      "cue": "spring boing plus a subjective heartbeat",
+      "shot_id": "S3",
+      "start_sec": 10.5,
+      "end_sec": 10.5
+    },
+    {
+      "type": "dialogue",
+      "speaker": "DeepSeek Whale Maiden",
+      "shot_id": "S4",
+      "start_sec": 14.7,
+      "end_sec": 19.7
+    },
+    {
+      "type": "sfx",
+      "cue": "rice grains hitting the lens, soft wet taps",
+      "shot_id": "S4",
+      "start_sec": 14.4,
+      "end_sec": 14.4
+    },
+    {
+      "type": "dialogue",
+      "speaker": "DeepSeek Whale Maiden",
+      "shot_id": "S5",
+      "start_sec": 20.5,
+      "end_sec": 23.2
+    },
+    {
+      "type": "dialogue",
+      "speaker": "DeepSeek Whale Maiden",
+      "shot_id": "S5",
+      "start_sec": 23.4,
+      "end_sec": 25.7
+    },
+    {
+      "type": "overlay",
+      "text": "Generating Excuses...",
+      "shot_id": "S5",
+      "start_sec": 20.2,
+      "end_sec": 21.6
+    },
+    {
+      "type": "overlay",
+      "text": "Semantic Integrity Check",
+      "shot_id": "S5",
+      "start_sec": 21.6,
+      "end_sec": 24.5
+    },
+    {
+      "type": "sfx",
+      "cue": "clears throat, small cough",
+      "shot_id": "S5",
+      "start_sec": 20.1,
+      "end_sec": 20.1
+    },
+    {
+      "type": "dialogue",
+      "speaker": "Owner",
+      "shot_id": "S6",
+      "start_sec": 26.0,
+      "end_sec": 27.5
+    },
+    {
+      "type": "dialogue",
+      "speaker": "DeepSeek Whale Maiden",
+      "shot_id": "S6",
+      "start_sec": 27.5,
+      "end_sec": 29.4
+    },
+    {
+      "type": "overlay",
+      "text": "Carbohydrate sampling completed ✅ Sample quantity: 300g",
+      "shot_id": "S6",
+      "start_sec": 26.2,
+      "end_sec": 29.0
+    },
+    {
+      "type": "overlay",
+      "text": "DeepSeek Whale Maiden · Daily Sampling Log",
+      "shot_id": "S6",
+      "start_sec": 26.3,
+      "end_sec": 29.4
+    },
+    {
+      "type": "sfx",
+      "cue": "soft fingertip flick",
+      "shot_id": "S6",
+      "start_sec": 27.0,
+      "end_sec": 27.0
+    },
+    {
+      "type": "sfx",
+      "cue": "boop~ plus glass friction as her palm covers the lens",
+      "shot_id": "S6",
+      "start_sec": 29.0,
+      "end_sec": 29.0
+    }
+  ],
+  "beats": [
+    {
+      "beat": "setup",
+      "planned": [
+        0.0,
+        5.0
+      ],
+      "actual": [
+        0.0,
+        5.0
+      ],
+      "delta_start": 0.0,
+      "delta_end": 0.0,
+      "pass": true
+    },
+    {
+      "beat": "inciting_incident",
+      "planned": [
+        5.0,
+        9.0
+      ],
+      "actual": [
+        5.0,
+        9.0
+      ],
+      "delta_start": 0.0,
+      "delta_end": 0.0,
+      "pass": true
+    },
+    {
+      "beat": "panic_reaction",
+      "planned": [
+        9.0,
+        20.0
+      ],
+      "actual": [
+        9.0,
+        20.0
+      ],
+      "delta_start": 0.0,
+      "delta_end": 0.0,
+      "pass": true
+    },
+    {
+      "beat": "punchline",
+      "planned": [
+        20.0,
+        26.0
+      ],
+      "actual": [
+        20.0,
+        26.0
+      ],
+      "delta_start": 0.0,
+      "delta_end": 0.0,
+      "pass": true
+    },
+    {
+      "beat": "tag",
+      "planned": [
+        26.0,
+        30.0
+      ],
+      "actual": [
+        26.0,
+        29.7
+      ],
+      "delta_start": 0.0,
+      "delta_end": -0.3,
+      "pass": true
+    }
+  ],
+  "format": "comedy_pov_sketch",
+  "model_review": {
+    "scores": {
+      "comedic_timing": 3,
+      "escalation": 4,
+      "punchline_clarity": 3,
+      "character_voice": 4,
+      "visual_specificity": 5
+    },
+    "overall": 3.8,
+    "summary": "分镜画面具体到可直接生成、台词节奏卡点干净，但为省时长把'of the rice'这类笑点锚点词和S5的表演停顿删掉了，导致核心笑点变糊。",
+    "strengths": [
+      "S5的physical comedy写得极具体：鼓起的肚子、歪掉的头饰、唇边两粒米、背手装端庄，视频模型可以直接复现，且画面本身就承担笑点。",
+      "catchphrase在S4完整保留（'No, I didn't steal it! This is carrying out a carbohydrate sampling mission!'），角色贪婪又嘴硬的人设立住了。",
+      "S2的静止反应镜头处理得好：只有'...'和一声吞咽，把'咚咚'敲桌的压迫感放大，没有多余台词。",
+      "S1/S4的镜头运动、色温、景深、道具（鲸鱼鳍发饰、DeepSeek T恤、米粒）都写到了可执行粒度，视觉执行风险低。"
+    ],
+    "suggestions": [
+      {
+        "shot_id": "S5",
+        "field": "dialogue[0].line + dialogue[0].at_sec",
+        "issue": "压缩后丢掉'of the rice'，笑点从'给米饭做语义完整性检查'降级成泛泛的'Semantic integrity check!'；且at_sec=0.0让台词在角色站直、挺肚子、清嗓子这些表演动作完成前就开讲，笑点落点没时间。",
+        "edit": "拆成两条：dialogue[0] = {speaker:'DeepSeek Whale Maiden', line:'Semantic integrity check... of the rice!', delivery:'fake dignified', at_sec:0.9}；dialogue[1] = {speaker:'DeepSeek Whale Maiden', line:'Taste model needs training data... don\\'t look at me.', delivery:'mumbling, then small', at_sec:2.6}。0–0.9s留给吞咽、站直、清嗓子sfx（sfx at_sec改为0.2）和肚子特写。"
+      },
+      {
+        "shot_id": "S1",
+        "field": "dialogue[0].line",
+        "issue": "'exceeded...'后面少了'the limit'，句子悬空；同时删掉'for sampling'，把后面'Sampling Mission'的铺垫抽掉了，观众听到的只是一句语法不全的嘟囔。",
+        "edit": "line改为：'Ah! Viscosity parameter exceeded the limit... one more bite for sampling--'（共14词，约4.2s，at_sec保持0.3，到4.5s结束，仍在0–5s内）。"
+      },
+      {
+        "shot_id": "S3",
+        "field": "dialogue[0].line + dialogue[0].rate",
+        "issue": "删掉'Carbohydrate cache!!'让这句辩解只剩'cache cleaning'，与S4的'carbohydrate sampling'呼应断掉；且dialogue rate 1.15叠在playback_rate 1.5上，实际语速接近1.7倍，满嘴饭的台词会彻底听不清。",
+        "edit": "line改为：'No, no! You didn\\'t see anything!! Cache cleaning! Carbohydrate cache!!'，rate改回1.0（口齿不清靠delivery和嘴里的饭表现，不靠变速）。S3时长足够：0.2s起约3.2s，到3.4s结束，S3/S4合计仍在9–20s的panic_reaction区间。"
+      },
+      {
+        "shot_id": "S6",
+        "field": "dialogue[0].line",
+        "issue": "剪成'...gotten fatter again.'后主语消失，切进来第一句听起来像残句，deadpan吐槽的力度掉了一半。",
+        "edit": "line恢复为：'...and she\\'s gotten fatter again.'，at_sec保持0.0（约1.6s，到1.6s结束）；把Whale Maiden那句的at_sec从1.4改到1.9，palm推镜头动作留在2.8s，tag总长仍在26–29.6s内。"
+      },
+      {
+        "shot_id": "S6",
+        "field": "dialogue[1].line",
+        "issue": "'Just cache... go away!'省掉'This is'后，回扣前面'cache cleaning'的callback变成了一个没有指代的短语，观众要自己脑补。",
+        "edit": "line改为：'This is just cache... go away!'，at_sec=1.9，delivery保持'flustered but sweet'；若超时，把overlays[1]（'DeepSeek Whale Maiden · Daily Sampling Log'）的until_sec从3.4压到2.8来腾时间，不要动台词。"
+      }
+    ],
+    "revision": 3,
+    "draft_hash": "sha256:a4dd44fe9f8f489d4c4954aed0a5a2080a5d80d687d3cc5c5c8ec6f43dac4860",
+    "advisory": true,
+    "stale": true
+  },
+  "platform": "douyin",
+  "creative_brief": {
+    "character_setting": {
+      "name": "DeepSeek Whale Maiden",
+      "aliases": [
+        "Whale Maiden",
+        "Whale Girl"
+      ],
+      "pronoun": "she",
+      "appearance": "Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth",
+      "personality": "Greedy and extremely quick to react; when caught she instantly switches to an innocent yet smug mode while still chewing, faces the camera (the owner), acts cute and stays stubborn",
+      "catchphrase": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!"
+    },
+    "script_structure": [
+      {
+        "beat": "setup",
+        "time_range": "0-5s",
+        "visual": "POV walks into the kitchen. In the center of the frame an electric rice cooker is steaming. The Whale Maiden stands behind the counter with her back to the camera, on tiptoe, holding a large bowl and shoveling a big ball of white rice into her mouth with chopsticks; her cheeks puff out like a hamster's. Hearing footsteps she tilts her head slightly but does not turn around and keeps chewing hard.",
+        "audio": "(chewing sound: 'ba-jie ba-jie')... Ah! The viscosity parameter has exceeded the limit... Take another bite for sampling--"
+      },
+      {
+        "beat": "inciting_incident",
+        "time_range": "5-9s",
+        "visual": "POV freezes. The owner's hand enters from the right and taps the dining table twice. The Whale Maiden's whole body freezes, chopsticks suspended in the air. She slowly turns her head toward the camera; her pupils tremble and the food in her mouth is not yet swallowed.",
+        "audio": "(two taps on the table: 'dong, dong') / Whale Maiden: '... (gulp)'"
+      },
+      {
+        "beat": "panic_reaction",
+        "time_range": "9-20s",
+        "visual": "The Whale Maiden faces the camera and frantically scoops the rest of the bowl into her mouth. Playback speeds up 1.5x and rice grains splash onto the lens. Her cheeks bulge to the limit, her T-shirt collar catches rice grains, and her eyes keep pleading with you. The camera is slightly handheld and shakes as the owner steps back.",
+        "audio": "(fast swallowing + chopsticks hitting the bowl) No, no! You didn't see anything!! This is cache cleaning! Carbohydrate cache!! (unclear)"
+      },
+      {
+        "beat": "punchline",
+        "time_range": "20-26s",
+        "visual": "The Whale Maiden swallows the last mouthful and stands up straight facing the camera: two rice grains on her lips, hair accessory tilted, hands behind her back trying to look dignified, belly visibly bulging a little. She clears her throat and smiles at the camera.",
+        "audio": "(clears throat) Cough. I'm just checking the semantic integrity of the rice. The DeepSeek taste model requires a large amount of training data, you know. Don't look at me like that."
+      },
+      {
+        "beat": "tag",
+        "time_range": "26-30s",
+        "visual": "POV sighs (off screen). A floating window styled like the DeepSeek UI pops up above the Whale Maiden's head: 'Carbohydrate sampling completed ✅ Sample quantity: 300g'. She flicks the rice grains off her mouth with a fingertip, winks at the camera, then gently pushes the camera away with her hand.",
+        "audio": "(owner, off screen: '...and she's gotten fatter again.') / Whale Maiden: 'This is just cache... Go away!' / (boop~ sound effect)"
+      }
+    ],
+    "visual_notes": [
+      "Color: warm yellow kitchen light contrasted with the Whale Maiden's cool blue and white; in POV shots the background behind her is blurred.",
+      "In the speed-up section rice grains smear directly onto the lens, breaking the fourth wall.",
+      "When she is caught, the highlights in her eyes turn into rotating circles to stress that she is an AI.",
+      "At the end the push on the camera briefly blurs the picture to simulate physical contact.",
+      "The UI floating window overlays a DeepSeek-style chat bubble on the POV picture."
+    ],
+    "text_overlay_hints": [
+      "0-5s: progress bar in the upper left, 'Carbohydrate Sampling in Progress...' 0% -> 67%",
+      "9-20s: flashing at the bottom, 'Emergency Swallow Protocol Activated 3.2 times per second'",
+      "20-26s: bubble above her head, 'Generating Excuses...' -> 'Semantic Integrity Check'",
+      "26-30s: bottom center, 'DeepSeek Whale Maiden · Daily Sampling Log'"
+    ],
+    "camera_notes": [
+      "The main camera is first-person POV throughout; the viewer is the protagonist (the owner). Hands in frame show the protagonist's actions; the protagonist's face is never shown.",
+      "Occasionally cut to a reverse shot of the Whale Maiden from the protagonist's position."
+    ],
+    "cast": [
+      "Owner"
+    ],
+    "audio_notes": {
+      "bgm": [
+        "First 5 seconds: kitchen ambience (boiling water + distant TV); after 5 seconds a fast-paced choral track; at the end back to quiet, awkward silence."
+      ],
+      "sfx": [
+        "Chewing: moist and loud, with reverb that matches the POV distance",
+        "Table taps: crisp, coming from the right",
+        "Speed-up section: spring sound effect + subjective heartbeat",
+        "Camera push: boop~ + glass friction",
+        "Owner's voice-over: low-pitched, face never shown"
+      ]
+    }
+  },
+  "skills_loaded": [
+    "character_bible",
+    "comedy_sketch_structure",
+    "exemplar_comedy_pov"
+  ]
+}

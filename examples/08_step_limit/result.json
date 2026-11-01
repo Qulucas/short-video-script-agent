@@ -8,9 +8,17 @@
     "max_tool_calls": 26
   },
   "last_state": {
-    "draft_revision": 0
+    "draft_revision": null,
+    "draft_hash": null,
+    "checks": {
+      "duration": null,
+      "rules": null,
+      "citations": null,
+      "production": null,
+      "brief": null
+    }
   },
-  "run_id": "20261101T051640Z-ee9661",
+  "run_id": "20261101T061527Z-ec8be7",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline"

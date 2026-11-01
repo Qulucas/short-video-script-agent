@@ -2,6 +2,7 @@
 id: virtual_character_direction
 title: 虚拟形象 / 角色出镜的表演指导
 when: creative_brief 里有 character_setting，需要写角色动作、表情和台词风格时
+formats: all
 ---
 ## 每镜都要写的三件事
 

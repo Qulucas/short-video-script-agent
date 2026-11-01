@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
+from src.export import write_exports
 from src.schemas import PRODUCTION_FIELDS
 
 EXIT_CODES = {
@@ -326,6 +327,14 @@ def render_storyboard(result: Dict[str, Any]) -> str:
                 lines.append("- **%s**：%s" % (label, _flat(value)))
         for line in shot.get("dialogue") or []:
             lines.append("- **对白**：%s" % _dialogue_line(line))
+        events = [e for e in result.get("timeline") or [] if e.get("shot_id") == shot.get("id")]
+        if events:
+            lines += ["", "| 时间 | 类型 | 内容 |", "|---|---|---|"]
+            for event in sorted(events, key=lambda e: e["start_sec"]):
+                span = "%.1fs" % event["start_sec"] if event["start_sec"] == event["end_sec"] else \
+                    "%.1f–%.1fs" % (event["start_sec"], event["end_sec"])
+                what = event.get("speaker") or event.get("text") or event.get("cue") or ""
+                lines.append("| %s | %s | %s |" % (span, event["type"], _cell(what)))
         prompt = "；".join(x for x in (
             appearance, _flat(shot.get("perspective")), shot.get("character_action"), shot.get("expression"),
             shot.get("visual"), _flat(shot.get("lighting")), _flat(shot.get("lens_fx")),
@@ -348,6 +357,7 @@ def write_artifacts(out_dir: Path, case_input: Dict[str, Any], result: Dict[str,
     (out_dir / "output.md").write_text(render_markdown(result), encoding="utf-8")
     if result.get("shots") and _has_production(result):
         (out_dir / "storyboard.md").write_text(render_storyboard(result), encoding="utf-8")
+        write_exports(out_dir, result)
     rev_dir = out_dir / "draft_revisions"
     rev_dir.mkdir(exist_ok=True)
     for item in revisions:

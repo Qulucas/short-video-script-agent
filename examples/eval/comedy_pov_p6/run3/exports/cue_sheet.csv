@@ -1,0 +1,32 @@
+type,start_sec,end_sec,shot_id,track,description,position,notes
+ambience,0,30.0,,ambience,apartment kitchen room tone,,
+bgm,0,5,,bgm,kitchen ambience: boiling water + distant TV,,fade in
+overlay,0.0,4.6,S1,overlay,Carbohydrate Sampling in Progress... 0% → 67%,,
+sfx,0.2,,S1,sfx,"wet, close chewing: ba-jie ba-jie",center,"moist and loud, with POV-distance reverb"
+sfx,3.4,,S1,sfx,rice cooker steam hiss,center,
+transition,4.9,,S1,picture,hard cut to POV freeze,,
+bgm,5,25.5,,bgm,fast-paced choral track,,cut in
+sfx,5.3,,S2,sfx,"two crisp taps on the table: dong, dong",right,crisp and close
+sfx,8.4,,S2,sfx,loud gulp,center,
+transition,8.8,,S2,picture,jump cut into the scramble,,
+sfx,9.4,,S3,sfx,chopsticks clattering against the bowl,center,
+sfx,13.0,,S3,sfx,subjective heartbeat,center,
+overlay,14.2,19.5,S4,overlay,Emergency Swallow Protocol Activated 3.2 times per second,,
+transition,14.2,,S3,picture,hard cut back to POV,,
+sfx,14.3,,S4,sfx,spring sound effect,center,"boing, cartoonish"
+sfx,15.4,,S4,sfx,"subjective heartbeat, speeding up",center,
+sfx,17.2,,S4,sfx,fast swallowing,center,
+overlay,19.5,21.9,S5,overlay,Generating Excuses...,,
+transition,19.5,,S4,picture,hard cut on the last swallow,,
+sfx,20.1,,S5,sfx,clears throat,center,close and dry
+overlay,22.1,24.9,S5,overlay,Semantic Integrity Check,,
+bgm,25.5,30.0,,bgm,quiet awkward silence,,cut
+overlay,25.5,27.7,S6,overlay,Carbohydrate sampling completed ✅ Sample quantity: 300g,,
+transition,25.5,,S5,picture,cut to the floating window,,
+sfx,25.6,,S6,sfx,soft UI pop,center,"digital, close"
+overlay,27.8,30.0,S7,overlay,DeepSeek Whale Maiden · Daily Sampling Log,,
+sfx,27.8,,S7,sfx,"owner sighs, offscreen",center,low and tired
+transition,27.8,,S6,picture,cut to the palm push,,
+sfx,29.7,,S7,sfx,boop~,center,"soft, round"
+sfx,29.9,,S7,sfx,glass friction,center,
+transition,30.0,,S7,picture,fade to black,,

@@ -124,7 +124,7 @@ class Orchestrator:
             "brief_items": [{"id": i["id"], "text": i["text"], "must_contain": i["quotes"] + ["%g" % n for n in i["numbers"]]}
                             for i in brief_items(brief.get("creative_brief") or {})],
             "planned_lines": planned_lines(brief.get("creative_brief") or {}),
-            "skills_available": list_skills(),
+            "skills_available": list_skills(fmt=self.format["name"]),
             "loaded_skills": {},
             "skill_loads": 0,
         }
@@ -187,13 +187,24 @@ class Orchestrator:
         if self.state["skill_loads"] >= MAX_SKILL_LOADS:
             return {"ok": False, "error_code": "SKILL_LOAD_LIMIT",
                     "message": "最多读取 %d 个技能" % MAX_SKILL_LOADS, "retryable": False}
-        skill = load_skill(name)
+        available = [s["id"] for s in self.state["skills_available"]]
+        skill = load_skill(name) if name in available else None    # only skills that apply to this format
         if skill is None:
             return {"ok": False, "error_code": "SKILL_NOT_FOUND", "retryable": True,
                     "available": [s["id"] for s in self.state["skills_available"]]}
         self.state["skill_loads"] += 1
         self.state["loaded_skills"][name] = skill["body"]
         return {"ok": True, "skill": name, "title": skill.get("title", ""), "chars": len(skill["body"])}
+
+    def _last_state(self) -> Dict[str, Any]:
+        """Where an unfinished run stopped: the revision on disk and which checks it had passed."""
+        checks = self.state["last_checks"]
+        return {
+            "draft_revision": self.state["draft_revision"] or None,
+            "draft_hash": self.state["draft_hash"],
+            "checks": {k: (v.get("pass") if v and v.get("draft_hash", self.state["draft_hash"]) == self.state["draft_hash"]
+                           else None) for k, v in checks.items()},
+        }
 
     def _record_error(self, code: str, message: str) -> None:
         self.state["trace_errors"].append({"code": code, "message": message})
@@ -213,6 +224,8 @@ class Orchestrator:
             item["touched"] = observation["touched"]
         if observation.get("sections"):
             item["failing"] = [k for k, v in observation["sections"].items() if not v.get("pass")]
+        if name == "check_all":
+            item["failing"] = observation.get("failing")
         for key in ("error_code", "revision", "total_sec", "pass", "beats_pass", "total", "missing"):
             if observation.get(key) is not None:
                 item[key] = observation[key]
@@ -286,9 +299,51 @@ class Orchestrator:
         return {"ok": True, "revision": rev, "draft_hash": h, "diff": diff}
 
     def _execute_tool(self, action: Dict[str, Any]) -> Dict[str, Any]:
+        self.state["tool_calls"] += 1
+        return self._dispatch(action)
+
+    def _applicable_checks(self) -> List[str]:
+        names = ["estimate_duration", "check_rules", "check_citations"]
+        if self.production_mode:
+            names.append("check_production")
+        if self.brief_checks_strict:
+            names.append("check_brief")
+        return names
+
+    def _check_all(self) -> Dict[str, Any]:
+        """Run every check the completion gate needs, in dependency order, as one tool call.
+
+        Each sub-check stores its result exactly as if it had been called on its own, so the gate
+        is unchanged. The observation keeps details only for checks that failed.
+        """
+        if not self.state["current_draft"]:
+            return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
+        summary: Dict[str, Any] = {}
+        for name in self._applicable_checks():
+            obs = self._dispatch({"name": name, "args": {}})
+            entry: Dict[str, Any] = {"pass": bool(obs.get("ok")) and bool(obs.get("pass"))}
+            if name == "estimate_duration":
+                entry.update({k: obs.get(k) for k in ("total_sec", "min_sec", "max_sec") if k in obs})
+                if not entry["pass"]:
+                    entry["beats"] = [b for b in obs.get("beats", []) if not b.get("pass")]
+                    entry["shots"] = obs.get("shots")
+            elif not entry["pass"]:
+                for key in ("error_code", "violations", "needs_review", "unsupported_claims", "issues", "sections"):
+                    if obs.get(key):
+                        entry[key] = obs[key]
+            if name == "check_brief" and obs.get("review"):
+                entry["review"] = obs["review"]
+            summary[name] = entry
+        failing = [k for k, v in summary.items() if not v["pass"]]
+        return {"ok": True, "pass": not failing, "failing": failing, "checks": summary,
+                "revision": self.state["draft_revision"], "draft_hash": self.state["draft_hash"]}
+
+    def _dispatch(self, action: Dict[str, Any]) -> Dict[str, Any]:
         name = action["name"]
         args = action.get("args", {})
-        self.state["tool_calls"] += 1
+
+        if name == "check_all":
+            return self._check_all()
 
         if name == "search_materials":
             if self.state["search_attempts"] >= 1 + MAX_QUERY_REWRITES:
@@ -655,6 +710,7 @@ class Orchestrator:
         if st["last_review"]:
             result["model_review"] = dict(st["last_review"], stale=st["last_review"]["draft_hash"] != st["draft_hash"])
         if self.production_mode:
+            result["platform"] = self.brief.get("platform")
             result["creative_brief"] = self.brief["creative_brief"]
             result["skills_loaded"] = sorted(st["loaded_skills"])
         if status == "incomplete":
@@ -706,12 +762,16 @@ class Orchestrator:
                 if self.state["action_repairs"] > MAX_ACTION_REPAIRS:
                     self.trace.finalize("incomplete", "invalid_action_limit", self.state["tool_calls"])
                     result = _terminal("incomplete", "invalid_action_limit",
-                                       "动作解析失败超过上限", run_id=self.run_id,
+                                       "连续 %d 次动作解析失败" % self.state["action_repairs"], run_id=self.run_id,
                                        provider=self.provider.name, model=self.provider.model,
-                                       mode=self.provider.mode, exit_code=4)
+                                       mode=self.provider.mode, exit_code=4, last_state=self._last_state())
                     return result, self.trace.to_dict(), self.state["revisions"]
                 self.state["last_observation"] = obs
                 continue
+
+            # The repair cap is for a model stuck producing garbage, so it counts consecutive failures;
+            # an occasional bad reply in a 30-step run should not end it (eval run2 died that way at step 18).
+            self.state["action_repairs"] = 0
 
             if action["name"] == "finish":
                 ok, missing = self._validate_finish(action)
@@ -746,7 +806,7 @@ class Orchestrator:
                 result = _terminal("incomplete", "tool_call_limit_reached",
                                    "工具调用达到上限", run_id=self.run_id,
                                    provider=self.provider.name, model=self.provider.model,
-                                   mode=self.provider.mode, exit_code=4)
+                                   mode=self.provider.mode, exit_code=4, last_state=self._last_state())
                 return result, self.trace.to_dict(), self.state["revisions"]
 
             observation = self._execute_tool(action)
@@ -761,7 +821,7 @@ class Orchestrator:
                            "已达到 %d 步执行上限" % MAX_STEPS, run_id=self.run_id,
                            provider=self.provider.name, model=self.provider.model,
                            mode=self.provider.mode, exit_code=4,
-                           last_state={"draft_revision": self.state["draft_revision"]})
+                           last_state=self._last_state())
         return result, self.trace.to_dict(), self.state["revisions"]
 
 

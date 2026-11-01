@@ -2,6 +2,7 @@
 id: video_ai_handoff
 title: 交给视频生成模型的分镜写法（景别、运镜、转场、声音）
 when: 填写 shot_size / camera / transition / sfx / bgm，或 check_production 报 FIELD_MISSING、VISUAL_TOO_SHORT 时
+formats: all
 ---
 ## visual 的写法
 

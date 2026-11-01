@@ -1,0 +1,175 @@
+{
+  "title": "DeepSeek Whale Maiden's Kitchen: Carbohydrate Sampling Mission",
+  "aspect_ratio": "9:16",
+  "clip_max_sec": 10.0,
+  "character_reference": "DeepSeek Whale Maiden, Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth",
+  "note": "overlays / on-screen text are added in editing, not generated in the clip",
+  "shots": [
+    {
+      "id": "S1",
+      "beat": "setup",
+      "start_sec": 0.0,
+      "duration_sec": 5.0,
+      "clips": [
+        {
+          "index": 1,
+          "start_sec": 0.0,
+          "duration_sec": 5.0
+        }
+      ],
+      "prompt": "DeepSeek Whale Maiden, Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth. pov shot. POV walks into a warm yellow-lit kitchen. DeepSeek Whale Maiden stands behind the counter with her back to the camera, blue and white gradient ponytail swinging, a small whale fin accessory on top of her head, loose home T-shirt, barefoot, up on tiptoe; she scoops a big ball of white rice into her mouth with chopsticks, cheeks puffed out like a hamster's. The kitchen behind her is soft and blurred, cool blue-white light on her hair against the warm room. on tiptoe behind the counter, shovels rice with chopsticks, tilts her head slightly at the footsteps but keeps her back to the camera and chews hard. cheeks packed, eyes half-closed in bliss, jaw working fast. warm 3000K tungsten kitchen key from the left, cool blue rim light on her ponytail, shallow depth of field so the background behind her is blurred. wide from the doorway, pushing to medium, slow handheld push-in from the doorway (handheld)",
+      "negative_prompt": "extra fingers, deformed hands, garbled text, watermark, inconsistent character design, different hairstyle or outfit than the character sheet, the protagonist's (camera owner's) face, including reflections",
+      "perspective": "pov",
+      "camera": {
+        "move": "slow handheld push-in from the doorway",
+        "handheld": true
+      },
+      "playback_rate": 1.0,
+      "post_production": {
+        "overlays": [
+          "Carbohydrate Sampling in Progress... 0% → 67%"
+        ],
+        "on_screen_text": "Carbohydrate Sampling in Progress... 0% → 67%",
+        "transition_out": "cut on the chew"
+      }
+    },
+    {
+      "id": "S2",
+      "beat": "inciting_incident",
+      "start_sec": 5.0,
+      "duration_sec": 4.0,
+      "clips": [
+        {
+          "index": 1,
+          "start_sec": 5.0,
+          "duration_sec": 4.0
+        }
+      ],
+      "prompt": "DeepSeek Whale Maiden, Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth. pov shot. POV freezes. The owner's right hand enters from the right edge of the frame and taps the dining table twice. DeepSeek Whale Maiden freezes mid-bite, chopsticks suspended in the air, blue and white ponytail completely still, the whale fin accessory on top of her head tilting; she slowly turns her head toward the lens, pupils trembling, the highlights in her eyes turning into rotating circles, food still packed in her mouth. whole body freezes mid-bite, chopsticks suspended, slow robotic head turn toward the lens. pupils trembling, spiral highlights in her eyes, mouth full and unmoving. same warm tungsten kitchen light, cool blue rim light on her hair, her iris highlights turning into rotating circles. medium close-up, locked off, owner's hand enters frame right",
+      "negative_prompt": "extra fingers, deformed hands, garbled text, watermark, inconsistent character design, different hairstyle or outfit than the character sheet, the protagonist's (camera owner's) face, including reflections",
+      "perspective": "pov",
+      "camera": {
+        "move": "locked off, owner's hand enters frame right",
+        "handheld": false
+      },
+      "playback_rate": 1.0,
+      "post_production": {
+        "overlays": [],
+        "on_screen_text": null,
+        "transition_out": "jump cut into the speed-up"
+      }
+    },
+    {
+      "id": "S3",
+      "beat": "panic_reaction",
+      "start_sec": 9.0,
+      "duration_sec": 5.0,
+      "clips": [
+        {
+          "index": 1,
+          "start_sec": 9.0,
+          "duration_sec": 5.0
+        }
+      ],
+      "prompt": "DeepSeek Whale Maiden, Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth. pov shot. POV, playback 1.5x. DeepSeek Whale Maiden faces the camera and frantically scoops the rest of the bowl into her mouth, blue and white ponytail whipping, whale fin accessory bouncing, rice grains flying; her cheeks bulge to bursting and rice catches all over her T-shirt collar; the handheld frame shakes as the owner takes a step back. scoops the rest of the bowl into her mouth in fast shovels, steps back, keeps her eyes on the lens. panicked, eyes wide and pleading, cheeks bulging to bursting. warm tungsten key, cool blue rim light, shallow focus with rice grains flying through the beam. medium shot, slightly wide, slight handheld shake, small step back (handheld). 1.5x playback",
+      "negative_prompt": "extra fingers, deformed hands, garbled text, watermark, inconsistent character design, different hairstyle or outfit than the character sheet, the protagonist's (camera owner's) face, including reflections",
+      "perspective": "pov",
+      "camera": {
+        "move": "slight handheld shake, small step back",
+        "handheld": true
+      },
+      "playback_rate": 1.5,
+      "post_production": {
+        "overlays": [
+          "Emergency Swallow Protocol Activated 3.2 times per second"
+        ],
+        "on_screen_text": "Emergency Swallow Protocol Activated 3.2 times per second",
+        "transition_out": "whip pan into the close-up"
+      }
+    },
+    {
+      "id": "S4",
+      "beat": "panic_reaction",
+      "start_sec": 14.0,
+      "duration_sec": 6.0,
+      "clips": [
+        {
+          "index": 1,
+          "start_sec": 14.0,
+          "duration_sec": 6.0
+        }
+      ],
+      "prompt": "DeepSeek Whale Maiden, Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth. pov shot. POV extreme close-up. DeepSeek Whale Maiden leans right into the lens, still shovelling rice; rice grains smear directly onto the glass and stick there, breaking the fourth wall; her cheeks bulge to bursting, rice stuck all over her T-shirt collar, the whale fin accessory crooked on her head, her eyes begging you; she backs off and the handheld frame shakes. leans into the lens while shovelling rice, then backs away with her hands up, still chewing. pleading eyes, cheeks bulging, rice grains stuck to her lips. warm tungsten key with a cool blue rim, smeared rice glowing on the glass. extreme close-up, handheld, she leans into the lens then backs away (handheld). 1.5x playback",
+      "negative_prompt": "extra fingers, deformed hands, garbled text, watermark, inconsistent character design, different hairstyle or outfit than the character sheet, the protagonist's (camera owner's) face, including reflections",
+      "perspective": "pov",
+      "camera": {
+        "move": "handheld, she leans into the lens then backs away",
+        "handheld": true
+      },
+      "playback_rate": 1.5,
+      "post_production": {
+        "overlays": [],
+        "on_screen_text": null,
+        "transition_out": "cut to reverse shot"
+      }
+    },
+    {
+      "id": "S5",
+      "beat": "punchline",
+      "start_sec": 20.0,
+      "duration_sec": 6.0,
+      "clips": [
+        {
+          "index": 1,
+          "start_sec": 20.0,
+          "duration_sec": 6.0
+        }
+      ],
+      "prompt": "DeepSeek Whale Maiden, Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth. reverse shot. Reverse shot from the owner's position. DeepSeek Whale Maiden has set the emptied bowl down on the counter and swallows the last mouthful, then stands up straight: two rice grains on her lips, the whale fin accessory crooked on her head, blue and white gradient ponytail, hands behind her back trying to look dignified, her belly visibly bulging a little under the loose home T-shirt. She clears her throat and smiles into the lens. swallows, stands up straight, hands behind her back, chin up, small dignified nod. innocent yet smug, corners of the mouth twitching, one wink held back. warm 3200K tungsten key from the left, soft cool blue fill, kitchen bokeh behind her. medium shot, eye level, slow push-in",
+      "negative_prompt": "extra fingers, deformed hands, garbled text, watermark, inconsistent character design, different hairstyle or outfit than the character sheet, the protagonist's (camera owner's) face, including reflections",
+      "perspective": "reverse",
+      "camera": {
+        "move": "slow push-in",
+        "handheld": false
+      },
+      "playback_rate": 1.0,
+      "post_production": {
+        "overlays": [
+          "Generating Excuses...",
+          "Semantic Integrity Check"
+        ],
+        "on_screen_text": "Semantic Integrity Check",
+        "transition_out": "cut to POV tag"
+      }
+    },
+    {
+      "id": "S6",
+      "beat": "tag",
+      "start_sec": 26.0,
+      "duration_sec": 3.7,
+      "clips": [
+        {
+          "index": 1,
+          "start_sec": 26.0,
+          "duration_sec": 3.7
+        }
+      ],
+      "prompt": "DeepSeek Whale Maiden, Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth. pov shot. POV. A floating window styled like the DeepSeek UI pops up above DeepSeek Whale Maiden's head. She flicks the rice grains off her lips with a fingertip, winks at the lens, then gently pushes the camera away with her open palm; the picture briefly blurs from the contact. flicks rice grains off her lips, winks, pushes the lens away with her palm. smug, eyes curved into a smile. warm tungsten key, cool blue rim light, defocus bloom as her palm covers the glass. medium close-up, camera pushed back by her palm, drifting out of focus (handheld)",
+      "negative_prompt": "extra fingers, deformed hands, garbled text, watermark, inconsistent character design, different hairstyle or outfit than the character sheet, the protagonist's (camera owner's) face, including reflections",
+      "perspective": "pov",
+      "camera": {
+        "move": "camera pushed back by her palm, drifting out of focus",
+        "handheld": true
+      },
+      "playback_rate": 1.0,
+      "post_production": {
+        "overlays": [
+          "Carbohydrate sampling completed ✅ Sample quantity: 300g",
+          "DeepSeek Whale Maiden · Daily Sampling Log"
+        ],
+        "on_screen_text": "DeepSeek Whale Maiden · Daily Sampling Log",
+        "transition_out": "soft blur out"
+      }
+    }
+  ]
+}

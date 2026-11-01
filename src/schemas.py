@@ -19,6 +19,7 @@ ACTION_NAMES = {
     "patch_draft",
     "write_outline",
     "review_draft",
+    "check_all",
 }
 
 # Optional per-shot fields for the video-production handoff; check_production decides which

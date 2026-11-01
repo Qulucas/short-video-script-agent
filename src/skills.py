@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from src.config import DATA_DIR
 
@@ -23,11 +23,29 @@ def _parse(path: Path) -> Dict[str, str]:
     return meta
 
 
-def list_skills(skills_dir: Path = SKILLS_DIR) -> List[Dict[str, str]]:
-    """Index shown to the model: id/title/when only, so the prompt stays small until it asks."""
+def _formats(value: str) -> List[str]:
+    return [v.strip() for v in (value or "").split(",") if v.strip()]
+
+
+def list_skills(skills_dir: Path = SKILLS_DIR, fmt: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Index shown to the model: id/title/when/recommended only, so the prompt stays small until it asks.
+
+    A skill's header says which formats it applies to (``formats: all`` or a list) and for which it is
+    recommended (``recommend:``). With ``fmt``, skills that do not apply are left out and recommended
+    ones come first.
+    """
     if not skills_dir.exists():
         return []
-    return [{k: v for k, v in _parse(p).items() if k != "body"} for p in sorted(skills_dir.glob("*.md"))]
+    out = []
+    for path in sorted(skills_dir.glob("*.md")):
+        meta = _parse(path)
+        applies = _formats(meta.get("formats", "all"))
+        if fmt and "all" not in applies and fmt not in applies:
+            continue
+        item: Dict[str, Any] = {k: meta[k] for k in ("id", "title", "when")}
+        item["recommended"] = bool(fmt) and fmt in _formats(meta.get("recommend", ""))
+        out.append(item)
+    return sorted(out, key=lambda i: (not i["recommended"], i["id"]))
 
 
 def load_skill(name: str, skills_dir: Path = SKILLS_DIR) -> Optional[Dict[str, str]]:

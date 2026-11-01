@@ -1,0 +1,119 @@
+{
+  "title": "DeepSeek Whale Maiden's Kitchen: Caught Sneaking White Rice",
+  "speakers": [
+    {
+      "name": "DeepSeek Whale Maiden",
+      "lines": 7
+    },
+    {
+      "name": "Owner",
+      "lines": 1
+    }
+  ],
+  "lines": [
+    {
+      "shot_id": "S1",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "Ah! Viscosity limit exceeded... one more sampling bite",
+      "text": "Ah! Viscosity limit exceeded... one more sampling bite",
+      "delivery": "mouth full, muffled and chatty",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 1.0,
+      "end_sec": 4.4,
+      "index": 1,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S2",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "……",
+      "text": "……",
+      "delivery": "frozen, tiny",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 8.2,
+      "end_sec": 8.5,
+      "index": 2,
+      "nonverbal": true
+    },
+    {
+      "shot_id": "S3",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!",
+      "text": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!",
+      "delivery": "panicked, mouth full, indignant",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 8.8,
+      "end_sec": 13.8,
+      "index": 3,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S4",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "No no! You didn't see anything!!",
+      "text": "No no! You didn't see anything!!",
+      "delivery": "mouth full, hysterical, shouted over the 1.5x speed",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 14.4,
+      "end_sec": 16.8,
+      "index": 4,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S4",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "Car-bo-hy-drate cache!!",
+      "text": "Car-bo-hy-drate cache!!",
+      "delivery": "cheeks bulging but each syllable spat out clear, back at normal speed",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 17.0,
+      "end_sec": 19.0,
+      "index": 5,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S5",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "Just checking the rice's semantic integrity. DeepSeek taste model needs training data.",
+      "text": "Just checking the rice's semantic integrity. DeepSeek taste model needs training data.",
+      "delivery": "smug, mock-professional, slightly hoarse",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 20.4,
+      "end_sec": 25.1,
+      "index": 6,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S6",
+      "speaker": "Owner",
+      "raw": "...she's fatter again.",
+      "text": "...she's fatter again.",
+      "delivery": "low, offscreen mutter",
+      "offscreen": true,
+      "rate": 1.0,
+      "start_sec": 26.0,
+      "end_sec": 27.5,
+      "index": 7,
+      "nonverbal": false
+    },
+    {
+      "shot_id": "S7",
+      "speaker": "DeepSeek Whale Maiden",
+      "raw": "Cache... go away!",
+      "text": "Cache... go away!",
+      "delivery": "flustered, smug",
+      "offscreen": false,
+      "rate": 1.0,
+      "start_sec": 28.0,
+      "end_sec": 29.5,
+      "index": 8,
+      "nonverbal": false
+    }
+  ]
+}

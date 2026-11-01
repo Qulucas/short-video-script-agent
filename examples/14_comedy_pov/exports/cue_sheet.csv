@@ -1,0 +1,26 @@
+type,start_sec,end_sec,shot_id,track,description,position,notes
+bgm,0,5,,bgm,kitchen ambience: boiling water + distant TV,,cut
+overlay,0.0,5.0,S1,overlay,Carbohydrate Sampling in Progress...,,
+sfx,0.0,,S1,sfx,"moist, loud chewing",center,close reverb matching the POV distance
+bgm,5,26,,bgm,fast-paced choral track,,slams in on the table tap
+transition,5.0,,S1,picture,hard cut on the first table tap,,
+sfx,5.4,,S2,sfx,"two crisp taps on the table: dong, dong",right,
+sfx,8.6,,S2,sfx,loud gulp,center,
+transition,9.0,,S2,picture,jump cut into the speed-up,,
+sfx,9.2,,S3,sfx,spring boing,,
+sfx,9.5,,S3,sfx,subjective heartbeat,,
+overlay,10.0,14.4,S3,overlay,Emergency Swallow Protocol Activated 3.2 times per second,,
+sfx,10.0,,S3,sfx,chopsticks clacking on the bowl,,
+sfx,14.4,,S4,sfx,heartbeat speeds up,,
+transition,14.4,,S3,picture,whip pan following a flying rice grain,,
+sfx,16.9,,S4,sfx,fast swallowing,,
+overlay,20.0,22.5,S5,overlay,Generating Excuses...,,
+transition,20.0,,S4,picture,"music hit, cut on her final swallow",,
+sfx,20.1,,S5,sfx,throat clear,,
+overlay,22.5,26.0,S5,overlay,Semantic Integrity Check,,
+bgm,26,30,,bgm,"awkward silence, room tone only",,music cuts out
+overlay,26.0,28.5,S6,overlay,Carbohydrate sampling completed ✅ Sample quantity: 300g,,
+transition,26.0,,S5,picture,music cuts out to awkward room tone,,
+overlay,27.0,30.0,S6,overlay,DeepSeek Whale Maiden · Daily Sampling Log,,
+sfx,29.4,,S6,sfx,boop~,,
+sfx,29.5,,S6,sfx,glass friction,,

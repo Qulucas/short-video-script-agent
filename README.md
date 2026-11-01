@@ -4,7 +4,7 @@
 >
 > GitHub：https://github.com/Qulucas/short-video-script-agent
 >
-> 提交版本：tag `v1.6`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
+> 提交版本：tag `v1.7`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
 >
 > 一句话：把“生成脚本”做成可审计的闭环——模型选动作，工具算时长、查规则、验引用，检查结果再驱动下一轮修改或明确失败。
 
@@ -45,9 +45,10 @@ pytest -q
 | 规则违规修正、60 秒动作对照、非法动作、检查哈希绑定 | 已完成 |
 | 14 个 fixture 场景输入、result/trace/output/draft_revisions | 已完成 |
 | 内容格式 + 脚本 v2 + 时间引擎（对白/音效/屏幕文字动画/动作时长/逐段计时） | 已完成（fixture 14 + live 14） |
+| 重复评测：`src/eval/score.py` 按同一金标准重打分；喜剧用例 v1.6、阶段 8.1、阶段 6–7 后 live 各跑 3 次（[报告](examples/eval/comedy_pov/report.md)） | 已完成：阶段 8.1 后完成 3/3、终稿全部达标，平均 12.7 步、9.3 次工具调用（v1.6：2/3，24.7 步、19.7 次）；加技能包后仍 3/3 达标，但台词保留度 0.88→0.76 |
 | brief 落实检查 `check_brief`（覆盖、台词保真、角色连贯、描述语言、时间线、POV、人工复核项） | 已完成（fixture 14、live 14-p3；拒绝 v1.3 的 live 14 稿和 v1.4 的 live 14-p3 终稿） |
 | 制作模式：角色设定/段落结构/视觉规范进入 prompt，制作字段 + `check_production` + 写作技能 + `storyboard.md` | 已完成（fixture 13 + live 13） |
-| `pytest -q` | **151 passed, 1 deselected** |
+| `pytest -q` | **171 passed, 1 deselected** |
 | **11 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩、制作模式、POV 搞笑短剧（阶段 3 前、阶段 3 后、阶段 5 后、阶段 4 后各一次）** |
 
 必选验收场景除“缺关键信息”（入口确定性校验，不经过模型）外都有 live 版本，对照表见 [docs/03-evaluation.md](docs/03-evaluation.md)。重点：
@@ -71,10 +72,12 @@ pytest -q
 | 时长估算 | `src/tools/duration.py` | 旁白 + 字幕阅读时长，十分之一秒整数累加 |
 | 规则检查 | `src/tools/rules.py` | `demo_default` / `strict_disclaimer`，BR-01~05 |
 | 引用校验 | `src/tools/citations.py` | source/quote/claim 覆盖、对抗性夹带扫描 |
+| 交付文件 | `src/export.py` | `exports/`：视频模型提示词、配音稿、SRT 字幕、音效表、角色表；`cli export` 可从保存的运行重建 |
+| 评测 | `src/eval/score.py` | 按金标准 brief 和当前检查给运行重新打分并汇总 |
 | 模型评审 | `src/tools/review.py` | 独立的审稿调用，5 维打分 + 修改建议；只供参考，不进闸门 |
 | 制作检查 | `src/tools/production.py` | 制作模式：必填制作字段、段落覆盖与顺序、口头禅、visual 细节、BGM |
 | brief 检查 | `src/tools/brief.py` | brief 每条要求是否落实、计划台词是否保留、角色/时间线/POV 是否连贯；人工复核项 |
-| 写作技能 | `src/skills.py`、`data/skills/*.md` | 5 个写作技能包，模型用 `load_skill` 按需读取 |
+| 写作技能 | `src/skills.py`、`data/skills/*.md` | 13 个写作技能包（5 个通用/口播、8 个喜剧/POV），按格式推荐，模型用 `load_skill` 按需读取 |
 | Trace/Render | `src/trace.py`、`src/render.py` | 步骤记录、`result.json`/`output.md`/`storyboard.md` |
 
 ## Agent 决策循环
@@ -83,7 +86,7 @@ pytest -q
 模型选动作 -> 工具执行 -> observation 回灌 -> 模型决定下一步 -> ... -> finish
 ```
 
-- 动作：`search_materials` / `write_outline` / `write_draft` / `patch_draft` / `estimate_duration` / `check_rules` / `check_citations` / `check_production` / `check_brief` / `review_draft` / `load_skill` / `finish`
+- 动作：`search_materials` / `write_outline` / `write_draft` / `patch_draft` / `estimate_duration` / `check_rules` / `check_citations` / `check_production` / `check_brief` / `check_all` / `review_draft` / `load_skill` / `finish`
 - 每次动作必须带 `rationale`，Trace 原样记录；不记录模型内部思维链。
 - `MAX_STEPS=32`，`MAX_TOOL_CALLS=26`，`MAX_DRAFT_WRITES=4`，`MAX_PATCHES=8`，`MAX_OUTLINES=3`（`src/limits.py`）；任一到顶返回 `incomplete`，两条上限各有一个场景实际触发。
 - `finish(completed)` 必须满足：当前稿有绑定 `draft_hash` 的时长/规则/引用检查，时长和规则通过，事实可追溯；输入带创作方向（制作模式）时还要 `check_production` 通过。

@@ -1,0 +1,8 @@
+{
+  "status": "incomplete",
+  "stop_reason": "invalid_action_limit",
+  "exit_code": 4,
+  "out": "examples/eval/comedy_pov/run2",
+  "title": null,
+  "estimated_total_sec": null
+}

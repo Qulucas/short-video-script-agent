@@ -321,11 +321,13 @@ class SkillProvider(Provider):
 
 def test_load_skill_errors_and_cap():
     from src.limits import MAX_SKILL_LOADS
-    names = ["nope", "hook_patterns", "hook_patterns", "short_video_structure", "subtitle_and_overlay",
-             "video_ai_handoff"]
-    result, trace, _ = run_case(load("13_creative_brief"), SkillProvider(names))
+    names = ["nope", "hook_patterns", "comedy_sketch_structure", "comedy_sketch_structure", "pov_cinematography",
+             "character_bible", "exemplar_comedy_pov", "physical_comedy_timing", "ui_overlay_gags"]
+    result, trace, _ = run_case(load("14_comedy_pov"), SkillProvider(names))
     obs = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "load_skill"]
-    assert obs[0]["error_code"] == "SKILL_NOT_FOUND" and "hook_patterns" in obs[0]["available"]
+    assert obs[0]["error_code"] == "SKILL_NOT_FOUND" and "comedy_sketch_structure" in obs[0]["available"]
+    assert obs[1]["error_code"] == "SKILL_NOT_FOUND"            # hook_patterns is for the promo format only
+    obs = obs[1:]
     assert obs[2].get("already_loaded") is True
     assert sum(1 for o in obs if o.get("ok") and not o.get("already_loaded")) == MAX_SKILL_LOADS
     assert obs[-1]["error_code"] == "SKILL_LOAD_LIMIT"
@@ -507,3 +509,57 @@ def test_review_unavailable_without_a_critic():
     _, trace, _ = run_case(load("01_normal_30s"), OutlineFirstProvider([
         ("write_draft", _fixture_json("drafts", "v2_28s")), ("review_draft", {})]))
     assert trace["steps"][1]["observation"]["error_code"] == "REVIEW_UNAVAILABLE"
+
+
+def test_scattered_bad_replies_do_not_end_the_run_but_consecutive_ones_do():
+    from src.limits import MAX_ACTION_REPAIRS
+    bad = ("not_a_tool", {})
+    draft = _fixture_json("drafts", "v2_28s")
+    scattered = [bad, ("write_draft", draft), bad, ("estimate_duration", {}), bad, ("check_rules", {}), bad]
+    result, trace, _ = run_case(load("01_normal_30s"), OutlineFirstProvider(scattered))
+    assert sum(1 for s in trace["steps"] if s["action"] == "parse_error") == 4
+    assert result["status"] == "needs_input"                     # the provider's own finish, not a repair stop
+    result, trace, _ = run_case(load("01_normal_30s"), OutlineFirstProvider(
+        [("write_draft", draft)] + [bad] * (MAX_ACTION_REPAIRS + 1)))
+    assert result["stop_reason"] == "invalid_action_limit"
+    assert result["last_state"]["draft_revision"] == 1 and result["last_state"]["draft_hash"]
+
+
+def _finish_completed():
+    return ("finish", {"status": "completed", "summary": "完成"})
+
+
+class ScriptThenFinish(OutlineFirstProvider):
+    def decide(self, state):
+        if self.script:
+            name, args = self.script.pop(0)
+            return {"rationale": "按脚本执行 " + name, "action": name, "args": args}
+        return {"rationale": "结束", "action": "finish", "args": {"status": "completed", "summary": "完成"}}
+
+
+def test_check_all_runs_every_gate_check_in_one_tool_call():
+    result, trace, _ = run_case(load("14_comedy_pov"), ScriptThenFinish([
+        ("write_outline", _fixture_json("outlines", "comedy_v2")), ("write_draft", _fixture_json("drafts", "comedy_v2")),
+        ("check_all", {})]))
+    obs = trace["steps"][2]["observation"]
+    assert list(obs["checks"]) == ["estimate_duration", "check_rules", "check_citations", "check_production", "check_brief"]
+    assert obs["pass"] is True and obs["failing"] == []
+    assert trace["tool_calls"] == 3                       # outline, draft, check_all
+    assert result["status"] == "completed" and result["checks"]["brief"]["pass"] is True
+
+
+def test_check_all_reports_details_only_for_failures():
+    _, trace, _ = run_case(load("14_comedy_pov"), ScriptThenFinish([
+        ("write_outline", _fixture_json("outlines", "comedy_v2")), ("write_draft", _fixture_json("drafts", "comedy_v1")),
+        ("check_all", {})]))
+    obs = trace["steps"][2]["observation"]
+    assert set(obs["failing"]) == {"estimate_duration", "check_brief", "check_production"}
+    assert obs["checks"]["estimate_duration"]["beats"][0]["beat"] == "punchline"
+    assert obs["checks"]["check_brief"]["issues"] and "issues" not in obs["checks"]["check_rules"]
+
+
+def test_check_all_in_promo_format_runs_the_three_basic_checks():
+    result, trace, _ = run_case(load("01_normal_30s"), ScriptThenFinish([
+        ("search_materials", {"query": "字幕"}), ("write_draft", _fixture_json("drafts", "v2_28s")), ("check_all", {})]))
+    assert list(trace["steps"][2]["observation"]["checks"]) == ["estimate_duration", "check_rules", "check_citations"]
+    assert result["status"] == "completed"

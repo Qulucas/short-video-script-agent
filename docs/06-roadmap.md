@@ -2,13 +2,17 @@
 
 目标样例：[examples/templates/comedy_pov.json](../examples/templates/comedy_pov.json)（POV 搞笑短剧，多人对白、画外音、带时间的音效、动画屏幕文字、变速、角色状态延续）。
 
-## 已完成（阶段 0–5）
+## 已完成（全部阶段 0–8）
 
 | 阶段 | 内容 | 位置 |
 |---|---|---|
 | 0 输入 | JSON 报错带行列和原因；键名大小写/别名；`camera_notes`/`audio_notes`；未知字段进 `extra`；`format`；`fiction` | `src/cli.py`、`src/schemas.py`、`data/formats.json` |
 | 1 脚本 v2 | `dialogue`/`sfx`/`overlays`/`action_sec`/`playback_rate`/`perspective`/`lens_fx`/`lighting`/`character_state`/`fulfills`、`audio_tracks` | `src/schemas.py` |
 | 2 时间引擎 | 按语言计时、括号音效不计、停顿、timeline、逐段计划 vs 估算、`strict` 格式进闸门 | `src/tools/duration.py` |
+| 6 技能 | 8 个喜剧/POV 技能包；技能声明 `formats`/`recommend`，索引按格式过滤、推荐优先；`MAX_SKILL_LOADS` 3→5；技能数字与估算常量一致的测试 | `data/skills/`、`src/skills.py` |
+| 7 交付文件 | `exports/` 下的 `shots.json`、`voice_script.json`、`subtitles.srt`、`cue_sheet.csv`、`character_sheet.md`；`storyboard.md` 加事件时间线；`cli export` 从保存的运行重建 | `src/export.py` |
+| 8 评测 | `src/eval/score.py`：按同一金标准 brief 和当前检查重新给任意运行打分，汇总均值/最值/标准差和目标达成；喜剧用例 v1.6 live 重复 3 次，报告在 `examples/eval/comedy_pov/` | 3 份终稿全部达标；完成 2/3（修复上限的设计问题，8.1 已修） |
+| 8.1 评测后续 | `check_all` 一次调用跑完全部闸门检查；修复上限改为连续失败；live 重测 3 次 | 完成 3/3，步数 24.7→12.7，工具调用 19.7→9.3（`examples/eval/comedy_pov/report.md`） |
 | 4 模型评审 | `review_draft`：独立调用、单独的审稿人 prompt，5 个维度打分 + 指向具体字段的建议；只供参考、不进闸门，最多 2 次，改稿后标记过期 | `src/tools/review.py`、`Provider.review` |
 | 5 生成方式 | `write_outline` 先过结构和覆盖检查，喜剧格式写正文前必须通过；`patch_draft` 局部修改；预算 32 步 / 26 次工具 / 4 次整稿 / 8 次补丁 / 3 次大纲；显式 `max_tokens`，截断回复交回模型重试 | `src/tools/outline.py`、`src/tools/patch.py`、`src/limits.py` |
 | 3.1 检查加固 | 段落 visual 条目（引号原文、数字作锚点）；词重合不足改为复核项；`language` 节检查画面描述中英混写；口头禅必须是角色本人的 dialogue；dialogue 脚本里的 narration 需要 Narrator | `src/tools/brief.py`；live 14-p3 终稿被拒（有测试） |
@@ -26,13 +30,14 @@ live 14-p5（`examples/14_comedy_pov-live-p5/`）是阶段 5 后的重跑：大�
 
 live 14-p4（`examples/14_comedy_pov-live-p4/`）是阶段 4 后的重跑：审稿人点出了被压缩掉的笑点，补丁后恢复；它也给出一条错误建议、分数评的是改之前的版本（stale）。下一步更值得做的是阶段 8 的多次 live 评测，而不是继续加规则。
 
+阶段 6–7 后的重测（`examples/eval/comedy_pov_p6/`）：质量目标仍然 3/3，但台词保留度从 0.88 降到 0.76、改动增多，技能包是否值得保留需要人看稿判断（见 docs/03）。
+
+剩下值得做的：样本扩大到 5 次以上；评审后再评一次，让评审分对应终稿；按实际使用的视频模型和 TTS 调整交付文件的格式。
+
 ## 待做
 
 | 阶段 | 内容 | 完成标准 |
 |---|---|---|
-| 6 技能 | `comedy_sketch_structure`、`pov_cinematography`、`physical_comedy_timing`、`anime_idol_acting`、`sound_design_cues`、`ui_overlay_gags`、`character_bible`、`exemplar_comedy_pov`；技能声明 `formats`/`recommended`；`MAX_SKILL_LOADS` 3→5；技能里引用的数字与估算常量一致的测试 | 喜剧格式自动推荐对应技能 |
-| 7 交付文件 | `storyboard.md` v2、`shots.json`（视频模型提示词、负面提示词、按 5/10 秒切片）、`voice_script.json`、`subtitles.srt`、`cue_sheet.csv`、`character_sheet.md` | 每个文件由 result 生成并有测试 |
-| 8 评测 | 以模板为金标准用例；`src/eval/score.py` 计算覆盖率、锁定台词一致率、字段完整度、逐段误差、连贯性问题、评审分；live 跑 3 次报均值和波动 | 覆盖 100%（或有豁免）、锁定台词 100%、逐段误差 ≤0.5s、连贯性 0 问题 |
 
 ## 目标样例本身的问题（建议在输入里改掉）
 

@@ -50,7 +50,8 @@
 
 - 每个分镜的 `beat`、`shot_size`、`camera`、`character_action`、`expression`、`on_screen_text`、`sfx`、`bgm`、`transition`；
 - `checks.production`、`creative_brief`、`skills_loaded`；
-- `storyboard.md`：逐镜制作单，每镜附一段可直接交给视频模型的提示词（重复角色设定，避免各镜角色走样）。
+- `storyboard.md`：逐镜制作单，每镜附一段可直接交给视频模型的提示词（重复角色设定，避免各镜角色走样）和事件时间线；
+- `exports/`：`shots.json`（视频模型提示词、负面提示词、画幅、片段切分）、`voice_script.json`（配音台词与时间）、`subtitles.srt`、`cue_sheet.csv`（音效/BGM/屏幕文字/转场时间表）、`character_sheet.md`。
 
 使用脚本 v2 字段时另外输出 `timeline`（每句对白、每个音效和屏幕文字的绝对时间）、`audio_tracks`；有 `script_structure` 时输出 `beats`（每段计划 vs 估算）；非默认格式输出 `format`。
 

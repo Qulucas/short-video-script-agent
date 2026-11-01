@@ -1,0 +1,14 @@
+{
+  "from": 3,
+  "to": 4,
+  "removed_shots": [],
+  "added_shots": [],
+  "changed_shots": [
+    {
+      "id": "S5",
+      "before": "",
+      "after": ""
+    }
+  ],
+  "via": "patch"
+}

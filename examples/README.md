@@ -1,6 +1,6 @@
 # 运行证据索引
 
-所有目录均由 `src/cli.py` 实际运行生成，包含 `input.json`、`result.json`、`trace.json`、`output.md`；部分包含 `draft_revisions/`；制作模式的目录另有 `storyboard.md`。
+所有目录均由 `src/cli.py` 实际运行生成，包含 `input.json`、`result.json`、`trace.json`、`output.md`；部分包含 `draft_revisions/`；制作模式的目录另有 `storyboard.md` 和 `exports/`（视频模型提示词、配音稿、字幕、音效表、角色表）。
 
 | 目录 | provider | status | 用途 |
 |---|---|---|---|
@@ -29,5 +29,7 @@
 | `14_comedy_pov-live-p3` | live | completed | 阶段 3 后重跑：check_brief 驱动两次改稿后通过，几乎用尽预算（见 docs/03） |
 | `14_comedy_pov-live` | live | completed | POV 搞笑短剧：首稿逐段计时全中，但漏了部分 brief 要求（见 docs/03） |
 | `13_creative_brief-live` | live | completed | 制作模式：按 5 段写 6 镜、制作字段齐全、29.4s，附 `storyboard.md` |
+
+`eval/comedy_pov/` 是阶段 8 的重复评测：v1.6 同一输入的 3 次 live（`run1..3`）和总报告 `report.md` / `report.json`；`eval/comedy_pov_v17/` 是阶段 8.1 后的 3 次重测，`eval/comedy_pov_p6/` 是阶段 6–7（喜剧技能包、交付文件）后的 3 次重测。
 
 `templates/comedy_pov.json` 是可直接改写的剧情格式输入模板。`test-report.txt` 是 `pytest -q` 的实际输出。运行方式见 [LIVE_RUNBOOK.md](LIVE_RUNBOOK.md)。

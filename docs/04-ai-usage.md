@@ -20,14 +20,20 @@
 
 第八轮（Claude Code，Claude Opus 5.5）：实现阶段 4 的 `review_draft`（独立审稿调用、5 维打分和修改建议，只供参考、不进闸门），喜剧 fixture 演示“评审 → 采纳一条建议 → 重查 → 再评审”。live 14 第一次重跑在第 5 步因网络连接被重置中断，随后给 provider 加传输层重试（`LLM_RETRIES`），再重跑一次（由 Claude Code 在本机用仓库 `.env` 配置执行）。
 
+第九轮（Claude Code，Claude Opus 5.5）：实现阶段 8 的打分器 `src/eval/score.py`，喜剧用例 live 并行跑 3 次（由 Claude Code 在本机用仓库 `.env` 配置执行）；从结果发现修复上限按累计计算会终止已做完的运行、incomplete 结果不写 revision，两处都已修。
+
+第十轮（Claude Code，Claude Opus 5.5）：阶段 8.1，加 `check_all`（一次工具调用跑完全部闸门检查），按修复后的版本再并行跑 3 次 live 并重新打分（由 Claude Code 在本机用仓库 `.env` 配置执行）。
+
+第十一轮（Claude Code，Claude Opus 5.5）：阶段 6（8 个喜剧/POV 技能包、按格式推荐、读取上限 5）和阶段 7（`exports/` 下的视频模型提示词、配音稿、SRT、音效表、角色表，`cli export`），之后再并行跑 3 次 live 检查技能包没有带来退步（由 Claude Code 在本机用仓库 `.env` 配置执行）。
+
 ## 使用范围
 
 | 范围 | AI 参与 | 验证 |
 |---|---|---|
 | 方案 | 根据审查意见修订 `docs/00-plan.md` | 人工审查意见逐条对照 |
-| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 151 passed |
+| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 171 passed |
 | 测试 | 单元、集成、场景测试 | 实际运行 |
-| 示例 | 14 个 fixture case + 11 条 live 的 result/trace/output | 实际运行生成 |
+| 示例 | 14 个 fixture case + 11 条单次 live + 6 次重复评测的 result/trace/output | 实际运行生成 |
 | 文档 | README、docs/01–05 | 对照实际输出复核 |
 
 ## 个人贡献需要补充的部分
@@ -47,14 +53,14 @@
 - live 04/04b/05/12：工具持续失败→incomplete、瞬时失败→重试恢复、BR-03 驱动改稿后 unmet、38.0s 初稿→28.4s；
 - live 13：制作模式，按 5 段写 6 镜、制作字段齐全、29.4s completed；
 - live 14：POV 搞笑短剧，首稿 30.0s、逐段计时全中，但漏了部分 brief 要求（docs/03 有记录）；
-- fixture 14 个场景、151 个离线测试通过。
+- fixture 14 个场景、171 个离线测试通过。
 
 ## 未验证/未完成
 
-- live 11 条各跑一次，不是稳定性评测；
+- 喜剧用例在 v1.6、阶段 8.1 后、阶段 6–7 后各重复 3 次，其余 live 各跑一次；3 次只能看出量级，不是统计意义上的稳定性评测；
 - 真实 TTS 时长：未接入；
 - 人工对 12 个场景文案的质量评审：未做；
-- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.6` 为准。
+- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.7` 为准。
 
 ## 防伪声明
 

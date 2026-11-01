@@ -2,6 +2,8 @@
 id: short_video_structure
 title: 15/30/60 秒短视频段落结构与篇幅预算
 when: 规划分镜数量、每段时长和每段台词字数时
+formats: all
+recommend: promo_talking_head
 ---
 ## 先算字数预算
 

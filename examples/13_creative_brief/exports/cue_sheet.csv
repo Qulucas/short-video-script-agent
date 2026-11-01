@@ -1,0 +1,10 @@
+type,start_sec,end_sec,shot_id,track,description,position,notes
+sfx,0.0,,S1,sfx,残影甩散时一声轻微的“嗖”,,untimed
+sfx,4.4,,S2,sfx,手指划走时“唰”一声,,untimed
+transition,4.4,,S1,picture,鲸鱼娘游动轨迹作为遮罩，从左向右擦除转场,,
+sfx,10.2,,S3,sfx,每条字幕出现时“叮”一声,,untimed
+transition,10.2,,S2,picture,硬切,,
+sfx,17.2,,S4,sfx,字幕逐字弹出时连续轻“叮”,,untimed
+transition,17.2,,S3,picture,叠化,,
+sfx,23.5,,S5,sfx,定格时一声清脆的“叮”,,untimed
+transition,23.5,,S4,picture,鲸鱼娘游动轨迹遮罩转场,,
