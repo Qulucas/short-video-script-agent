@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from src.config import FIXTURES_DIR
 from src.providers.base import Provider
+from src.schemas import DRAFT_KEYS
 from src.tools.duration import MIN_SHOT_SEC
 
 
@@ -51,7 +52,7 @@ class FixtureProvider(Provider):
 
     def _write(self, name: str, rationale: str) -> Dict[str, Any]:
         draft = _load(name)
-        return _act(rationale, "write_draft", {k: v for k, v in draft.items() if k in ("title", "shots", "audio_tracks")})
+        return _act(rationale, "write_draft", {k: v for k, v in draft.items() if k in ("title", "shots") + DRAFT_KEYS})
 
     def decide(self, state: Dict[str, Any]) -> Dict[str, Any]:
         scenario = self.scenario
@@ -82,15 +83,21 @@ class FixtureProvider(Provider):
             if est is None:
                 return _act("估算 revision %d（beat_timing=%s）" % (state.get("draft_revision", 0), fmt.get("beat_timing")),
                             "estimate_duration")
-            if not est.get("pass") and writes < 2:
+            brief_check = checks.get("brief")
+            if not brief_check and writes < 2:
+                return _act("估算 pass=%s；同一版也先跑 check_brief，一次改稿把时间和 brief 问题一起修"
+                            % str(est.get("pass")).lower(), "check_brief")
+            if brief_check and (not est.get("pass") or not brief_check.get("pass")) and writes < 2:
                 late = [b for b in est.get("beats", []) if not b.get("pass")]
                 first = late[0] if late else {}
+                codes = sorted({i["code"] for i in brief_check.get("issues", [])})
                 return self._write("comedy_v2", "总长 %s 超过 %s；%s 段估算 %s–%ss、计划 %s–%ss（止点偏差 %+.1fs），"
-                                   "压缩该段台词并提速；口头禅不在任何计划段落里，放进 panic_reaction" % (
+                                   "压缩该段台词并记进 deviations；口头禅不在任何计划段落里，放进 panic_reaction；"
+                                   "check_brief 报 %s，逐条修正" % (
                                        _sec(est["total_sec"]), _sec(est["max_sec"]), first.get("beat"),
                                        (first.get("actual") or [0, 0])[0], (first.get("actual") or [0, 0])[1],
                                        first.get("planned", [0, 0])[0], first.get("planned", [0, 0])[1],
-                                       first.get("delta_end", 0.0)))
+                                       first.get("delta_end", 0.0), "、".join(codes)))
             if not est.get("pass"):
                 return _act("改稿后仍未通过，结束并说明", "finish", {
                     "status": "unmet_constraints", "stop_reason": "duration_cannot_meet",
@@ -106,8 +113,11 @@ class FixtureProvider(Provider):
                 return _act("引用 pass=%s，列出 %d 处 fiction 说法；检查制作字段" % (
                     str(checks["citations"].get("pass")).lower(), len(checks["citations"].get("fiction_claims", []))),
                     "check_production")
-            if checks["production"].get("pass"):
-                return _act("时长、段落时间、规则、引用、制作字段全部通过，输出", "finish", {
+            if checks["production"].get("pass") and not checks.get("brief"):
+                return _act("制作字段通过，检查 brief 覆盖、台词保真和连贯性", "check_brief")
+            if checks["production"].get("pass") and checks["brief"].get("pass"):
+                return _act("时长、段落时间、规则、引用、制作字段、brief 全部通过；%d 条交给用户确认"
+                            % len(checks["brief"].get("review", [])), "finish", {
                     "status": "completed", "summary": "POV 搞笑短剧脚本完成：6 镜按 5 段，段落时间与计划一致。",
                 })
             return _act("制作字段未补齐，结束并说明", "finish", {

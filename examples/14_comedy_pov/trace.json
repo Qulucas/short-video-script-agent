@@ -13,6 +13,32 @@
       "action": "write_draft",
       "args": {
         "title": "Whale Maiden's Carbohydrate Sampling Incident",
+        "fulfills": [
+          "camera_notes[0]",
+          "audio_notes.bgm[0]"
+        ],
+        "audio_tracks": {
+          "bgm": [
+            {
+              "start": 0,
+              "end": 5,
+              "style": "kitchen ambience: boiling water + distant TV",
+              "transition": "cut"
+            },
+            {
+              "start": 5,
+              "end": 24,
+              "style": "fast-paced choral track",
+              "transition": "slams in on the table tap"
+            },
+            {
+              "start": 26,
+              "end": 30,
+              "style": "awkward silence, room tone only",
+              "transition": "music cuts out"
+            }
+          ]
+        },
         "shots": [
           {
             "id": "S1",
@@ -80,7 +106,7 @@
             "beat": "inciting_incident",
             "claim_scope": "generic",
             "perspective": "pov",
-            "visual": "POV freezes. The owner's hand enters from the right edge of the frame and taps the dining table twice. DeepSeek Whale Maiden freezes mid-bite, chopsticks suspended in the air, then slowly turns her head toward the lens with rice still in her mouth.",
+            "visual": "POV freezes; the owner's face is reflected in the rice cooker lid. The owner's hand enters from the right edge of the frame and taps the dining table twice. DeepSeek Whale Maiden freezes mid-bite, chopsticks suspended in the air, then slowly turns her head toward the lens with rice still in her mouth.",
             "shot_size": "medium close-up",
             "camera": {
               "move": "locked off, POV hand enters frame right",
@@ -91,7 +117,8 @@
             "expression": "pupils trembling, spiral highlights in her eyes, mouth full and unmoving",
             "character_state": {
               "props": [
-                "chopsticks suspended"
+                "large bowl",
+                "chopsticks"
               ],
               "body": [
                 "cheeks puffed"
@@ -114,7 +141,7 @@
               },
               {
                 "cue": "loud gulp",
-                "at_sec": 3.2,
+                "at_sec": 4.6,
                 "position": "center"
               }
             ],
@@ -146,10 +173,12 @@
             "expression": "pleading puppy eyes over bulging cheeks",
             "character_state": {
               "props": [
+                "large bowl",
+                "chopsticks",
                 "rice grains on the T-shirt collar"
               ],
               "body": [
-                "cheeks bulging to the limit"
+                "cheeks puffed"
               ]
             },
             "dialogue": [
@@ -213,15 +242,17 @@
             "expression": "desperate, eyes wide, chewing furiously",
             "character_state": {
               "props": [
+                "large bowl",
+                "chopsticks",
                 "rice grains on the T-shirt collar"
               ],
               "body": [
-                "cheeks bulging to the limit"
+                "cheeks puffed"
               ]
             },
             "dialogue": [
               {
-                "speaker": "DeepSeek Whale Maiden",
+                "speaker": "Whale Girl",
                 "line": "You didn't see anything!! Cache cleaning! (unclear)",
                 "delivery": "muffled, panicked",
                 "at_sec": 0.5,
@@ -260,13 +291,19 @@
             "expression": "forced dignified smile, smug eyebrows",
             "character_state": {
               "props": [
-                "two rice grains on her lips"
+                "two rice grains on her lips",
+                "rice grains on the T-shirt collar"
               ],
               "costume": [
                 "hair accessory tilted"
               ],
               "body": [
                 "belly slightly bulging"
+              ],
+              "cleared": [
+                "large bowl",
+                "chopsticks",
+                "cheeks puffed"
               ]
             },
             "dialogue": [
@@ -323,6 +360,9 @@
             "character_action": "flicks the rice grains away, winks, pushes the camera",
             "expression": "smug wink",
             "character_state": {
+              "props": [
+                "rice grains on the T-shirt collar"
+              ],
               "costume": [
                 "hair accessory tilted"
               ],
@@ -334,14 +374,14 @@
               {
                 "speaker": "Owner",
                 "line": "...and she's gotten fatter again.",
-                "delivery": "low, deadpan",
+                "delivery": "low-pitched voice-over, face never shown",
                 "offscreen": true,
                 "at_sec": 0.0,
                 "rate": 1.2
               },
               {
                 "speaker": "DeepSeek Whale Maiden",
-                "line": "Just cache... shoo!",
+                "line": "Bye bye!",
                 "delivery": "pouty",
                 "rate": 1.2
               }
@@ -381,34 +421,12 @@
               "audio_notes.sfx[4]"
             ]
           }
-        ],
-        "audio_tracks": {
-          "bgm": [
-            {
-              "start": 0,
-              "end": 5,
-              "style": "kitchen ambience: boiling water + distant TV",
-              "transition": "cut"
-            },
-            {
-              "start": 5,
-              "end": 26,
-              "style": "fast-paced choral track",
-              "transition": "slams in on the table tap"
-            },
-            {
-              "start": 26,
-              "end": 30,
-              "style": "awkward silence, room tone only",
-              "transition": "music cuts out"
-            }
-          ]
-        }
+        ]
       },
       "observation": {
         "ok": true,
         "revision": 1,
-        "draft_hash": "sha256:615fb92fb2c47ca93ed9ee46a4b37ac33dddd31d3f5fe6f0de1f09ece42051be",
+        "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7",
         "diff": {
           "from": 0,
           "to": 1,
@@ -426,7 +444,7 @@
       },
       "next": "estimate_duration",
       "draft_revision": 1,
-      "draft_hash": "sha256:615fb92fb2c47ca93ed9ee46a4b37ac33dddd31d3f5fe6f0de1f09ece42051be"
+      "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
     },
     {
       "n": 2,
@@ -535,8 +553,8 @@
             "type": "sfx",
             "cue": "loud gulp",
             "shot_id": "S2",
-            "start_sec": 8.2,
-            "end_sec": 8.2
+            "start_sec": 9.6,
+            "end_sec": 9.6
           },
           {
             "type": "dialogue",
@@ -575,7 +593,7 @@
           },
           {
             "type": "dialogue",
-            "speaker": "DeepSeek Whale Maiden",
+            "speaker": "Whale Girl",
             "shot_id": "S4",
             "start_sec": 14.9,
             "end_sec": 16.9
@@ -634,7 +652,7 @@
             "speaker": "DeepSeek Whale Maiden",
             "shot_id": "S6",
             "start_sec": 33.6,
-            "end_sec": 34.9
+            "end_sec": 34.3
           },
           {
             "type": "overlay",
@@ -742,18 +760,179 @@
         "beats_pass": false,
         "window_pass": false,
         "revision": 1,
-        "draft_hash": "sha256:615fb92fb2c47ca93ed9ee46a4b37ac33dddd31d3f5fe6f0de1f09ece42051be"
+        "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
       },
-      "next": "write_draft",
+      "next": "check_brief",
       "draft_revision": 1,
-      "draft_hash": "sha256:615fb92fb2c47ca93ed9ee46a4b37ac33dddd31d3f5fe6f0de1f09ece42051be"
+      "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
     },
     {
       "n": 3,
-      "rationale": "总长 35.5s 超过 30.0s；punchline 段估算 20.0–31.5s、计划 20.0–26.0s（止点偏差 +5.5s），压缩该段台词并提速；口头禅不在任何计划段落里，放进 panic_reaction",
+      "rationale": "估算 pass=false；同一版也先跑 check_brief，一次改稿把时间和 brief 问题一起修",
+      "action": "check_brief",
+      "args": {},
+      "observation": {
+        "ok": true,
+        "pass": false,
+        "sections": {
+          "coverage": {
+            "pass": false,
+            "issues": 1
+          },
+          "fidelity": {
+            "pass": false,
+            "issues": 1
+          },
+          "continuity": {
+            "pass": false,
+            "issues": 2
+          },
+          "timeline": {
+            "pass": false,
+            "issues": 3
+          },
+          "pov": {
+            "pass": false,
+            "issues": 1
+          }
+        },
+        "issues": [
+          {
+            "section": "coverage",
+            "code": "ITEM_UNCOVERED",
+            "message": "没有分镜落实，也没有 waiver：Occasionally cut to a reverse shot of the Whale Maiden from the protagonist's position.",
+            "item": "camera_notes[1]"
+          },
+          {
+            "section": "fidelity",
+            "code": "LINE_CHANGED",
+            "message": "计划台词被改写或删掉，但没有 deviations 记录（保留度 0.00）",
+            "beat": "tag",
+            "line": "This is just cache... Go away!"
+          },
+          {
+            "section": "continuity",
+            "code": "NON_CANONICAL_SPEAKER",
+            "message": "说话人用了别名 Whale Girl，请统一为 DeepSeek Whale Maiden",
+            "shot_id": "S4"
+          },
+          {
+            "section": "continuity",
+            "code": "STATE_DROPPED",
+            "message": "角色状态“two rice grains on her lips”消失了，没有写进 cleared",
+            "shot_id": "S6"
+          },
+          {
+            "section": "timeline",
+            "code": "SFX_OUT_OF_SHOT",
+            "message": "音效“loud gulp”在 4.6s，超出本镜 4.0s",
+            "shot_id": "S2"
+          },
+          {
+            "section": "timeline",
+            "code": "BGM_GAP",
+            "message": "BGM 在 24.0–26.0s 没有音轨"
+          },
+          {
+            "section": "timeline",
+            "code": "BGM_SHORT",
+            "message": "BGM 到 30.0s 结束，全片 35.5s"
+          },
+          {
+            "section": "pov",
+            "code": "POV_FACE_SHOWN",
+            "message": "POV 镜头里出现了主角的脸：owner's face",
+            "shot_id": "S2"
+          }
+        ],
+        "review": [
+          {
+            "shot_id": "S6",
+            "code": "BRAND_ASSET",
+            "text": "A DeepSeek-style chat bubble pops up above DeepSeek Whale Maiden's head over the POV picture; she flicks the rice grains off her lips with a fingertip, winks at the camera, then gently pushes the lens away with her palm and the picture briefly blurs.",
+            "message": "用了 DeepSeek 的品牌元素（logo/界面），确认有使用权"
+          },
+          {
+            "shot_id": "S6",
+            "code": "BODY_COMMENT",
+            "text": "...and she's gotten fatter again.",
+            "message": "涉及身材/外貌评价（fatter），确认是否适合目标受众"
+          }
+        ],
+        "waivers": [],
+        "deviations": [],
+        "items": [
+          "visual_notes[0]",
+          "visual_notes[1]",
+          "visual_notes[2]",
+          "visual_notes[3]",
+          "visual_notes[4]",
+          "text_overlay_hints[0]",
+          "text_overlay_hints[1]",
+          "text_overlay_hints[2]",
+          "text_overlay_hints[3]",
+          "camera_notes[0]",
+          "camera_notes[1]",
+          "audio_notes.bgm[0]",
+          "audio_notes.sfx[0]",
+          "audio_notes.sfx[1]",
+          "audio_notes.sfx[2]",
+          "audio_notes.sfx[3]",
+          "audio_notes.sfx[4]"
+        ],
+        "revision": 1,
+        "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
+      },
+      "next": "write_draft",
+      "draft_revision": 1,
+      "draft_hash": "sha256:ab685c302d94bdd3eed519c9ddd766cbc87365746c98ecfb8d7124b984a90ff7"
+    },
+    {
+      "n": 4,
+      "rationale": "总长 35.5s 超过 30.0s；punchline 段估算 20.0–31.5s、计划 20.0–26.0s（止点偏差 +5.5s），压缩该段台词并记进 deviations；口头禅不在任何计划段落里，放进 panic_reaction；check_brief 报 BGM_GAP、BGM_SHORT、ITEM_UNCOVERED、LINE_CHANGED、NON_CANONICAL_SPEAKER、POV_FACE_SHOWN、SFX_OUT_OF_SHOT、STATE_DROPPED，逐条修正",
       "action": "write_draft",
       "args": {
         "title": "Whale Maiden's Carbohydrate Sampling Incident",
+        "fulfills": [
+          "camera_notes[0]",
+          "audio_notes.bgm[0]"
+        ],
+        "waivers": [
+          {
+            "item": "camera_notes[1]",
+            "reason": "no reverse shot: every beat plays straight into the POV lens, and a cut-away would break the strict beat timing"
+          }
+        ],
+        "deviations": [
+          {
+            "beat": "punchline",
+            "original": "Cough. I'm just checking the semantic integrity of the rice. The DeepSeek taste model requires a large amount of training data, you know. Don't look at me like that.",
+            "new": "(clears throat) Ahem. Semantic integrity check. DeepSeek's taste model needs data. Don't look at me like that.",
+            "reason": "beat timing: estimate_duration put the planned line at 20.0-31.5s against the planned 20-26s"
+          }
+        ],
+        "audio_tracks": {
+          "bgm": [
+            {
+              "start": 0,
+              "end": 5,
+              "style": "kitchen ambience: boiling water + distant TV",
+              "transition": "cut"
+            },
+            {
+              "start": 5,
+              "end": 26,
+              "style": "fast-paced choral track",
+              "transition": "slams in on the table tap"
+            },
+            {
+              "start": 26,
+              "end": 30,
+              "style": "awkward silence, room tone only",
+              "transition": "music cuts out"
+            }
+          ]
+        },
         "shots": [
           {
             "id": "S1",
@@ -832,7 +1011,8 @@
             "expression": "pupils trembling, spiral highlights in her eyes, mouth full and unmoving",
             "character_state": {
               "props": [
-                "chopsticks suspended"
+                "large bowl",
+                "chopsticks"
               ],
               "body": [
                 "cheeks puffed"
@@ -887,10 +1067,12 @@
             "expression": "pleading puppy eyes over bulging cheeks",
             "character_state": {
               "props": [
+                "large bowl",
+                "chopsticks",
                 "rice grains on the T-shirt collar"
               ],
               "body": [
-                "cheeks bulging to the limit"
+                "cheeks puffed"
               ]
             },
             "dialogue": [
@@ -954,10 +1136,12 @@
             "expression": "desperate, eyes wide, chewing furiously",
             "character_state": {
               "props": [
+                "large bowl",
+                "chopsticks",
                 "rice grains on the T-shirt collar"
               ],
               "body": [
-                "cheeks bulging to the limit"
+                "cheeks puffed"
               ]
             },
             "dialogue": [
@@ -1001,13 +1185,19 @@
             "expression": "forced dignified smile, smug eyebrows",
             "character_state": {
               "props": [
-                "two rice grains on her lips"
+                "two rice grains on her lips",
+                "rice grains on the T-shirt collar"
               ],
               "costume": [
                 "hair accessory tilted"
               ],
               "body": [
                 "belly slightly bulging"
+              ],
+              "cleared": [
+                "large bowl",
+                "chopsticks",
+                "cheeks puffed"
               ]
             },
             "dialogue": [
@@ -1066,18 +1256,24 @@
             "character_action": "flicks the rice grains away, winks, pushes the camera",
             "expression": "smug wink",
             "character_state": {
+              "props": [
+                "rice grains on the T-shirt collar"
+              ],
               "costume": [
                 "hair accessory tilted"
               ],
               "body": [
                 "belly slightly bulging"
+              ],
+              "cleared": [
+                "two rice grains on her lips"
               ]
             },
             "dialogue": [
               {
                 "speaker": "Owner",
                 "line": "...and she's gotten fatter again.",
-                "delivery": "low, deadpan",
+                "delivery": "low-pitched voice-over, face never shown",
                 "offscreen": true,
                 "at_sec": 0.0,
                 "rate": 1.2
@@ -1124,34 +1320,12 @@
               "audio_notes.sfx[4]"
             ]
           }
-        ],
-        "audio_tracks": {
-          "bgm": [
-            {
-              "start": 0,
-              "end": 5,
-              "style": "kitchen ambience: boiling water + distant TV",
-              "transition": "cut"
-            },
-            {
-              "start": 5,
-              "end": 26,
-              "style": "fast-paced choral track",
-              "transition": "slams in on the table tap"
-            },
-            {
-              "start": 26,
-              "end": 30,
-              "style": "awkward silence, room tone only",
-              "transition": "music cuts out"
-            }
-          ]
-        }
+        ]
       },
       "observation": {
         "ok": true,
         "revision": 2,
-        "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259",
+        "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e",
         "diff": {
           "from": 1,
           "to": 2,
@@ -1159,12 +1333,27 @@
           "added_shots": [],
           "changed_shots": [
             {
+              "id": "S2",
+              "before": "",
+              "after": ""
+            },
+            {
               "id": "S3",
               "before": "",
               "after": ""
             },
             {
+              "id": "S4",
+              "before": "",
+              "after": ""
+            },
+            {
               "id": "S5",
+              "before": "",
+              "after": ""
+            },
+            {
+              "id": "S6",
               "before": "",
               "after": ""
             }
@@ -1173,10 +1362,10 @@
       },
       "next": "estimate_duration",
       "draft_revision": 2,
-      "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
     },
     {
-      "n": 4,
+      "n": 5,
       "rationale": "估算 revision 2（beat_timing=strict）",
       "action": "estimate_duration",
       "args": {},
@@ -1489,14 +1678,14 @@
         "beats_pass": true,
         "window_pass": true,
         "revision": 2,
-        "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+        "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
       },
       "next": "check_rules",
       "draft_revision": 2,
-      "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
     },
     {
-      "n": 5,
+      "n": 6,
       "rationale": "时长 30.0s，5 段时间误差都在 ±0.5s 内，检查规则",
       "action": "check_rules",
       "args": {},
@@ -1507,14 +1696,14 @@
         "violations": [],
         "needs_review": [],
         "revision": 2,
-        "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+        "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
       },
       "next": "check_citations",
       "draft_revision": 2,
-      "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
     },
     {
-      "n": 6,
+      "n": 7,
       "rationale": "规则通过，检查引用（fiction 分镜只列出不校验）",
       "action": "check_citations",
       "args": {},
@@ -1530,14 +1719,14 @@
           }
         ],
         "revision": 2,
-        "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+        "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
       },
       "next": "check_production",
       "draft_revision": 2,
-      "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
     },
     {
-      "n": 7,
+      "n": 8,
       "rationale": "引用 pass=true，列出 1 处 fiction 说法；检查制作字段",
       "action": "check_production",
       "args": {},
@@ -1551,19 +1740,105 @@
           "transition",
           "character_action",
           "expression",
-          "perspective"
+          "perspective",
+          "lighting"
         ],
         "issues": [],
         "revision": 2,
-        "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+        "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
+      },
+      "next": "check_brief",
+      "draft_revision": 2,
+      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
+    },
+    {
+      "n": 9,
+      "rationale": "制作字段通过，检查 brief 覆盖、台词保真和连贯性",
+      "action": "check_brief",
+      "args": {},
+      "observation": {
+        "ok": true,
+        "pass": true,
+        "sections": {
+          "coverage": {
+            "pass": true,
+            "issues": 0
+          },
+          "fidelity": {
+            "pass": true,
+            "issues": 0
+          },
+          "continuity": {
+            "pass": true,
+            "issues": 0
+          },
+          "timeline": {
+            "pass": true,
+            "issues": 0
+          },
+          "pov": {
+            "pass": true,
+            "issues": 0
+          }
+        },
+        "issues": [],
+        "review": [
+          {
+            "shot_id": "S6",
+            "code": "BRAND_ASSET",
+            "text": "A DeepSeek-style chat bubble pops up above DeepSeek Whale Maiden's head over the POV picture; she flicks the rice grains off her lips with a fingertip, winks at the camera, then gently pushes the lens away with her palm and the picture briefly blurs.",
+            "message": "用了 DeepSeek 的品牌元素（logo/界面），确认有使用权"
+          },
+          {
+            "shot_id": "S6",
+            "code": "BODY_COMMENT",
+            "text": "...and she's gotten fatter again.",
+            "message": "涉及身材/外貌评价（fatter），确认是否适合目标受众"
+          }
+        ],
+        "waivers": [
+          {
+            "item": "camera_notes[1]",
+            "reason": "no reverse shot: every beat plays straight into the POV lens, and a cut-away would break the strict beat timing"
+          }
+        ],
+        "deviations": [
+          {
+            "beat": "punchline",
+            "original": "Cough. I'm just checking the semantic integrity of the rice. The DeepSeek taste model requires a large amount of training data, you know. Don't look at me like that.",
+            "new": "(clears throat) Ahem. Semantic integrity check. DeepSeek's taste model needs data. Don't look at me like that.",
+            "reason": "beat timing: estimate_duration put the planned line at 20.0-31.5s against the planned 20-26s"
+          }
+        ],
+        "items": [
+          "visual_notes[0]",
+          "visual_notes[1]",
+          "visual_notes[2]",
+          "visual_notes[3]",
+          "visual_notes[4]",
+          "text_overlay_hints[0]",
+          "text_overlay_hints[1]",
+          "text_overlay_hints[2]",
+          "text_overlay_hints[3]",
+          "camera_notes[0]",
+          "camera_notes[1]",
+          "audio_notes.bgm[0]",
+          "audio_notes.sfx[0]",
+          "audio_notes.sfx[1]",
+          "audio_notes.sfx[2]",
+          "audio_notes.sfx[3]",
+          "audio_notes.sfx[4]"
+        ],
+        "revision": 2,
+        "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
       },
       "next": "finish",
       "draft_revision": 2,
-      "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
     },
     {
-      "n": 8,
-      "rationale": "时长、段落时间、规则、引用、制作字段全部通过，输出",
+      "n": 10,
+      "rationale": "时长、段落时间、规则、引用、制作字段、brief 全部通过；2 条交给用户确认",
       "action": "finish",
       "args": {
         "status": "completed",
@@ -1575,10 +1850,10 @@
       },
       "next": null,
       "draft_revision": 2,
-      "draft_hash": "sha256:32e56280eb007846ed1db0e9f17188c56867d2bd5fd96e6b9a7a9ca2f2f99259"
+      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
     }
   ],
   "result_status": "completed",
   "stop_reason": null,
-  "tool_calls": 7
+  "tool_calls": 9
 }

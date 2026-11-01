@@ -338,6 +338,11 @@ def test_comedy_pov_revises_on_beat_timing_without_materials(tmp_path):
     assert result["status"] == "completed" and result["format"] == "comedy_pov_sketch"
     estimates = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "estimate_duration"]
     assert [e["pass"] for e in estimates] == [False, True]
+    briefs = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "check_brief"]
+    assert [b["pass"] for b in briefs] == [False, True]
+    assert all(not v["pass"] for v in briefs[0]["sections"].values())   # v1 trips every section once
+    codes = {r["code"] for r in result["risks"]}
+    assert {"CONTENT_REVIEW", "BRIEF_WAIVERS", "BRIEF_DEVIATIONS"} <= codes
     punchline = [b for b in estimates[0]["beats"] if b["beat"] == "punchline"][0]
     assert punchline["pass"] is False and punchline["delta_end"] == 5.5
     assert "search_materials" not in _actions(trace)          # materials are optional for this format
@@ -347,7 +352,7 @@ def test_comedy_pov_revises_on_beat_timing_without_materials(tmp_path):
     assert {e["type"] for e in result["timeline"]} == {"dialogue", "overlay", "sfx"}
     write_artifacts(tmp_path, load("14_comedy_pov"), result, trace, revisions)
     storyboard = (tmp_path / "storyboard.md").read_text(encoding="utf-8")
-    assert "段落时间（计划 vs 估算）" in storyboard and "Owner（low, deadpan，画外）" in storyboard
+    assert "段落时间（计划 vs 估算）" in storyboard and "Owner（low-pitched voice-over, face never shown，画外）" in storyboard
     assert "## 音轨" in storyboard and "{" not in (tmp_path / "output.md").read_text(encoding="utf-8")
 
 
@@ -373,3 +378,38 @@ def test_fiction_scope_is_rejected_in_promo_format():
     result, trace, _ = run_case(load("01_normal_30s"), FictionInPromoProvider())
     obs = trace["steps"][0]["observation"]
     assert obs["error_code"] == "DRAFT_SCHEMA" and "fiction" in obs["errors"][0]
+
+
+class SkipBriefProvider(Provider):
+    """Passes every other check on the good comedy draft, then tries to finish without check_brief."""
+    name = "fixture"
+    model = "skip-brief-test"
+    mode = "test"
+
+    def __init__(self):
+        draft = json.loads((ROOT / "fixtures" / "drafts" / "comedy_v2.json").read_text(encoding="utf-8"))
+        self.script = [("write_draft", draft), ("estimate_duration", {}), ("check_rules", {}),
+                       ("check_citations", {}), ("check_production", {})]
+
+    def decide(self, state):
+        if self.script:
+            name, args = self.script.pop(0)
+            return {"rationale": "按脚本执行 " + name, "action": name, "args": args}
+        return {"rationale": "跳过 brief 检查直接完成", "action": "finish",
+                "args": {"status": "completed", "summary": "完成"}}
+
+
+def test_strict_format_gate_requires_check_brief():
+    result, trace, _ = run_case(load("14_comedy_pov"), SkipBriefProvider())
+    rejected = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "finish"]
+    assert rejected and all("brief" in o["missing"] for o in rejected)
+    assert result["status"] == "incomplete"
+
+
+def test_check_brief_needs_a_current_estimate():
+    class P(SkipBriefProvider):
+        def __init__(self):
+            super().__init__()
+            self.script = [self.script[0], ("check_brief", {})]
+    _, trace, _ = run_case(load("14_comedy_pov"), P())
+    assert trace["steps"][1]["observation"]["error_code"] == "ESTIMATE_REQUIRED"

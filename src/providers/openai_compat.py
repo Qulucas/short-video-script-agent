@@ -11,25 +11,42 @@ from src.prompts import SYSTEM_PROMPT, build_user_prompt
 from src.providers.base import ModelError, Provider
 
 
+def _protocol_error(message: str) -> Dict[str, Any]:
+    """A reply that is not exactly one JSON action goes back to the model as INVALID_ACTION.
+
+    The orchestrator's action-repair budget then decides whether the run continues, instead of
+    one malformed reply ending the whole run as model_error.
+    """
+    return {"_protocol_error": message}
+
+
 def _extract_json(text: str) -> Dict[str, Any]:
     cleaned = text.strip()
     if cleaned.startswith("```"):
         cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
         cleaned = re.sub(r"\s*```$", "", cleaned)
+    start = cleaned.find("{")
+    if start < 0:
+        return _protocol_error("没有返回 JSON 对象；请只输出一个 JSON 动作")
+    decoder = json.JSONDecoder()
+    objects = []
+    pos = start
     try:
-        value = json.loads(cleaned)
-    except Exception:
-        start = cleaned.find("{")
-        end = cleaned.rfind("}")
-        if start < 0 or end <= start:
-            raise ModelError("模型没有返回 JSON 对象")
-        try:
-            value = json.loads(cleaned[start:end + 1])
-        except Exception as exc:
-            raise ModelError("模型 JSON 解析失败: " + str(exc))
-    if not isinstance(value, dict):
-        raise ModelError("模型输出不是 JSON 对象")
-    return value
+        while pos < len(cleaned):
+            value, end = decoder.raw_decode(cleaned, pos)
+            objects.append(value)
+            nxt = cleaned.find("{", end)
+            if nxt < 0:
+                break
+            pos = nxt
+    except json.JSONDecodeError as exc:
+        if not objects:
+            return _protocol_error("JSON 解析失败（%s）；请只输出一个完整的 JSON 动作" % exc.msg)
+    if len(objects) > 1:
+        return _protocol_error("一次只能输出一个 JSON 动作，这次收到 %d 个；请只输出下一步" % len(objects))
+    if not isinstance(objects[0], dict):
+        return _protocol_error("模型输出不是 JSON 对象")
+    return objects[0]
 
 
 class OpenAICompatProvider(Provider):

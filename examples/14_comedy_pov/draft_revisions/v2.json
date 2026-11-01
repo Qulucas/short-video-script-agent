@@ -78,7 +78,8 @@
       "expression": "pupils trembling, spiral highlights in her eyes, mouth full and unmoving",
       "character_state": {
         "props": [
-          "chopsticks suspended"
+          "large bowl",
+          "chopsticks"
         ],
         "body": [
           "cheeks puffed"
@@ -133,10 +134,12 @@
       "expression": "pleading puppy eyes over bulging cheeks",
       "character_state": {
         "props": [
+          "large bowl",
+          "chopsticks",
           "rice grains on the T-shirt collar"
         ],
         "body": [
-          "cheeks bulging to the limit"
+          "cheeks puffed"
         ]
       },
       "dialogue": [
@@ -200,10 +203,12 @@
       "expression": "desperate, eyes wide, chewing furiously",
       "character_state": {
         "props": [
+          "large bowl",
+          "chopsticks",
           "rice grains on the T-shirt collar"
         ],
         "body": [
-          "cheeks bulging to the limit"
+          "cheeks puffed"
         ]
       },
       "dialogue": [
@@ -247,13 +252,19 @@
       "expression": "forced dignified smile, smug eyebrows",
       "character_state": {
         "props": [
-          "two rice grains on her lips"
+          "two rice grains on her lips",
+          "rice grains on the T-shirt collar"
         ],
         "costume": [
           "hair accessory tilted"
         ],
         "body": [
           "belly slightly bulging"
+        ],
+        "cleared": [
+          "large bowl",
+          "chopsticks",
+          "cheeks puffed"
         ]
       },
       "dialogue": [
@@ -312,18 +323,24 @@
       "character_action": "flicks the rice grains away, winks, pushes the camera",
       "expression": "smug wink",
       "character_state": {
+        "props": [
+          "rice grains on the T-shirt collar"
+        ],
         "costume": [
           "hair accessory tilted"
         ],
         "body": [
           "belly slightly bulging"
+        ],
+        "cleared": [
+          "two rice grains on her lips"
         ]
       },
       "dialogue": [
         {
           "speaker": "Owner",
           "line": "...and she's gotten fatter again.",
-          "delivery": "low, deadpan",
+          "delivery": "low-pitched voice-over, face never shown",
           "offscreen": true,
           "at_sec": 0.0,
           "rate": 1.2
@@ -392,5 +409,23 @@
         "transition": "music cuts out"
       }
     ]
-  }
+  },
+  "fulfills": [
+    "camera_notes[0]",
+    "audio_notes.bgm[0]"
+  ],
+  "waivers": [
+    {
+      "item": "camera_notes[1]",
+      "reason": "no reverse shot: every beat plays straight into the POV lens, and a cut-away would break the strict beat timing"
+    }
+  ],
+  "deviations": [
+    {
+      "beat": "punchline",
+      "original": "Cough. I'm just checking the semantic integrity of the rice. The DeepSeek taste model requires a large amount of training data, you know. Don't look at me like that.",
+      "new": "(clears throat) Ahem. Semantic integrity check. DeepSeek's taste model needs data. Don't look at me like that.",
+      "reason": "beat timing: estimate_duration put the planned line at 20.0-31.5s against the planned 20-26s"
+    }
+  ]
 }

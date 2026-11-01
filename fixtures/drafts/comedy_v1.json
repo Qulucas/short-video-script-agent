@@ -1,5 +1,31 @@
 {
   "title": "Whale Maiden's Carbohydrate Sampling Incident",
+  "fulfills": [
+    "camera_notes[0]",
+    "audio_notes.bgm[0]"
+  ],
+  "audio_tracks": {
+    "bgm": [
+      {
+        "start": 0,
+        "end": 5,
+        "style": "kitchen ambience: boiling water + distant TV",
+        "transition": "cut"
+      },
+      {
+        "start": 5,
+        "end": 24,
+        "style": "fast-paced choral track",
+        "transition": "slams in on the table tap"
+      },
+      {
+        "start": 26,
+        "end": 30,
+        "style": "awkward silence, room tone only",
+        "transition": "music cuts out"
+      }
+    ]
+  },
   "shots": [
     {
       "id": "S1",
@@ -67,7 +93,7 @@
       "beat": "inciting_incident",
       "claim_scope": "generic",
       "perspective": "pov",
-      "visual": "POV freezes. The owner's hand enters from the right edge of the frame and taps the dining table twice. DeepSeek Whale Maiden freezes mid-bite, chopsticks suspended in the air, then slowly turns her head toward the lens with rice still in her mouth.",
+      "visual": "POV freezes; the owner's face is reflected in the rice cooker lid. The owner's hand enters from the right edge of the frame and taps the dining table twice. DeepSeek Whale Maiden freezes mid-bite, chopsticks suspended in the air, then slowly turns her head toward the lens with rice still in her mouth.",
       "shot_size": "medium close-up",
       "camera": {
         "move": "locked off, POV hand enters frame right",
@@ -78,7 +104,8 @@
       "expression": "pupils trembling, spiral highlights in her eyes, mouth full and unmoving",
       "character_state": {
         "props": [
-          "chopsticks suspended"
+          "large bowl",
+          "chopsticks"
         ],
         "body": [
           "cheeks puffed"
@@ -101,7 +128,7 @@
         },
         {
           "cue": "loud gulp",
-          "at_sec": 3.2,
+          "at_sec": 4.6,
           "position": "center"
         }
       ],
@@ -133,10 +160,12 @@
       "expression": "pleading puppy eyes over bulging cheeks",
       "character_state": {
         "props": [
+          "large bowl",
+          "chopsticks",
           "rice grains on the T-shirt collar"
         ],
         "body": [
-          "cheeks bulging to the limit"
+          "cheeks puffed"
         ]
       },
       "dialogue": [
@@ -200,15 +229,17 @@
       "expression": "desperate, eyes wide, chewing furiously",
       "character_state": {
         "props": [
+          "large bowl",
+          "chopsticks",
           "rice grains on the T-shirt collar"
         ],
         "body": [
-          "cheeks bulging to the limit"
+          "cheeks puffed"
         ]
       },
       "dialogue": [
         {
-          "speaker": "DeepSeek Whale Maiden",
+          "speaker": "Whale Girl",
           "line": "You didn't see anything!! Cache cleaning! (unclear)",
           "delivery": "muffled, panicked",
           "at_sec": 0.5,
@@ -247,13 +278,19 @@
       "expression": "forced dignified smile, smug eyebrows",
       "character_state": {
         "props": [
-          "two rice grains on her lips"
+          "two rice grains on her lips",
+          "rice grains on the T-shirt collar"
         ],
         "costume": [
           "hair accessory tilted"
         ],
         "body": [
           "belly slightly bulging"
+        ],
+        "cleared": [
+          "large bowl",
+          "chopsticks",
+          "cheeks puffed"
         ]
       },
       "dialogue": [
@@ -310,6 +347,9 @@
       "character_action": "flicks the rice grains away, winks, pushes the camera",
       "expression": "smug wink",
       "character_state": {
+        "props": [
+          "rice grains on the T-shirt collar"
+        ],
         "costume": [
           "hair accessory tilted"
         ],
@@ -321,14 +361,14 @@
         {
           "speaker": "Owner",
           "line": "...and she's gotten fatter again.",
-          "delivery": "low, deadpan",
+          "delivery": "low-pitched voice-over, face never shown",
           "offscreen": true,
           "at_sec": 0.0,
           "rate": 1.2
         },
         {
           "speaker": "DeepSeek Whale Maiden",
-          "line": "Just cache... shoo!",
+          "line": "Bye bye!",
           "delivery": "pouty",
           "rate": 1.2
         }
@@ -368,27 +408,5 @@
         "audio_notes.sfx[4]"
       ]
     }
-  ],
-  "audio_tracks": {
-    "bgm": [
-      {
-        "start": 0,
-        "end": 5,
-        "style": "kitchen ambience: boiling water + distant TV",
-        "transition": "cut"
-      },
-      {
-        "start": 5,
-        "end": 26,
-        "style": "fast-paced choral track",
-        "transition": "slams in on the table tap"
-      },
-      {
-        "start": 26,
-        "end": 30,
-        "style": "awkward silence, room tone only",
-        "transition": "music cuts out"
-      }
-    ]
-  }
+  ]
 }

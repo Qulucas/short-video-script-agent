@@ -172,6 +172,15 @@ def render_markdown(result: Dict[str, Any]) -> str:
                 citations.get("pass"), len(citations.get("unsupported_claims", []))))
         else:
             lines.append("| citations | — | 未执行 |")
+        if "brief" in checks:
+            brief = checks.get("brief")
+            if brief:
+                lines.append("| brief | %s | %d 个问题（%s）；%d 条待人工确认 |" % (
+                    brief.get("pass"), len(brief.get("issues", [])),
+                    "、".join("%s %s" % (k, "✓" if v["pass"] else "✗") for k, v in brief.get("sections", {}).items()),
+                    len(brief.get("review", []))))
+            else:
+                lines.append("| brief | — | 未执行 |")
         if "production" in checks:
             production = checks.get("production")
             if production:
@@ -232,6 +241,28 @@ def render_storyboard(result: Dict[str, Any]) -> str:
                 "%+.1f / %+.1f" % (beat["delta_start"], beat["delta_end"]) if actual else "—",
                 "是" if beat.get("pass") else "否"))
         lines.append("")
+    brief = (result.get("checks") or {}).get("brief") or {}
+    if brief:
+        holders: Dict[str, List[str]] = {}
+        for shot in result.get("shots") or []:
+            for ref in shot.get("fulfills") or []:
+                holders.setdefault(ref, []).append(shot.get("id", ""))
+        waived = {w.get("item"): w.get("reason") for w in brief.get("waivers", [])}
+        lines.append("## Brief 落实情况")
+        lines.append("")
+        lines.append("| 条目 | 落实于 |")
+        lines.append("|---|---|")
+        for item in brief.get("items", []):
+            where = ", ".join(holders.get(item, [])) or ("全片" if item in (result.get("fulfills") or []) else "")
+            lines.append("| %s | %s |" % (item, where or ("未落实：%s" % waived[item] if item in waived else "—")))
+        lines.append("")
+        for dev in brief.get("deviations", []):
+            lines.append("- **台词改动**（%s）：%s → %s。原因：%s" % (
+                dev.get("beat"), dev.get("original"), dev.get("new", "（删除）"), dev.get("reason")))
+        for flag in brief.get("review", []):
+            lines.append("- **待人工确认**（%s）：%s" % (flag.get("shot_id"), flag.get("message")))
+        if brief.get("deviations") or brief.get("review"):
+            lines.append("")
     tracks = result.get("audio_tracks") or {}
     if tracks:
         lines.append("## 音轨")

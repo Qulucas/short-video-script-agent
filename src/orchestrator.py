@@ -12,8 +12,9 @@ from src.formats import DEFAULT_FORMAT, format_config
 from src.limits import (MAX_ACTION_REPAIRS, MAX_DRAFT_WRITES, MAX_QUERY_REWRITES,
                         MAX_SKILL_LOADS, MAX_STEPS, MAX_TOOL_CALLS)
 from src.render import exit_code_for
-from src.schemas import draft_hash, normalize_brief, parse_action, validate_draft
+from src.schemas import DRAFT_KEYS, draft_hash, normalize_brief, parse_action, validate_draft
 from src.skills import list_skills, load_skill
+from src.tools.brief import brief_items, check_brief, planned_lines
 from src.tools.citations import check_citations
 from src.tools.duration import estimate_draft
 from src.tools.errors import ToolError
@@ -23,7 +24,7 @@ from src.tools.rules import check_rules
 from src.trace import TraceRecorder
 
 HISTORY_WINDOW = 8
-EMPTY_CHECKS = {"duration": None, "rules": None, "citations": None, "production": None}
+EMPTY_CHECKS = {"duration": None, "rules": None, "citations": None, "production": None, "brief": None}
 
 
 class ModelError(Exception):
@@ -111,6 +112,9 @@ class Orchestrator:
             "history": [],
             "rule_set": self._rule_set_view(brief.get("brand_rule_set", "")),
             "format": self.format,
+            "brief_items": [{"id": i["id"], "text": i["text"], "must_contain": i["quotes"] + ["%g" % n for n in i["numbers"]]}
+                            for i in brief_items(brief.get("creative_brief") or {})],
+            "planned_lines": planned_lines(brief.get("creative_brief") or {}),
             "skills_available": list_skills(),
             "loaded_skills": {},
             "skill_loads": 0,
@@ -146,9 +150,14 @@ class Orchestrator:
 
     def _draft_from(self, source: Dict[str, Any]) -> Dict[str, Any]:
         draft = {"title": source.get("title"), "shots": source.get("shots")}
-        if source.get("audio_tracks") is not None:
-            draft["audio_tracks"] = source["audio_tracks"]
+        for key in DRAFT_KEYS:
+            if source.get(key) is not None:
+                draft[key] = source[key]
         return draft
+
+    @property
+    def brief_checks_strict(self) -> bool:
+        return self.production_mode and self.format.get("brief_checks") == "strict"
 
     def _scope_errors(self, draft: Dict[str, Any]) -> List[str]:
         if self.format.get("allow_fiction"):
@@ -326,6 +335,23 @@ class Orchestrator:
             self.state["last_checks"]["citations"] = result
             return {"ok": True, **result}
 
+        if name == "check_brief":
+            draft = self.state["current_draft"]
+            est = self.state["last_estimate"]
+            if not draft:
+                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
+            if not est or est.get("draft_hash") != self.state["draft_hash"]:
+                return {"ok": False, "error_code": "ESTIMATE_REQUIRED",
+                        "message": "请先对当前 revision 估算时长", "retryable": True}
+            result = check_brief(draft, self.brief.get("creative_brief") or {}, est,
+                                 product_name=self.brief.get("product_name", ""),
+                                 output_language=self.brief.get("output_language", ""),
+                                 pov_min_ratio=self.format.get("pov_min_ratio"))
+            result["revision"] = self.state["draft_revision"]
+            result["draft_hash"] = self.state["draft_hash"]
+            self.state["last_checks"]["brief"] = result
+            return {"ok": True, **result}
+
         if name == "check_production":
             draft = self.state["current_draft"]
             if not draft:
@@ -356,6 +382,10 @@ class Orchestrator:
             production = st["last_checks"].get("production")
             if not production or production.get("draft_hash") != st["draft_hash"]:
                 missing.append("production")
+        if self.brief_checks_strict:
+            brief = st["last_checks"].get("brief")
+            if not brief or brief.get("draft_hash") != st["draft_hash"]:
+                missing.append("brief")
         return missing
 
     def _validate_finish(self, action: Dict[str, Any]) -> Tuple[bool, List[str]]:
@@ -380,6 +410,8 @@ class Orchestrator:
                 missing.append("citations_not_pass")
             if self.production_mode and not st["last_checks"]["production"].get("pass"):
                 missing.append("production_not_pass")
+            if self.brief_checks_strict and not st["last_checks"]["brief"].get("pass"):
+                missing.append("brief_not_pass")
             if self.format.get("requires_product_claim") and (
                     self.brief.get("product_name") or self.brief.get("material_ids")):
                 has_claim = any(
@@ -450,6 +482,18 @@ class Orchestrator:
                           "message": "%d 处剧情内提到产品的玩笑式说法未做事实校验，发布前请人工确认：%s" % (
                               len(citations["fiction_claims"]),
                               "；".join(c["sentence"] for c in citations["fiction_claims"]))})
+        brief = self.state["last_checks"].get("brief") or {}
+        if brief.get("review"):
+            risks.append({"code": "CONTENT_REVIEW", "severity": "warn",
+                          "message": "需要人工确认：" + "；".join("%s %s" % (f["shot_id"], f["message"]) for f in brief["review"])})
+        if brief.get("waivers"):
+            risks.append({"code": "BRIEF_WAIVERS", "severity": "info",
+                          "message": "未落实的 brief 条目：" + "；".join("%s（%s）" % (w.get("item"), w.get("reason"))
+                                                               for w in brief["waivers"])})
+        if brief.get("deviations"):
+            risks.append({"code": "BRIEF_DEVIATIONS", "severity": "info",
+                          "message": "改动的计划台词：" + "；".join("%s（%s）" % (d.get("beat"), d.get("reason"))
+                                                            for d in brief["deviations"])})
         if self.format.get("materials_required") and len(self.visible_materials) <= 1:
             risks.append({"code": "LIMITED_MATERIAL", "severity": "warn",
                           "message": "可用产品素材很少，脚本以使用建议为主。"})
@@ -477,6 +521,8 @@ class Orchestrator:
         }
         if self.production_mode:
             checks["production"] = st["last_checks"].get("production")
+        if self.brief_checks_strict or st["last_checks"].get("brief"):
+            checks["brief"] = st["last_checks"].get("brief")
         result = {
             "run_id": self.run_id,
             "provider": self.provider.name,
@@ -510,6 +556,8 @@ class Orchestrator:
         }
         if draft.get("audio_tracks"):
             result["audio_tracks"] = draft["audio_tracks"]
+        if draft.get("fulfills"):
+            result["fulfills"] = draft["fulfills"]
         if est.get("timeline"):
             result["timeline"] = est["timeline"]
         if est.get("beats"):

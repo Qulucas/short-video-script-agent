@@ -80,6 +80,24 @@ system prompt 还写明了估算公式（4.2 字/秒 + 0.3s 停顿、每镜 ≥1
 
 v1 草稿的估算结果和字段完全不变（fixture 01–12 重新生成后逐字节一致）；13 只多了 `advisory` 的逐段对比。
 
+## brief 检查（阶段 3）：`check_brief`
+
+起因：live 14 的稿子通过了全部 v1.3 检查，却丢了原 punchline 笑点、“300g”气泡、“3.2 次/秒”、BGM 换场时间，还把英文改成了中文。字段齐不齐、时间准不准都查不出“brief 有没有被落实”。
+
+`check_brief`（`src/tools/brief.py`）是一次工具调用，分五节，任一节有问题即不通过；`format.brief_checks=strict`（喜剧格式）时完成闸门要求它绑定当前 `draft_hash` 且通过，默认格式下可以调用但不强制。需要先有当前稿的估算（用到每镜时长和 timeline）。
+
+| 节 | 查什么 | 关键规则 |
+|---|---|---|
+| coverage | brief 每一条要求是否落实 | `visual_notes`/`text_overlay_hints`/`camera_notes`/`audio_notes.*` 每条有稳定 id（如 `text_overlay_hints[1]`），prompt 里给出。落实它的分镜在 `fulfills` 写 id，全片性要求写在草稿顶层 `fulfills`；引号原文和数字（去掉“0-5s:”时间前缀）必须原样出现在落实它的分镜里，否则 `ANCHOR_MISSING`；没有原文锚点的按词重合度（≥0.3）判断 `EVIDENCE_WEAK`。做不到就写 `waivers`，会列给用户 |
+| fidelity | 计划台词有没有被保留 | 从 `script_structure.audio` 里拆出台词：按“ / ”分段，括号是音效，除非括号里引用了已知说话人（“(owner, off screen: '...')”）。语言默认要与计划台词一致（`output_language` 可改）；`locked` 段落或 `locked_lines` 必须逐字保留；其余台词保留度（词重合）<0.6 时必须有 `deviations` 记录，reason 要写出是哪项检查要求的（beat timing、BR-01、citation 等关键词） |
+| continuity | 角色是否前后一致 | 说话人必须是角色名原文或 `cast`（别名报 `NON_CANONICAL_SPEAKER`）；每镜 visual 要写出角色名；`pronoun` 声明后，配角台词里不能用错代词；`character_state` 的条目必须延续到后面每一镜，或写进 `cleared` |
+| timeline | 时间上是否成立 | 音效不能超出本镜时长；屏幕文字显示时长要够读；同一说话人的台词不能重叠；`audio_tracks.bgm` 从 0 覆盖到片尾，中间无空档 |
+| pov | 视角规则 | POV 分镜占比 ≥ `pov_min_ratio`（喜剧格式 0.6）；POV 镜头不能出现主角的脸；写了“反打”就要 `perspective: reverse` |
+
+另有 `review`：身材/外貌评价、品牌 logo 或仿界面，只列出、不阻断，进入 `CONTENT_REVIEW` 风险。`waivers` 和 `deviations` 也分别进入 `BRIEF_WAIVERS` / `BRIEF_DEVIATIONS`，并在 `storyboard.md` 的“Brief 落实情况”里逐条列出。
+
+取舍：这些都是文本层面的确定性检查。它能判断某条要求、某句台词是不是缺了或被改了，判断不了好不好笑；词重合和关键词判断也会有漏判和误判，阈值集中在 `src/tools/brief.py` 顶部。默认格式不强制，是因为口播里改台词多半是为了事实准确，逐句保真不适用。
+
 ## 工具
 
 | 工具 | 输入 | 输出 |

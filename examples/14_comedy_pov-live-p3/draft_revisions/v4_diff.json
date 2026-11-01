@@ -1,0 +1,23 @@
+{
+  "from": 3,
+  "to": 4,
+  "removed_shots": [],
+  "added_shots": [],
+  "changed_shots": [
+    {
+      "id": "S1",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "S4",
+      "before": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!",
+      "after": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!"
+    },
+    {
+      "id": "S6",
+      "before": "",
+      "after": ""
+    }
+  ]
+}

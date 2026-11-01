@@ -8,7 +8,9 @@
       "allow_fiction": false,
       "beat_timing": "advisory",
       "beat_tolerance_sec": 0.5,
-      "production_fields": []
+      "production_fields": [],
+      "brief_checks": "advisory",
+      "pov_min_ratio": null
     },
     "comedy_pov_sketch": {
       "title": "POV 第一人称搞笑短剧",
@@ -17,7 +19,12 @@
       "allow_fiction": true,
       "beat_timing": "strict",
       "beat_tolerance_sec": 0.5,
-      "production_fields": ["perspective"]
+      "production_fields": [
+        "perspective",
+        "lighting"
+      ],
+      "brief_checks": "strict",
+      "pov_min_ratio": 0.6
     }
   }
 }

@@ -30,6 +30,7 @@
 
   这些是方向，不是事实来源：其中的产品功能、效果说法仍要有素材依据。
 - `format`：内容格式，`promo_talking_head`（默认）或 `comedy_pov_sketch`，见 `data/formats.json`。
+- `cast`：角色以外的说话人（如 `["Owner"]`）；`character_setting.aliases`、`character_setting.pronoun`；`locked_lines` 或段落里的 `"locked": true`：必须逐字保留的台词；`output_language`：要换语言时显式指定。
 
 输入处理：键名不区分大小写并支持别名（`Topic`→`topic`、`duration`→`target_duration_sec` 等），每次改名都写进 `assumptions`；不认识的字段原样放进 `creative_brief.extra`；JSON 语法错误报行、列和可能原因，退出码 2。
 
@@ -84,4 +85,4 @@
 | 步数/工具调用上限 | `examples/08_step_limit/`、`examples/11_tool_call_limit/` |
 | 对抗性事实夹带 | `examples/10_adversarial_claim/` |
 | 创作方向落地（制作模式） | fixture：`examples/13_creative_brief/`；live：`examples/13_creative_brief-live/` |
-| 剧情格式、逐段计时、无素材完成 | fixture：`examples/14_comedy_pov/` |
+| 剧情格式、逐段计时、无素材完成、brief 落实检查 | fixture：`examples/14_comedy_pov/`；live：`examples/14_comedy_pov-live/`（v1.3 基线）、`examples/14_comedy_pov-live-p3/` |

@@ -15,6 +15,7 @@ ACTION_NAMES = {
     "finish",
     "load_skill",
     "check_production",
+    "check_brief",
 }
 
 # Optional per-shot fields for the video-production handoff; check_production decides which
@@ -30,6 +31,8 @@ STRING_FIELDS = (
 )
 PERSPECTIVES = ("pov", "reverse", "insert", "third_person")
 CLAIM_SCOPES = ("product", "generic", "fiction")
+# Optional draft-level keys besides title/shots; every writer and reader goes through this list.
+DRAFT_KEYS = ("audio_tracks", "fulfills", "waivers", "deviations")
 
 
 def _num(value: Any) -> bool:
@@ -77,17 +80,19 @@ def shot_texts(shot: Dict[str, Any]) -> List[Tuple[str, str]]:
 CORE_KEYS = {
     "topic", "platform", "target_duration_sec", "audience", "style", "product_name",
     "material_query", "material_ids", "brand_rule_set", "scenario", "faults", "initial_draft", "format",
+    "output_language",
 }
 CREATIVE_KEYS = {
     "character_setting", "script_structure", "visual_notes", "text_overlay_hints",
-    "camera_notes", "audio_notes",
+    "camera_notes", "audio_notes", "cast", "locked_lines",
 }
 KEY_ALIASES = {
     "duration": "target_duration_sec", "duration_sec": "target_duration_sec",
     "target_duration": "target_duration_sec", "target_sec": "target_duration_sec",
     "product": "product_name", "rule_set": "brand_rule_set", "brand_rules": "brand_rule_set",
     "materials": "material_ids", "query": "material_query",
-    "content_format": "format", "video_format": "format",
+    "content_format": "format", "video_format": "format", "language": "output_language",
+    "characters": "cast", "locked": "locked_lines",
     "character": "character_setting", "structure": "script_structure", "beats": "script_structure",
     "visual_note": "visual_notes", "overlay_hints": "text_overlay_hints", "text_overlays": "text_overlay_hints",
     "overlays": "text_overlay_hints", "camera": "camera_notes", "camera_note": "camera_notes",
@@ -167,11 +172,13 @@ def normalize_creative_brief(raw: Dict[str, Any]) -> Dict[str, Any]:
         if not _text(item.get("beat")):
             continue
         beat = {key: _text(item.get(key)) for key in ("beat", "time_range", "visual", "audio")}
-        beat.update({k: _text(v) for k, v in item.items() if k not in beat and _text(v)})
+        beat.update({k: _text(v) for k, v in item.items() if k not in beat and k != "locked" and _text(v)})
+        if item.get("locked") is True:
+            beat["locked"] = True
         beats.append(beat)
     if beats:
         creative["script_structure"] = beats
-    for key in ("visual_notes", "text_overlay_hints", "camera_notes"):
+    for key in ("visual_notes", "text_overlay_hints", "camera_notes", "cast", "locked_lines"):
         values = _str_list(raw.get(key))
         if values:
             creative[key] = values
@@ -232,6 +239,7 @@ def normalize_brief(raw: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str,
         "brand_rule_set": str(raw.get("brand_rule_set") or "demo_default").strip(),
         "scenario": str(raw.get("scenario") or "normal").strip(),
         "format": fmt,
+        "output_language": canonical_key(raw.get("output_language") or ""),
         "faults": raw.get("faults") or {},
         "initial_draft": raw.get("initial_draft") if isinstance(raw.get("initial_draft"), dict) else None,
         "creative_brief": creative or None,
@@ -300,6 +308,13 @@ def validate_draft(draft: Any) -> List[str]:
             for key in ("text", "source_id", "quote"):
                 if not isinstance(claim.get(key), str) or not claim.get(key, "").strip():
                     errors.append(clabel + "." + key + " 不能为空")
+    if "fulfills" in draft and not (isinstance(draft["fulfills"], list)
+                                    and all(isinstance(x, str) for x in draft["fulfills"])):
+        errors.append("fulfills 必须是字符串数组")
+    if "waivers" in draft:
+        _check_items(errors, "waivers", draft["waivers"], ("item", "reason"))
+    if "deviations" in draft:
+        _check_items(errors, "deviations", draft["deviations"], ("beat", "original", "reason"))
     tracks = draft.get("audio_tracks")
     if tracks is not None:
         if not isinstance(tracks, dict):
@@ -360,6 +375,8 @@ def parse_action(raw: Any) -> Tuple[Dict[str, Any], List[str]]:
     errors: List[str] = []
     if not isinstance(raw, dict):
         return {}, ["动作必须是 JSON 对象"]
+    if raw.get("_protocol_error"):
+        return {}, [str(raw["_protocol_error"])]
     rationale = raw.get("rationale")
     if not isinstance(rationale, str) or not rationale.strip():
         errors.append("rationale 不能为空")

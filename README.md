@@ -4,7 +4,7 @@
 >
 > GitHub：https://github.com/Qulucas/short-video-script-agent
 >
-> 提交版本：tag `v1.3`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
+> 提交版本：tag `v1.4`（最终 commit SHA 见 [SUBMISSION.md](SUBMISSION.md)）
 >
 > 一句话：把“生成脚本”做成可审计的闭环——模型选动作，工具算时长、查规则、验引用，检查结果再驱动下一轮修改或明确失败。
 
@@ -45,9 +45,10 @@ pytest -q
 | 规则违规修正、60 秒动作对照、非法动作、检查哈希绑定 | 已完成 |
 | 14 个 fixture 场景输入、result/trace/output/draft_revisions | 已完成 |
 | 内容格式 + 脚本 v2 + 时间引擎（对白/音效/屏幕文字动画/动作时长/逐段计时） | 已完成（fixture 14 + live 14） |
+| brief 落实检查 `check_brief`（覆盖、台词保真、角色连贯、时间线、POV、人工复核项） | 已完成（fixture 14、live 14-p3；拒绝 v1.3 的 live 14 稿） |
 | 制作模式：角色设定/段落结构/视觉规范进入 prompt，制作字段 + `check_production` + 写作技能 + `storyboard.md` | 已完成（fixture 13 + live 13） |
-| `pytest -q` | **107 passed, 1 deselected** |
-| **8 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩、制作模式、POV 搞笑短剧** |
+| `pytest -q` | **127 passed, 1 deselected** |
+| **9 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩、制作模式、POV 搞笑短剧（阶段 3 前后各一次）** |
 
 必选验收场景除“缺关键信息”（入口确定性校验，不经过模型）外都有 live 版本，对照表见 [docs/03-evaluation.md](docs/03-evaluation.md)。重点：
 
@@ -71,6 +72,7 @@ pytest -q
 | 规则检查 | `src/tools/rules.py` | `demo_default` / `strict_disclaimer`，BR-01~05 |
 | 引用校验 | `src/tools/citations.py` | source/quote/claim 覆盖、对抗性夹带扫描 |
 | 制作检查 | `src/tools/production.py` | 制作模式：必填制作字段、段落覆盖与顺序、口头禅、visual 细节、BGM |
+| brief 检查 | `src/tools/brief.py` | brief 每条要求是否落实、计划台词是否保留、角色/时间线/POV 是否连贯；人工复核项 |
 | 写作技能 | `src/skills.py`、`data/skills/*.md` | 5 个写作技能包，模型用 `load_skill` 按需读取 |
 | Trace/Render | `src/trace.py`、`src/render.py` | 步骤记录、`result.json`/`output.md`/`storyboard.md` |
 
@@ -80,7 +82,7 @@ pytest -q
 模型选动作 -> 工具执行 -> observation 回灌 -> 模型决定下一步 -> ... -> finish
 ```
 
-- 动作：`search_materials` / `write_draft` / `estimate_duration` / `check_rules` / `check_citations` / `check_production` / `load_skill` / `finish`
+- 动作：`search_materials` / `write_draft` / `estimate_duration` / `check_rules` / `check_citations` / `check_production` / `check_brief` / `load_skill` / `finish`
 - 每次动作必须带 `rationale`，Trace 原样记录；不记录模型内部思维链。
 - `MAX_STEPS=20`，`MAX_TOOL_CALLS=16`，`MAX_DRAFT_WRITES=4`（`src/limits.py`）；任一到顶返回 `incomplete`，两条上限各有一个场景实际触发。
 - `finish(completed)` 必须满足：当前稿有绑定 `draft_hash` 的时长/规则/引用检查，时长和规则通过，事实可追溯；输入带创作方向（制作模式）时还要 `check_production` 通过。
@@ -102,7 +104,7 @@ pytest -q
 | `10_adversarial_claim` | 删除“还能自动生成字幕”后 completed |
 | `11_tool_call_limit` | 16 次工具调用后 incomplete/tool_call_limit_reached |
 | `12_seeded_draft_38s` | 用户给 38.0s 初稿 → 压缩到 28.0s → completed |
-| `14_comedy_pov` | `format=comedy_pov_sketch`，不检索素材；首稿保留原 punchline 台词 → 估算 35.5s、punchline 段止点 +5.5s → 压缩台词、补口头禅 → 30.0s，5 段时间与计划完全一致 → completed |
+| `14_comedy_pov` | `format=comedy_pov_sketch`，不检索素材；首稿 punchline 段止点 +5.5s，`check_brief` 五节各报一处问题 → 压缩台词并记 deviation、补口头禅、逐条修正 → 30.0s，5 段时间与计划一致，`check_brief` 通过 → completed |
 | `13_creative_brief` | 读 2 个技能 → 首稿时长/规则/引用都过但 `check_production` 报 31 个问题 → 补齐制作字段、口头禅 → completed，输出 `storyboard.md` |
 
 ## 制作模式（给视频生成模型用）
@@ -147,7 +149,7 @@ pytest -q
 
 ## 已知限制
 
-1. **live 结果不稳定**：8 条 live 各跑一次，不保证每次同一路径；fixture 才是可重复证据。05-live 中观察到 rationale 数字与 observation 不符、内容镜用占位句凑时长，见 docs/03。
+1. **live 结果不稳定**：9 条 live 各跑一次，不保证每次同一路径；fixture 才是可重复证据。05-live 中观察到 rationale 数字与 observation 不符、内容镜用占位句凑时长，见 docs/03。
 2. 时长是估算，不是 TTS 实测。
 3. claim 扫描是启发式，复杂语义改写仍需人工复核。
 4. `material_ids` 是白名单；正常案例使用 P01，避免 P04 污染。

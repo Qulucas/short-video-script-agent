@@ -101,3 +101,24 @@ def test_sfx_may_mix_strings_and_cues():
     assert validate_draft(draft) == []
     draft["shots"][0]["sfx"] = [{"at_sec": 0.2}]
     assert any("sfx[0].cue" in e for e in validate_draft(draft))
+
+
+def test_draft_level_waivers_and_deviations_are_validated():
+    draft = _v2()
+    draft["waivers"] = [{"item": "camera_notes[1]"}]
+    draft["deviations"] = [{"beat": "punchline", "reason": "beat timing"}]
+    draft["fulfills"] = "camera_notes[0]"
+    errors = validate_draft(draft)
+    for fragment in ("waivers[0].reason", "deviations[0].original", "fulfills"):
+        assert any(fragment in e for e in errors), fragment
+
+
+def test_cast_locks_and_output_language_are_read():
+    from src.schemas import normalize_brief
+    brief, _ = normalize_brief({"topic": "x", "platform": "douyin", "target_duration_sec": 30, "Language": "ZH",
+                                "characters": ["Owner"], "locked_lines": ["别看我"],
+                                "script_structure": {"tag": {"time_range": "0-5s", "audio": "别看我", "locked": True}}})
+    creative = brief["creative_brief"]
+    assert brief["output_language"] == "zh"
+    assert creative["cast"] == ["Owner"] and creative["locked_lines"] == ["别看我"]
+    assert creative["script_structure"][0]["locked"] is True

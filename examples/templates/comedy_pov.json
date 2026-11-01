@@ -9,11 +9,18 @@
   "brand_rule_set": "demo_default",
   "character_setting": {
     "name": "DeepSeek Whale Maiden",
-    "aliases": ["Whale Maiden", "Whale Girl"],
+    "aliases": [
+      "Whale Maiden",
+      "Whale Girl"
+    ],
+    "pronoun": "she",
     "appearance": "Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth",
     "personality": "Greedy and extremely quick to react; when caught she instantly switches to an innocent yet smug mode while still chewing, faces the camera (the owner), acts cute and stays stubborn",
     "catchphrase": "No, I didn't steal it! This is carrying out a carbohydrate sampling mission!"
   },
+  "cast": [
+    "Owner"
+  ],
   "camera_notes": [
     "The main camera is first-person POV throughout; the viewer is the protagonist (the owner). Hands in frame show the protagonist's actions; the protagonist's face is never shown.",
     "Occasionally cut to a reverse shot of the Whale Maiden from the protagonist's position."

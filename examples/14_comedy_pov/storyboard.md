@@ -6,6 +6,7 @@
 
 - **name**：DeepSeek Whale Maiden
 - **aliases**：Whale Maiden；Whale Girl
+- **pronoun**：she
 - **appearance**：Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth
 - **personality**：Greedy and extremely quick to react; when caught she instantly switches to an innocent yet smug mode while still chewing, faces the camera (the owner), acts cute and stays stubborn
 - **catchphrase**：No, I didn't steal it! This is carrying out a carbohydrate sampling mission!
@@ -35,6 +36,32 @@
 | panic_reaction | 9.0–20.0s | 9.0–20.0s | +0.0 / +0.0 | 是 |
 | punchline | 20.0–26.0s | 20.0–26.0s | +0.0 / +0.0 | 是 |
 | tag | 26.0–30.0s | 26.0–30.0s | +0.0 / +0.0 | 是 |
+
+## Brief 落实情况
+
+| 条目 | 落实于 |
+|---|---|
+| visual_notes[0] | S1 |
+| visual_notes[1] | S3 |
+| visual_notes[2] | S2 |
+| visual_notes[3] | S6 |
+| visual_notes[4] | S6 |
+| text_overlay_hints[0] | S1 |
+| text_overlay_hints[1] | S3 |
+| text_overlay_hints[2] | S5 |
+| text_overlay_hints[3] | S6 |
+| camera_notes[0] | 全片 |
+| camera_notes[1] | 未落实：no reverse shot: every beat plays straight into the POV lens, and a cut-away would break the strict beat timing |
+| audio_notes.bgm[0] | 全片 |
+| audio_notes.sfx[0] | S1 |
+| audio_notes.sfx[1] | S2 |
+| audio_notes.sfx[2] | S3 |
+| audio_notes.sfx[3] | S6 |
+| audio_notes.sfx[4] | S6 |
+
+- **台词改动**（punchline）：Cough. I'm just checking the semantic integrity of the rice. The DeepSeek taste model requires a large amount of training data, you know. Don't look at me like that. → (clears throat) Ahem. Semantic integrity check. DeepSeek's taste model needs data. Don't look at me like that.。原因：beat timing: estimate_duration put the planned line at 20.0-31.5s against the planned 20-26s
+- **待人工确认**（S6）：用了 DeepSeek 的品牌元素（logo/界面），确认有使用权
+- **待人工确认**（S6）：涉及身材/外貌评价（fatter），确认是否适合目标受众
 
 ## 音轨
 
@@ -72,7 +99,7 @@ DeepSeek Whale Maiden，Blue and white gradient ponytail, a small whale fin acce
 - **动作时长**：4.0s
 - **角色动作**：whole body freezes; slow robotic head turn toward the camera
 - **表情**：pupils trembling, spiral highlights in her eyes, mouth full and unmoving
-- **角色状态**：props: chopsticks suspended；body: cheeks puffed
+- **角色状态**：props: large bowl；chopsticks；body: cheeks puffed
 - **音效**：two crisp taps on the table: dong, dong @0.4s（right）；loud gulp @3.2s（center）
 - **转场到下一镜**：jump cut into the speed-up
 - **对白**：DeepSeek Whale Maiden（frozen, tiny）：... (gulp) @3.0s
@@ -93,7 +120,7 @@ DeepSeek Whale Maiden，Blue and white gradient ponytail, a small whale fin acce
 - **动作时长**：8.1s
 - **角色动作**：scoops rice at double speed, chopsticks clacking against the bowl
 - **表情**：pleading puppy eyes over bulging cheeks
-- **角色状态**：props: rice grains on the T-shirt collar；body: cheeks bulging to the limit
+- **角色状态**：props: large bowl；chopsticks；rice grains on the T-shirt collar；body: cheeks puffed
 - **屏幕文字动画**：「Emergency Swallow Protocol Activated 3.2 times per second」 @1.0–5.4s（bottom，flashing alert bar，blink）
 - **音效**：spring boing @0.2s；subjective heartbeat @0.5s；chopsticks clacking on the bowl @1.0s
 - **转场到下一镜**：whip pan following a flying rice grain
@@ -114,7 +141,7 @@ DeepSeek Whale Maiden，Blue and white gradient ponytail, a small whale fin acce
 - **动作时长**：5.6s
 - **角色动作**：chases the camera one step while tipping the bowl into her mouth
 - **表情**：desperate, eyes wide, chewing furiously
-- **角色状态**：props: rice grains on the T-shirt collar；body: cheeks bulging to the limit
+- **角色状态**：props: large bowl；chopsticks；rice grains on the T-shirt collar；body: cheeks puffed
 - **音效**：fast swallowing @2.5s；heartbeat speeds up @0.0s
 - **转场到下一镜**：music hit, cut on her final swallow
 - **对白**：DeepSeek Whale Maiden（muffled, panicked）：You didn't see anything!! Cache cleaning! (unclear) @0.5s
@@ -133,7 +160,7 @@ DeepSeek Whale Maiden，Blue and white gradient ponytail, a small whale fin acce
 - **动作时长**：6.0s
 - **角色动作**：stands straight, hands behind her back, clears her throat
 - **表情**：forced dignified smile, smug eyebrows
-- **角色状态**：props: two rice grains on her lips；costume: hair accessory tilted；body: belly slightly bulging
+- **角色状态**：props: two rice grains on her lips；rice grains on the T-shirt collar；costume: hair accessory tilted；body: belly slightly bulging；cleared: large bowl；chopsticks；cheeks puffed
 - **屏幕文字动画**：「Generating Excuses...」 @0–2.5s（bubble above her head，thinking bubble）；「Semantic Integrity Check」 @2.5–6.0s（bubble above her head，thinking bubble）
 - **音效**：throat clear @0.1s
 - **转场到下一镜**：music cuts out to awkward room tone
@@ -154,10 +181,10 @@ DeepSeek Whale Maiden，Blue and white gradient ponytail, a small whale fin acce
 - **动作时长**：4.0s
 - **角色动作**：flicks the rice grains away, winks, pushes the camera
 - **表情**：smug wink
-- **角色状态**：costume: hair accessory tilted；body: belly slightly bulging
+- **角色状态**：props: rice grains on the T-shirt collar；costume: hair accessory tilted；body: belly slightly bulging；cleared: two rice grains on her lips
 - **屏幕文字动画**：「Carbohydrate sampling completed ✅ Sample quantity: 300g」 @0.0–2.5s（above her head，DeepSeek-style chat bubble）；「DeepSeek Whale Maiden · Daily Sampling Log」 @1.0–4.0s（bottom center，caption bar）
 - **音效**：boop~ @3.4s；glass friction @3.5s
-- **对白**：Owner（low, deadpan，画外）：...and she's gotten fatter again. @0.0s
+- **对白**：Owner（low-pitched voice-over, face never shown，画外）：...and she's gotten fatter again. @0.0s
 - **对白**：DeepSeek Whale Maiden（pouty）：Just cache... shoo!
 
 ```text
