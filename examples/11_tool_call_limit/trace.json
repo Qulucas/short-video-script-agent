@@ -3,8 +3,8 @@
   "model": "policy-fixture-v1",
   "mode": "offline",
   "limits": {
-    "max_steps": 20,
-    "max_tool_calls": 16
+    "max_steps": 32,
+    "max_tool_calls": 26
   },
   "steps": [
     {
@@ -254,6 +254,156 @@
       "args": {},
       "observation": {
         "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 18,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 19,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 20,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 21,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 22,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 23,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 24,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 25,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 26,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
+        "error_code": "DRAFT_REQUIRED",
+        "message": "请先写草稿",
+        "retryable": true
+      },
+      "next": "check_citations",
+      "draft_revision": 0,
+      "draft_hash": null
+    },
+    {
+      "n": 27,
+      "rationale": "反复检查引用（观察到 DRAFT_REQUIRED），测试工具调用上限",
+      "action": "check_citations",
+      "args": {},
+      "observation": {
+        "ok": false,
         "error_code": "TOOL_CALL_LIMIT"
       },
       "next": null,
@@ -263,5 +413,5 @@
   ],
   "result_status": "incomplete",
   "stop_reason": "tool_call_limit_reached",
-  "tool_calls": 16
+  "tool_calls": 26
 }

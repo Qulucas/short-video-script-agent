@@ -16,14 +16,18 @@
 
 第六轮（Claude Code，Claude Opus 5.5）：按 live 14-p3 暴露的问题实现阶段 3.1：段落 visual 条目、词重合降为复核项、描述语言混写检查、口头禅必须是角色台词、dialogue 脚本里的 narration 需要 Narrator；加测试证明 14-p3 终稿会被拒。本轮没有跑 live。
 
+第七轮（Claude Code，Claude Opus 5.5）：实现阶段 5：`write_outline`（喜剧格式写正文前必须通过）、`patch_draft` 局部修改、预算调到 32 步 / 26 次工具调用并加补丁和大纲上限、provider 显式 `max_tokens` 并把截断回复交回模型；喜剧 fixture 改为大纲 → 首稿 → 补丁；live 14 重跑一次（由 Claude Code 在本机用仓库 `.env` 配置执行），从 trace 发现并修复大纲检查拒收段落 visual 条目的 bug。
+
+第八轮（Claude Code，Claude Opus 5.5）：实现阶段 4 的 `review_draft`（独立审稿调用、5 维打分和修改建议，只供参考、不进闸门），喜剧 fixture 演示“评审 → 采纳一条建议 → 重查 → 再评审”。live 14 第一次重跑在第 5 步因网络连接被重置中断，随后给 provider 加传输层重试（`LLM_RETRIES`），再重跑一次（由 Claude Code 在本机用仓库 `.env` 配置执行）。
+
 ## 使用范围
 
 | 范围 | AI 参与 | 验证 |
 |---|---|---|
 | 方案 | 根据审查意见修订 `docs/00-plan.md` | 人工审查意见逐条对照 |
-| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 130 passed |
+| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 151 passed |
 | 测试 | 单元、集成、场景测试 | 实际运行 |
-| 示例 | 14 个 fixture case + 9 条 live 的 result/trace/output | 实际运行生成 |
+| 示例 | 14 个 fixture case + 11 条 live 的 result/trace/output | 实际运行生成 |
 | 文档 | README、docs/01–05 | 对照实际输出复核 |
 
 ## 个人贡献需要补充的部分
@@ -32,7 +36,7 @@
 
 1. 逐行理解 `src/orchestrator.py` 的完成闸门和预算；
 2. 检查 `src/tools/citations.py` 的启发式是否符合预期；
-3. 核对 9 条 live trace，确认模型确实根据 observation 改稿；
+3. 核对 11 条 live trace，确认模型确实根据 observation 改稿；
 4. 检查示例文案和品牌规则是否符合实际产品；
 5. 填写实际投入时间、未完成部分和个人复盘。
 
@@ -43,14 +47,14 @@
 - live 04/04b/05/12：工具持续失败→incomplete、瞬时失败→重试恢复、BR-03 驱动改稿后 unmet、38.0s 初稿→28.4s；
 - live 13：制作模式，按 5 段写 6 镜、制作字段齐全、29.4s completed；
 - live 14：POV 搞笑短剧，首稿 30.0s、逐段计时全中，但漏了部分 brief 要求（docs/03 有记录）；
-- fixture 14 个场景、130 个离线测试通过。
+- fixture 14 个场景、151 个离线测试通过。
 
 ## 未验证/未完成
 
-- live 9 条各跑一次，不是稳定性评测；
+- live 11 条各跑一次，不是稳定性评测；
 - 真实 TTS 时长：未接入；
 - 人工对 12 个场景文案的质量评审：未做；
-- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.5` 为准。
+- GitHub 远端 URL、最终 commit SHA：已上传 `Qulucas/short-video-script-agent`，以 tag `v1.6` 为准。
 
 ## 防伪声明
 

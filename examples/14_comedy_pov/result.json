@@ -1,5 +1,5 @@
 {
-  "run_id": "20261101T050854Z-d64f23",
+  "run_id": "20261101T052516Z-be0a42",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -23,11 +23,11 @@
     "creative_brief 包含 audio_notes/camera_notes/cast/character_setting/script_structure/text_overlay_hints/visual_notes，按制作模式输出并要求 check_production"
   ],
   "limits": {
-    "max_steps": 20,
-    "max_tool_calls": 16
+    "max_steps": 32,
+    "max_tool_calls": 26
   },
-  "draft_revision": 2,
-  "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e",
+  "draft_revision": 3,
+  "draft_hash": "sha256:93c6537ad4f1a96eeb381a3b686721a82918bd7ca921fa26f9d1fd3027ee7ea6",
   "shots": [
     {
       "id": "S1",
@@ -122,7 +122,7 @@
           "speaker": "DeepSeek Whale Maiden",
           "line": "... (gulp)",
           "delivery": "frozen, tiny",
-          "at_sec": 3.0
+          "at_sec": 3.4
         }
       ],
       "sfx": [
@@ -133,7 +133,7 @@
         },
         {
           "cue": "loud gulp",
-          "at_sec": 3.2,
+          "at_sec": 3.6,
           "position": "center"
         }
       ],
@@ -459,7 +459,7 @@
         {
           "id": "S2",
           "start_sec": 5.0,
-          "driver": "action",
+          "driver": "dialogue",
           "duration_sec": 4.0,
           "narration_chars": 0,
           "subtitle_chars": 0
@@ -523,8 +523,8 @@
           "type": "dialogue",
           "speaker": "DeepSeek Whale Maiden",
           "shot_id": "S2",
-          "start_sec": 8.0,
-          "end_sec": 8.3
+          "start_sec": 8.4,
+          "end_sec": 8.7
         },
         {
           "type": "sfx",
@@ -537,8 +537,8 @@
           "type": "sfx",
           "cue": "loud gulp",
           "shot_id": "S2",
-          "start_sec": 8.2,
-          "end_sec": 8.2
+          "start_sec": 8.6,
+          "end_sec": 8.6
         },
         {
           "type": "dialogue",
@@ -743,8 +743,8 @@
       "beat_tolerance_sec": 0.5,
       "beats_pass": true,
       "window_pass": true,
-      "revision": 2,
-      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
+      "revision": 3,
+      "draft_hash": "sha256:93c6537ad4f1a96eeb381a3b686721a82918bd7ca921fa26f9d1fd3027ee7ea6"
     },
     "rules": {
       "ok": true,
@@ -752,8 +752,8 @@
       "rule_set": "demo_default",
       "violations": [],
       "needs_review": [],
-      "revision": 2,
-      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
+      "revision": 3,
+      "draft_hash": "sha256:93c6537ad4f1a96eeb381a3b686721a82918bd7ca921fa26f9d1fd3027ee7ea6"
     },
     "citations": {
       "ok": true,
@@ -766,8 +766,8 @@
           "sentence": "DeepSeek's taste model needs data"
         }
       ],
-      "revision": 2,
-      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
+      "revision": 3,
+      "draft_hash": "sha256:93c6537ad4f1a96eeb381a3b686721a82918bd7ca921fa26f9d1fd3027ee7ea6"
     },
     "production": {
       "ok": true,
@@ -783,8 +783,8 @@
         "lighting"
       ],
       "issues": [],
-      "revision": 2,
-      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
+      "revision": 3,
+      "draft_hash": "sha256:93c6537ad4f1a96eeb381a3b686721a82918bd7ca921fa26f9d1fd3027ee7ea6"
     },
     "brief": {
       "ok": true,
@@ -865,8 +865,8 @@
         "script_structure.panic_reaction.visual",
         "script_structure.tag.visual"
       ],
-      "revision": 2,
-      "draft_hash": "sha256:740faee6569e95d3549938db77578d4e9af594d3414e2b7ec36de3f2e0a9f54e"
+      "revision": 3,
+      "draft_hash": "sha256:93c6537ad4f1a96eeb381a3b686721a82918bd7ca921fa26f9d1fd3027ee7ea6"
     }
   },
   "risks": [
@@ -874,6 +874,11 @@
       "code": "FICTION_CLAIMS",
       "severity": "warn",
       "message": "1 处剧情内提到产品的玩笑式说法未做事实校验，发布前请人工确认：DeepSeek's taste model needs data"
+    },
+    {
+      "code": "MODEL_REVIEW",
+      "severity": "info",
+      "message": "模型评审（仅供参考，不影响完成判定）：总分 4.2/5；无修改建议"
     },
     {
       "code": "CONTENT_REVIEW",
@@ -953,8 +958,8 @@
       "type": "dialogue",
       "speaker": "DeepSeek Whale Maiden",
       "shot_id": "S2",
-      "start_sec": 8.0,
-      "end_sec": 8.3
+      "start_sec": 8.4,
+      "end_sec": 8.7
     },
     {
       "type": "sfx",
@@ -967,8 +972,8 @@
       "type": "sfx",
       "cue": "loud gulp",
       "shot_id": "S2",
-      "start_sec": 8.2,
-      "end_sec": 8.2
+      "start_sec": 8.6,
+      "end_sec": 8.6
     },
     {
       "type": "dialogue",
@@ -1170,6 +1175,26 @@
     }
   ],
   "format": "comedy_pov_sketch",
+  "model_review": {
+    "scores": {
+      "comedic_timing": 4,
+      "escalation": 4,
+      "punchline_clarity": 4,
+      "character_voice": 4,
+      "visual_specificity": 5
+    },
+    "overall": 4.2,
+    "summary": "定格撑够了，吞口水成了一个清楚的小笑点；整体可以交付。",
+    "strengths": [
+      "定格 + 吞口水的节奏成立",
+      "punchline 的“语义完整性”说出来了"
+    ],
+    "suggestions": [],
+    "revision": 3,
+    "draft_hash": "sha256:93c6537ad4f1a96eeb381a3b686721a82918bd7ca921fa26f9d1fd3027ee7ea6",
+    "advisory": true,
+    "stale": false
+  },
   "creative_brief": {
     "character_setting": {
       "name": "DeepSeek Whale Maiden",

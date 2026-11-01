@@ -1,5 +1,5 @@
 {
-  "run_id": "20261031T120412Z-a56027",
+  "run_id": "20261101T051640Z-2c489c",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",
@@ -22,8 +22,8 @@
     "initial_draft 由用户提供，作为 revision 1 待检查和修改"
   ],
   "limits": {
-    "max_steps": 20,
-    "max_tool_calls": 16
+    "max_steps": 32,
+    "max_tool_calls": 26
   },
   "draft_revision": 2,
   "draft_hash": "sha256:b9706690e081bd7996bd0f8b088e080647945ff9df14a4a1eb8bdc79a524986b",

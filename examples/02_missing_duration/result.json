@@ -4,10 +4,10 @@
   "message": "请补充：target_duration_sec",
   "exit_code": 2,
   "limits": {
-    "max_steps": 20,
-    "max_tool_calls": 16
+    "max_steps": 32,
+    "max_tool_calls": 26
   },
-  "run_id": "preflight-57da37",
+  "run_id": "preflight-5859f6",
   "provider": "fixture",
   "model": "policy-fixture-v1",
   "mode": "offline",

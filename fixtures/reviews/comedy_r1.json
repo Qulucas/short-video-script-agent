@@ -1,0 +1,29 @@
+{
+  "scores": {
+    "comedic_timing": 3,
+    "escalation": 4,
+    "punchline_clarity": 4,
+    "character_voice": 4,
+    "visual_specificity": 5
+  },
+  "summary": "结构和画面都到位；被抓那一下的停顿太短，吞口水来得太快，笑点没落稳。",
+  "strengths": [
+    "5 段升级清楚",
+    "每镜画面可直接生成",
+    "口头禅由角色本人在慌乱时说出"
+  ],
+  "suggestions": [
+    {
+      "shot_id": "S2",
+      "field": "sfx[1].at_sec",
+      "issue": "敲桌后 2.8 秒就吞口水，定格不够长，观众还没反应过来笑点就过去了",
+      "edit": "把吞口水挪到 3.6s（对白 at_sec 3.4），定格多撑 0.4 秒，本镜仍是 4.0s"
+    },
+    {
+      "shot_id": "S6",
+      "field": "dialogue[1].line",
+      "issue": "“Just cache... shoo!”比原句短，但 shoo 的反差感还在，可以不改",
+      "edit": "保持不变"
+    }
+  ]
+}

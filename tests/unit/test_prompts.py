@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from src.limits import MAX_DRAFT_WRITES, MAX_SKILL_LOADS, MAX_STEPS, MAX_TOOL_CALLS
+from src.limits import (MAX_DRAFT_WRITES, MAX_OUTLINES, MAX_PATCHES, MAX_SKILL_LOADS, MAX_STEPS,
+                        MAX_TOOL_CALLS)
 from src.orchestrator import Orchestrator
 from src.prompts import SYSTEM_PROMPT, build_user_prompt
 from src.providers.base import Provider
@@ -27,6 +28,8 @@ def test_budget_uses_shared_limits():
     assert payload["budget"]["steps_left"] == MAX_STEPS
     assert payload["budget"]["tool_calls_left"] == MAX_TOOL_CALLS
     assert payload["budget"]["draft_writes_left"] == MAX_DRAFT_WRITES
+    assert payload["budget"]["patches_left"] == MAX_PATCHES and payload["budget"]["outlines_left"] == MAX_OUTLINES
+    assert payload["budget"]["reviews_left"] == 2 and payload["last_review"] is None
 
 
 def test_brand_rules_are_visible_to_model():

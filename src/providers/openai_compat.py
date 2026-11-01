@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 import urllib.error
 import urllib.request
 from typing import Any, Dict
 
 from src.prompts import SYSTEM_PROMPT, build_user_prompt
+from src.tools.review import CRITIC_SYSTEM_PROMPT, build_critic_prompt
 from src.providers.base import ModelError, Provider
 
 
@@ -49,6 +51,9 @@ def _extract_json(text: str) -> Dict[str, Any]:
     return objects[0]
 
 
+RETRY_HTTP_CODES = {429, 500, 502, 503, 504}
+
+
 class OpenAICompatProvider(Provider):
     name = "live"
     mode = "live"
@@ -58,17 +63,31 @@ class OpenAICompatProvider(Provider):
         self.base_url = os.environ.get("LLM_BASE_URL", "https://api.deepseek.com").rstrip("/")
         self.model = os.environ.get("LLM_MODEL", "deepseek-reasoner").strip() or "deepseek-reasoner"
         self.timeout = int(os.environ.get("LLM_TIMEOUT_SEC", "60"))
+        # A detailed draft is 5-8K tokens of JSON; reasoner models also spend output tokens on reasoning.
+        default_max = "32768" if "reasoner" in self.model else "8192"
+        self.max_tokens = int(os.environ.get("LLM_MAX_TOKENS", default_max))
+        # Transport retries only (reset connection, timeout, 429/5xx); a bad reply is the model's to fix.
+        self.retries = int(os.environ.get("LLM_RETRIES", "2"))
         if not self.api_key:
             raise ModelError("LLM_API_KEY 未配置，live 模式不可用；请使用 --provider fixture 或配置 .env")
 
     def decide(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        return self._chat(SYSTEM_PROMPT, build_user_prompt(state),
+                          "输出被 max_tokens（%d）截断；改用 patch_draft 分段修改，或先 write_outline 再写更短的稿")
+
+    def review(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        # A separate, stateless call with its own system prompt: the critic never sees the writer's rationales.
+        return self._chat(CRITIC_SYSTEM_PROMPT, build_critic_prompt(context), "评审输出被 max_tokens（%d）截断")
+
+    def _chat(self, system: str, user: str, truncated_message: str) -> Dict[str, Any]:
         payload = {
             "model": self.model,
             "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": build_user_prompt(state)},
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
             ],
             "temperature": 0.0,
+            "max_tokens": self.max_tokens,
             "response_format": {"type": "json_object"},
         }
         request = urllib.request.Request(
@@ -80,17 +99,29 @@ class OpenAICompatProvider(Provider):
             },
             method="POST",
         )
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                body = response.read().decode("utf-8")
-        except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")[:300]
-            raise ModelError("模型 HTTP 错误 %s: %s" % (exc.code, detail))
-        except Exception as exc:
-            raise ModelError("模型请求失败: " + str(exc))
+        body = self._send(request)
         try:
             data = json.loads(body)
-            content = data["choices"][0]["message"]["content"]
+            choice = data["choices"][0]
+            content = choice["message"]["content"]
         except Exception as exc:
             raise ModelError("模型响应结构异常: " + str(exc))
+        if choice.get("finish_reason") == "length":
+            return _protocol_error(truncated_message % self.max_tokens)
         return _extract_json(content)
+
+    def _send(self, request: urllib.request.Request) -> str:
+        attempts = 1 + max(0, self.retries)
+        for attempt in range(1, attempts + 1):
+            try:
+                with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                    return response.read().decode("utf-8")
+            except urllib.error.HTTPError as exc:
+                detail = exc.read().decode("utf-8", errors="replace")[:300]
+                if exc.code not in RETRY_HTTP_CODES or attempt == attempts:
+                    raise ModelError("模型 HTTP 错误 %s: %s（第 %d/%d 次）" % (exc.code, detail, attempt, attempts))
+            except Exception as exc:
+                if attempt == attempts:
+                    raise ModelError("模型请求失败: %s（第 %d/%d 次）" % (exc, attempt, attempts))
+            time.sleep(2.0 * attempt)
+        raise ModelError("模型请求失败")

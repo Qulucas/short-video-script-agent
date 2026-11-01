@@ -337,9 +337,19 @@ def test_comedy_pov_revises_on_beat_timing_without_materials(tmp_path):
     result, trace, revisions = run("14_comedy_pov")
     assert result["status"] == "completed" and result["format"] == "comedy_pov_sketch"
     estimates = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "estimate_duration"]
-    assert [e["pass"] for e in estimates] == [False, True]
+    assert [e["pass"] for e in estimates] == [False, True, True]
+    acts = _actions(trace)
+    assert acts[:3] == ["write_outline", "write_outline", "write_draft"]
+    assert acts.count("write_draft") == 1 and acts.count("patch_draft") == 2     # fixes by patch, not rewrite;
+    # the second patch adopts the reviewer's S2 timing tip
+    patch = trace["steps"][acts.index("patch_draft")]["observation"]
+    assert patch["diff"]["via"] == "patch" and "S5" in patch["touched"]
+    reviews = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "review_draft"]
+    assert [r["overall"] for r in reviews] == [4.0, 4.2] and all(r["advisory"] for r in reviews)
+    assert result["model_review"]["overall"] == 4.2 and result["model_review"]["stale"] is False
+    assert "MODEL_REVIEW" in {r["code"] for r in result["risks"]}
     briefs = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "check_brief"]
-    assert [b["pass"] for b in briefs] == [False, True]
+    assert [b["pass"] for b in briefs] == [False, True, True]
     assert all(not v["pass"] for v in briefs[0]["sections"].values())   # v1 trips every section once
     codes = {r["code"] for r in result["risks"]}
     assert {"CONTENT_REVIEW", "BRIEF_WAIVERS", "BRIEF_DEVIATIONS"} <= codes
@@ -388,8 +398,9 @@ class SkipBriefProvider(Provider):
 
     def __init__(self):
         draft = json.loads((ROOT / "fixtures" / "drafts" / "comedy_v2.json").read_text(encoding="utf-8"))
-        self.script = [("write_draft", draft), ("estimate_duration", {}), ("check_rules", {}),
-                       ("check_citations", {}), ("check_production", {})]
+        outline = json.loads((ROOT / "fixtures" / "outlines" / "comedy_v2.json").read_text(encoding="utf-8"))
+        self.script = [("write_outline", outline), ("write_draft", draft), ("estimate_duration", {}),
+                       ("check_rules", {}), ("check_citations", {}), ("check_production", {})]
 
     def decide(self, state):
         if self.script:
@@ -410,6 +421,89 @@ def test_check_brief_needs_a_current_estimate():
     class P(SkipBriefProvider):
         def __init__(self):
             super().__init__()
-            self.script = [self.script[0], ("check_brief", {})]
+            self.script = self.script[:2] + [("check_brief", {})]
     _, trace, _ = run_case(load("14_comedy_pov"), P())
-    assert trace["steps"][1]["observation"]["error_code"] == "ESTIMATE_REQUIRED"
+    assert trace["steps"][2]["observation"]["error_code"] == "ESTIMATE_REQUIRED"
+
+
+class OutlineFirstProvider(Provider):
+    name = "fixture"
+    model = "outline-test"
+    mode = "test"
+
+    def __init__(self, script):
+        self.script = list(script)
+
+    def decide(self, state):
+        if self.script:
+            name, args = self.script.pop(0)
+            return {"rationale": "按脚本执行 " + name, "action": name, "args": args}
+        return {"rationale": "结束", "action": "finish", "args": {
+            "status": "needs_input", "stop_reason": "missing_required_fields", "summary": "x", "missing_fields": ["x"]}}
+
+
+def _fixture_json(kind, name):
+    return json.loads((ROOT / "fixtures" / kind / (name + ".json")).read_text(encoding="utf-8"))
+
+
+def test_strict_format_needs_a_passing_outline_before_prose():
+    draft = _fixture_json("drafts", "comedy_v2")
+    _, trace, _ = run_case(load("14_comedy_pov"), OutlineFirstProvider([
+        ("write_draft", draft), ("write_outline", _fixture_json("outlines", "comedy_v1")), ("write_draft", draft),
+        ("write_outline", _fixture_json("outlines", "comedy_v2")), ("write_draft", draft)]))
+    obs = [s["observation"] for s in trace["steps"][:5]]
+    assert [o.get("error_code") for o in obs[:3]] == ["OUTLINE_REQUIRED", None, "OUTLINE_REQUIRED"]
+    assert obs[3]["pass"] is True and obs[4]["revision"] == 1
+
+
+def test_promo_format_does_not_need_an_outline():
+    result, trace, _ = run("01_normal_30s")
+    assert result["status"] == "completed" and "write_outline" not in _actions(trace)
+
+
+def test_bad_patch_makes_no_revision_and_good_patch_invalidates_checks():
+    draft = _fixture_json("drafts", "comedy_v2")
+    _, trace, revisions = run_case(load("14_comedy_pov"), OutlineFirstProvider([
+        ("write_outline", _fixture_json("outlines", "comedy_v2")), ("write_draft", draft), ("estimate_duration", {}),
+        ("patch_draft", {"patches": [{"shot": "S9", "set": {"visual": "x"}}]}),
+        ("patch_draft", {"patches": [{"shot": "S1", "set": {"perspective": "drone"}}]}),
+        ("patch_draft", {"patches": [{"shot": "S1", "set": {"action_sec": 4.5}}]}),
+        ("check_rules", {})]))
+    obs = [s["observation"] for s in trace["steps"]]
+    assert obs[3]["error_code"] == "PATCH_INVALID" and obs[4]["error_code"] == "DRAFT_SCHEMA"
+    assert obs[5]["revision"] == 2 and obs[5]["touched"] == ["S1"]
+    assert obs[6]["error_code"] == "ESTIMATE_REQUIRED"                 # the patch made the old estimate stale
+    assert [r["revision"] for r in revisions] == [1, 2]
+
+
+def test_patch_budget_is_enforced():
+    from src.limits import MAX_PATCHES
+    draft = _fixture_json("drafts", "comedy_v2")
+    patches = [("patch_draft", {"patches": [{"shot": "S1", "set": {"action_sec": 4.0 + i / 10}}]})
+               for i in range(MAX_PATCHES + 1)]
+    _, trace, _ = run_case(load("14_comedy_pov"), OutlineFirstProvider(
+        [("write_outline", _fixture_json("outlines", "comedy_v2")), ("write_draft", draft)] + patches))
+    obs = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "patch_draft"]
+    assert all(o["ok"] for o in obs[:MAX_PATCHES]) and obs[MAX_PATCHES]["error_code"] == "PATCH_LIMIT"
+
+
+def test_review_is_advisory_limited_and_can_go_stale():
+    from src.limits import MAX_REVIEWS
+    class WithCritic(OutlineFirstProvider):
+        def review(self, context):
+            return _fixture_json("reviews", "comedy_r1")
+
+    draft = _fixture_json("drafts", "comedy_v2")
+    result, trace, _ = run_case(load("14_comedy_pov"), WithCritic(
+        [("write_outline", _fixture_json("outlines", "comedy_v2")), ("write_draft", draft)]
+        + [("review_draft", {})] * (MAX_REVIEWS + 1)
+        + [("patch_draft", {"patches": [{"shot": "S1", "set": {"action_sec": 4.8}}]})]))
+    obs = [s["observation"] for s in trace["steps"] if _actions({"steps": [s]})[0] == "review_draft"]
+    assert [o.get("error_code") for o in obs] == [None, None, "REVIEW_LIMIT"]
+    assert result["model_review"]["revision"] == 1 and result["model_review"]["stale"] is True
+
+
+def test_review_unavailable_without_a_critic():
+    _, trace, _ = run_case(load("01_normal_30s"), OutlineFirstProvider([
+        ("write_draft", _fixture_json("drafts", "v2_28s")), ("review_draft", {})]))
+    assert trace["steps"][1]["observation"]["error_code"] == "REVIEW_UNAVAILABLE"

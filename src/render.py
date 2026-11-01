@@ -82,6 +82,25 @@ def _has_production(result: Dict[str, Any]) -> bool:
     return any(shot.get(f) for shot in result.get("shots") or [] for f in PRODUCTION_FIELDS)
 
 
+def _review_lines(review: Dict[str, Any]) -> List[str]:
+    lines = ["## 模型评审（仅供参考，不影响完成判定）", ""]
+    if review.get("stale"):
+        lines.append("> 评的是 revision %d，之后草稿又改过。" % review.get("revision", 0))
+        lines.append("")
+    lines.append("总分 %.1f/5。%s" % (review.get("overall", 0), review.get("summary", "")))
+    lines.append("")
+    lines.append("| 维度 | 分数 |")
+    lines.append("|---|---|")
+    for dim, score in (review.get("scores") or {}).items():
+        lines.append("| %s | %s |" % (dim, score))
+    lines.append("")
+    for tip in review.get("suggestions") or []:
+        lines.append("- **%s %s**：%s → %s" % (tip.get("shot_id"), tip.get("field") or "", tip.get("issue"), tip.get("edit")))
+    if review.get("suggestions"):
+        lines.append("")
+    return lines
+
+
 def render_markdown(result: Dict[str, Any]) -> str:
     lines: List[str] = []
     lines.append("# %s" % result.get("title", "未生成标题"))
@@ -189,6 +208,9 @@ def render_markdown(result: Dict[str, Any]) -> str:
                 lines.append("| production | — | 未执行 |")
         lines.append("")
 
+    if result.get("model_review"):
+        lines.extend(_review_lines(result["model_review"]))
+
     risks = result.get("risks") or []
     if risks:
         lines.append("## 风险")
@@ -263,6 +285,8 @@ def render_storyboard(result: Dict[str, Any]) -> str:
             lines.append("- **待人工确认**（%s）：%s" % (flag.get("shot_id"), flag.get("message")))
         if brief.get("deviations") or brief.get("review"):
             lines.append("")
+    if result.get("model_review"):
+        lines.extend(_review_lines(result["model_review"]))
     tracks = result.get("audio_tracks") or {}
     if tracks:
         lines.append("## 音轨")

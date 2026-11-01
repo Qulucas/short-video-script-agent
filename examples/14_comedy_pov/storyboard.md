@@ -65,6 +65,18 @@
 - **待人工确认**（S6）：用了 DeepSeek 的品牌元素（logo/界面），确认有使用权
 - **待人工确认**（S6）：涉及身材/外貌评价（fatter），确认是否适合目标受众
 
+## 模型评审（仅供参考，不影响完成判定）
+
+总分 4.2/5。定格撑够了，吞口水成了一个清楚的小笑点；整体可以交付。
+
+| 维度 | 分数 |
+|---|---|
+| comedic_timing | 4 |
+| escalation | 4 |
+| punchline_clarity | 4 |
+| character_voice | 4 |
+| visual_specificity | 5 |
+
 ## 音轨
 
 - **bgm** 0–5s：kitchen ambience: boiling water + distant TV（cut）
@@ -102,9 +114,9 @@ DeepSeek Whale Maiden，Blue and white gradient ponytail, a small whale fin acce
 - **角色动作**：whole body freezes; slow robotic head turn toward the camera
 - **表情**：pupils trembling, spiral highlights in her eyes, mouth full and unmoving
 - **角色状态**：props: large bowl；chopsticks；body: cheeks puffed
-- **音效**：two crisp taps on the table: dong, dong @0.4s（right）；loud gulp @3.2s（center）
+- **音效**：two crisp taps on the table: dong, dong @0.4s（right）；loud gulp @3.6s（center）
 - **转场到下一镜**：jump cut into the speed-up
-- **对白**：DeepSeek Whale Maiden（frozen, tiny）：... (gulp) @3.0s
+- **对白**：DeepSeek Whale Maiden（frozen, tiny）：... (gulp) @3.4s
 
 ```text
 DeepSeek Whale Maiden，Blue and white gradient ponytail, a small whale fin accessory on top of her head, a loose home-style T-shirt with the DeepSeek logo on the bottom hem, barefoot, rice grains often stuck to the corners of her mouth；pov；whole body freezes; slow robotic head turn toward the camera；pupils trembling, spiral highlights in her eyes, mouth full and unmoving；POV freezes. The owner's hand enters from the right edge of the frame and taps the dining table twice. DeepSeek Whale Maiden freezes mid-bite, chopsticks suspended in the air, then slowly turns her head toward the lens with rice still in her mouth.；same warm kitchen light; the highlights in her eyes turn into rotating circles；medium close-up，locked off, POV hand enters frame right。时长 4.0s。

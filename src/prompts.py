@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from typing import Any, Dict
 
-from src.limits import (MAX_DRAFT_WRITES, MAX_QUERY_REWRITES, MAX_SKILL_LOADS, MAX_STEPS,
-                        MAX_TOOL_CALLS)
+from src.limits import (MAX_DRAFT_WRITES, MAX_OUTLINES, MAX_PATCHES, MAX_QUERY_REWRITES, MAX_REVIEWS,
+                        MAX_SKILL_LOADS, MAX_STEPS, MAX_TOOL_CALLS)
 from src.tools.duration import (CPS, EN_WPS, LINE_GAP_SEC, MIN_SHOT_SEC, OVERLAY_MIN_SEC, PAUSE_MARK_SEC,
                                 PAUSE_PER_SHOT, SUBTITLE_CPS, SUBTITLE_EN_WPS, SUBTITLE_PAUSE)
 
@@ -33,9 +33,12 @@ SYSTEM_PROMPT = """你是短视频脚本 Agent。你的目标：生成有事实�
 18. brief_items 是 brief 里每条可检查的要求（id + 原文 + must_contain）。落实某条的分镜把 id 写进自己的 fulfills；全片性的要求（如镜头总规范、BGM 安排）写进草稿顶层 fulfills。must_contain 里的引号原文和数字必须原样出现在落实它的分镜里（屏幕文字、音效、visual 等任一字段）。script_structure.<段落>.visual 条目由该段落的分镜自动承担，不用写进 fulfills，但它的 must_contain 同样要出现。没有 must_contain 的条目只会在内容对不上时列给用户复核：用自己的话把要求真正做出来，不要把 brief 原句抄进画面描述。确实做不到的写进草稿顶层 waivers: [{"item":"id","reason":"..."}]，会列给用户。
 19. planned_lines 是用户的计划台词：默认原样沿用、语言保持一致（除非 brief.output_language 另有指定）；locked=true 的必须逐字保留。改动或删掉的写进草稿顶层 deviations: [{"beat":"段落","original":"原台词","new":"新台词","reason":"哪项检查要求改的，如 beat timing / BR-01 / citation"}]。
 20. 说话人必须用 character_setting.name 原文或 cast 里的名字（别名不行）；每镜 visual 写出角色名；character_state 的条目会延续到后面的分镜，后面每镜要么继续写、要么列进 character_state.cleared；有 pronoun 时台词里不能用错代词。用了 dialogue 的脚本里，所有要读出来的话都写成 dialogue（narration 没有说话人，除非 cast 里有 Narrator），口头禅必须是角色本人的一句 dialogue。
-23. 画面描述字段（visual、lighting、character_action、expression、camera、lens_fx、transition）每个只用一种语言写；角色名、引号里的屏幕文字、POV/BGM/UI/logo 这类通用词不算混写。
 21. POV 镜头不能出现主角（观众）的脸，写反打时 perspective 用 reverse；音效 at_sec 不能超出本镜时长；屏幕文字显示时长要够读完；audio_tracks.bgm 要从 0 覆盖到片尾。
 22. format.brief_checks=strict 时每版稿都要 check_brief（需先 estimate），按 issues 修改；review 列出的内容（身材评价、品牌 logo/界面）不阻断，但会交给用户确认。
+23. 画面描述字段（visual、lighting、character_action、expression、camera、lens_fx、transition）每个只用一种语言写；角色名、引号里的屏幕文字、POV/BGM/UI/logo 这类通用词不算混写。
+24. 先大纲后正文：format.brief_checks=strict 且有 script_structure 时，write_draft 前必须先 write_outline 并通过（outline_check.pass=true）。大纲只写每镜的 id、beat、计划时长 duration_sec、一句 gist 和 fulfills，外加需要的 waivers；它检查段落顺序、每段计划时间、计划总时长和 brief 条目有没有分到分镜。
+25. 已有草稿时，小改动用 patch_draft，只改出问题的字段，不要整稿重写：write_draft 最多 %(max_writes)s 次，patch_draft 最多 %(max_patches)s 次。每次补丁都生成新 revision，之前的检查全部作废，要重新 estimate 和检查。
+26. review_draft 另起一次独立的模型调用（只看 brief 和草稿，看不到你的 rationale），按喜剧节奏、升级、笑点清晰度、角色声音、画面具体度打分并给修改建议。它只供参考、不影响完成判定，最多 %(max_reviews)s 次。制作模式下建议在各项检查通过后评审一次，按 suggestions 里值得做的用 patch_draft 改，再重新跑检查；不采纳的建议不用改。
 
 时长估算规则（estimate_duration 的实现，供你规划篇幅）：
 - 说话时长 = 汉字和数字串数/%(cps)s + 英文单词数/%(en_wps)s + 每个“……/——” %(pause_mark)ss + 括号里写明的停顿；括号内容不计；
@@ -62,6 +65,10 @@ SYSTEM_PROMPT = """你是短视频脚本 Agent。你的目标：生成有事实�
 - check_citations: {}
 - check_brief: {}   （需先 estimate；检查 brief 覆盖、台词保真、角色连贯、描述语言、时间线、POV，另列人工复核项）
 - check_production: {}   （制作模式：检查必填制作字段、段落覆盖与顺序、口头禅、visual 细节、BGM）
+- write_outline: {"shots":[{"id":"S1","beat":"setup","duration_sec":5.0,"gist":"这一镜讲什么","fulfills":["visual_notes[0]"]}],"fulfills":["camera_notes[0]"],"waivers":[{"item":"id","reason":"..."}]}   （最多 %(max_outlines)s 次）
+- patch_draft: {"patches":[{"shot":"S5","set":{"dialogue[0].line":"新台词","action_sec":6.0},"unset":["narration"]},{"draft":true,"set":{"deviations[1]":{"beat":"tag","original":"...","new":"...","reason":"beat timing ..."}}},{"insert_shot":{...完整分镜...},"after":"S3"},{"remove_shot":"S4"}]}
+  路径写法：字段名、[下标]、.子字段；下标等于当前长度表示追加。任一条失败则整个补丁不生效。
+- review_draft: {}   （模型评审，只供参考；最多 %(max_reviews)s 次，计工具调用）
 - load_skill: {"name": "技能 id"}   （读取写作技能，不计工具调用，最多 %(max_skills)s 个）
 - finish: {"status":"completed|needs_input|unmet_constraints|incomplete|failed","summary":"...","missing_fields":[],"blocking_reason":"...","options":[],"stop_reason":"..."}
 
@@ -78,6 +85,8 @@ stop_reason 只能取以下值（completed 不填）：
 """ % {
     "cps": CPS, "pause": PAUSE_PER_SHOT, "sub_cps": SUBTITLE_CPS,
     "sub_pause": SUBTITLE_PAUSE, "min_shot": MIN_SHOT_SEC, "max_skills": MAX_SKILL_LOADS,
+    "max_writes": MAX_DRAFT_WRITES, "max_patches": MAX_PATCHES, "max_outlines": MAX_OUTLINES,
+    "max_reviews": MAX_REVIEWS,
     "en_wps": EN_WPS, "sub_en": SUBTITLE_EN_WPS, "pause_mark": PAUSE_MARK_SEC, "gap": LINE_GAP_SEC,
     "ov_min": OVERLAY_MIN_SEC,
 }
@@ -107,6 +116,9 @@ def build_user_prompt(state: Dict[str, Any]) -> str:
         "last_estimate": state.get("last_estimate"),
         "last_checks": state.get("last_checks"),
         "history": state.get("history", []),
+        "outline": state.get("outline"),
+        "outline_check": state.get("outline_check"),
+        "last_review": state.get("last_review"),
         "skills_available": state.get("skills_available", []),
         "loaded_skills": state.get("loaded_skills", {}),
         "budget": {
@@ -115,6 +127,9 @@ def build_user_prompt(state: Dict[str, Any]) -> str:
             "draft_writes_left": MAX_DRAFT_WRITES - int(state.get("draft_writes", 0)),
             "query_rewrites_left": max(0, MAX_QUERY_REWRITES - max(0, int(state.get("search_attempts", 0)) - 1)),
             "skill_loads_left": MAX_SKILL_LOADS - int(state.get("skill_loads", 0)),
+            "patches_left": MAX_PATCHES - int(state.get("patches", 0)),
+            "outlines_left": MAX_OUTLINES - int(state.get("outlines", 0)),
+            "reviews_left": MAX_REVIEWS - int(state.get("reviews", 0)),
         },
         "last_observation": state.get("last_observation"),
     }

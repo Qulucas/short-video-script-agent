@@ -25,11 +25,11 @@ CLI -> 输入校验 -> Orchestrator -> Provider.decide
 
 - 执行模型选的动作；
 - 把工具结果原样回灌；
-- 维护 `MAX_STEPS=20`、`MAX_TOOL_CALLS=16`、`MAX_QUERY_REWRITES=2`、`MAX_DRAFT_WRITES=4`（集中在 `src/limits.py`，prompt 的剩余预算也从这里算）；
+- 维护 `MAX_STEPS=32`、`MAX_TOOL_CALLS=26`、`MAX_QUERY_REWRITES=2`、`MAX_DRAFT_WRITES=4`、`MAX_PATCHES=8`、`MAX_OUTLINES=3`（集中在 `src/limits.py`，prompt 的剩余预算也从这里算）；
 - 在 `finish` 前做完成闸门；
 - 写 Trace。
 
-`MAX_TOOL_CALLS` 故意小于 `MAX_STEPS`：被闸门拒绝的 `finish` 和解析失败只消耗步数、不消耗工具调用，所以两条上限都能真实触发（`08_step_limit` 触发步数上限，`11_tool_call_limit` 触发工具上限）。早期版本是 20/24，每步最多一次工具调用，工具上限永远到不了。
+`MAX_TOOL_CALLS` 故意小于 `MAX_STEPS`：被闸门拒绝的 `finish` 和解析失败只消耗步数、不消耗工具调用，所以两条上限都能真实触发（`08_step_limit` 触发步数上限，`11_tool_call_limit` 触发工具上限）。早期版本是 20/24，每步最多一次工具调用，工具上限永远到不了；后来是 20/16，喜剧格式多了两项检查后 live 14-p3 用到 19 步、16 次，现在是 32/26。
 
 完成闸门要求当前 revision 的 estimate/rules/citations 都绑定同一个 `draft_hash`，防止“检查旧稿、提交新稿”。
 
@@ -79,6 +79,28 @@ system prompt 还写明了估算公式（4.2 字/秒 + 0.3s 停顿、每镜 ≥1
 - **时间引擎（阶段 2）**：说话时长按语言算（中文 4.2 字/秒、英文 2.6 词/秒），括号内是音效不计时，“……/——”各加 0.3 秒，“（停顿0.5s）”按写明的加。用了 v2 时间字段的分镜取最长的一项：旁白、字幕、最后一句对白结束、最后一个 overlay 消失、`action_sec ÷ playback_rate`；`playback_rate` 只缩短动作画面，不加快说话。估算返回每镜 `driver`（谁决定了时长）和全片 `timeline`。有 `script_structure` 时按段对比计划 `time_range` 和实际起止；`strict` 格式下每段误差 ≤ `beat_tolerance_sec`（0.5 秒）才算通过。
 
 v1 草稿的估算结果和字段完全不变（fixture 01–12 重新生成后逐字节一致）；13 只多了 `advisory` 的逐段对比。
+
+## 模型评审（阶段 4）：`review_draft`
+
+起因：live 14-p5 通过了全部确定性检查，但主人的吐槽被压成半句、punchline 的“语义完整性”笑点只留在屏幕文字里。“压缩后还好不好笑”是确定性规则判断不了的。
+
+- `review_draft` 另起一次**独立的**模型调用（`Provider.review`），用单独的审稿人 system prompt（`src/tools/review.py`），只给 brief、角色、段落、计划台词、当前稿、deviations 和当前稿的逐段计时，**不给**作者的 rationale 和历史，避免审稿人被作者的自我解释带偏。
+- 审稿人按 5 个维度打 1–5 分（comedic_timing、escalation、punchline_clarity、character_voice、visual_specificity），给一句总评和最多 5 条指向具体分镜/字段的修改建议；输出经 `validate_review` 校验，格式不对返回 `REVIEW_INVALID`。
+- **只供参考**：不进完成闸门；每次评审绑定 revision 和 `draft_hash`，之后再改稿则在结果里标 `stale`。评审计工具调用，最多 2 次（`MAX_REVIEWS`）。结果写进 `result.model_review`、`MODEL_REVIEW` 风险项和 `output.md`/`storyboard.md` 的“模型评审”一节。
+- prompt 建议在各项检查通过后评审一次，挑值得做的建议用 `patch_draft` 改，再重新检查；不采纳的建议不必改。
+- fixture 的审稿人是固定文本（`fixtures/reviews/`），只证明流程：评审 → 采纳一条建议的补丁 → 重新检查 → 第二次评审。
+
+取舍：用同一个模型自评，独立性有限；分数在不同运行间会波动。所以它只能做“提示作者再看一眼哪里”，不能当作完成条件，也不能当作质量指标汇报。
+
+## 先大纲、再正文、小改用补丁（阶段 5）
+
+起因：live 14-p3 为了修 `check_brief` 报的几个字段，两次整稿重写，19 步、16 次工具调用、4 次写稿全部用完；14-live 更早时为了 0.2 秒也整稿重写。
+
+- **`write_outline`**（`src/tools/outline.py`）：每镜只写 id、beat、计划时长、一句 gist 和 `fulfills`，外加 `waivers`。检查分镜数、段落顺序和覆盖、每段计划起止（同 `beat_tolerance_sec`）、计划总时长、brief 条目有没有分到分镜。喜剧格式（`brief_checks=strict` 且有 `script_structure`）要求大纲通过后才能 `write_draft`，否则 `OUTLINE_REQUIRED`；默认格式不要求。大纲时长是模型自己的预算，正文仍以 `estimate_duration` 为准。
+- **`patch_draft`**（`src/tools/patch.py`）：按路径改单个分镜的字段（`dialogue[0].line`、`camera.handheld`），插入或删除分镜，改草稿级字段（`title`、`audio_tracks`、`fulfills`、`waivers`、`deviations`）。任一操作失败则整个补丁不生效；结果照常过 schema、`fiction` 和来源校验，生成新 revision，之前的检查全部作废。diff 里标 `via: patch`，观察结果里有 `touched`。
+- **预算**：32 步 / 26 次工具调用 / 4 次整稿 / 8 次补丁 / 3 次大纲。
+- **provider**：显式发送 `max_tokens`（reasoner 默认 32768，其他 8192，可用 `LLM_MAX_TOKENS` 改）；`finish_reason=length` 的截断回复和格式不对的回复一样，作为 `INVALID_ACTION` 交回模型。
+- 模型可见的 `history` 里，`check_brief` 记下失败的节，补丁记下改了哪些分镜。
 
 ## brief 检查（阶段 3）：`check_brief`
 

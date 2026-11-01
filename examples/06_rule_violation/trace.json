@@ -3,8 +3,8 @@
   "model": "policy-fixture-v1",
   "mode": "offline",
   "limits": {
-    "max_steps": 20,
-    "max_tool_calls": 16
+    "max_steps": 32,
+    "max_tool_calls": 26
   },
   "steps": [
     {

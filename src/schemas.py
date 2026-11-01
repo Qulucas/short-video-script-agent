@@ -16,6 +16,9 @@ ACTION_NAMES = {
     "load_skill",
     "check_production",
     "check_brief",
+    "patch_draft",
+    "write_outline",
+    "review_draft",
 }
 
 # Optional per-shot fields for the video-production handoff; check_production decides which
@@ -404,6 +407,10 @@ def parse_action(raw: Any) -> Tuple[Dict[str, Any], List[str]]:
     if name == "write_draft":
         if not isinstance(args.get("title"), str) or not isinstance(args.get("shots"), list):
             errors.append("write_draft 需要 title/shots")
+    if name == "patch_draft" and not (isinstance(args.get("patches"), list) and args["patches"]):
+        errors.append("patch_draft 需要非空的 patches 数组")
+    if name == "write_outline" and not isinstance(args.get("shots"), list):
+        errors.append("write_outline 需要 shots 数组")
     if name == "load_skill":
         if not isinstance(args.get("name"), str) or not args.get("name", "").strip():
             errors.append("load_skill.name 不能为空")

@@ -9,8 +9,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from src.config import DATA_DIR, load_json
 from src.formats import DEFAULT_FORMAT, format_config
-from src.limits import (MAX_ACTION_REPAIRS, MAX_DRAFT_WRITES, MAX_QUERY_REWRITES,
-                        MAX_SKILL_LOADS, MAX_STEPS, MAX_TOOL_CALLS)
+from src.limits import (MAX_ACTION_REPAIRS, MAX_DRAFT_WRITES, MAX_OUTLINES, MAX_PATCHES,
+                        MAX_QUERY_REWRITES, MAX_REVIEWS, MAX_SKILL_LOADS, MAX_STEPS, MAX_TOOL_CALLS)
 from src.render import exit_code_for
 from src.schemas import DRAFT_KEYS, draft_hash, normalize_brief, parse_action, validate_draft
 from src.skills import list_skills, load_skill
@@ -19,6 +19,9 @@ from src.tools.citations import check_citations
 from src.tools.duration import estimate_draft
 from src.tools.errors import ToolError
 from src.tools.materials import FaultInjector, MaterialsTool
+from src.tools.outline import check_outline
+from src.tools.patch import apply_patches
+from src.tools.review import review_context, validate_review
 from src.tools.production import check_production
 from src.tools.rules import check_rules
 from src.trace import TraceRecorder
@@ -105,6 +108,12 @@ class Orchestrator:
             "search_attempts": 0,
             "tool_calls": 0,
             "draft_writes": 0,
+            "patches": 0,
+            "outlines": 0,
+            "outline": None,
+            "outline_check": None,
+            "reviews": 0,
+            "last_review": None,
             "action_repairs": 0,
             "revisions": [],
             "step": 0,
@@ -200,6 +209,10 @@ class Orchestrator:
             item["status"] = args.get("status")
         if name == "load_skill":
             item["skill"] = args.get("name")
+        if observation.get("touched"):
+            item["touched"] = observation["touched"]
+        if observation.get("sections"):
+            item["failing"] = [k for k, v in observation["sections"].items() if not v.get("pass")]
         for key in ("error_code", "revision", "total_sec", "pass", "beats_pass", "total", "missing"):
             if observation.get(key) is not None:
                 item[key] = observation[key]
@@ -239,6 +252,39 @@ class Orchestrator:
         self.trace.add(0, "载入用户提供的初稿作为 revision 1（不计入模型写稿次数）", "seed_draft", obs, 1, h)
         self.state["last_observation"] = obs
 
+    @property
+    def outline_required(self) -> bool:
+        return self.brief_checks_strict and bool((self.brief.get("creative_brief") or {}).get("script_structure"))
+
+    def _draft_errors(self, draft: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        errors = validate_draft(draft) or self._scope_errors(draft)
+        if errors:
+            return {"ok": False, "error_code": "DRAFT_SCHEMA", "errors": errors, "retryable": True}
+        known = set(m["id"] for m in self.visible_materials) | {"BRIEF"}
+        for shot in draft["shots"]:
+            for claim in shot.get("claims", []):
+                if claim.get("source_id") not in known:
+                    return {"ok": False, "error_code": "UNKNOWN_SOURCE",
+                            "message": "未知来源: " + str(claim.get("source_id")), "retryable": True}
+        return None
+
+    def _install(self, draft: Dict[str, Any], via: str = "write") -> Dict[str, Any]:
+        """Make ``draft`` the new revision; every earlier check is now stale."""
+        prev = self.state["current_draft"]
+        prev_rev = self.state["draft_revision"]
+        rev = prev_rev + 1
+        h = draft_hash(draft)
+        diff = _rev_diff(prev, draft, prev_rev, rev)
+        if via != "write":
+            diff["via"] = via
+        self.state["current_draft"] = draft
+        self.state["draft_revision"] = rev
+        self.state["draft_hash"] = h
+        self.state["last_estimate"] = None
+        self.state["last_checks"] = dict(EMPTY_CHECKS)
+        self.state["revisions"].append({"revision": rev, "draft": copy.deepcopy(draft), "diff": diff})
+        return {"ok": True, "revision": rev, "draft_hash": h, "diff": diff}
+
     def _execute_tool(self, action: Dict[str, Any]) -> Dict[str, Any]:
         name = action["name"]
         args = action.get("args", {})
@@ -263,35 +309,48 @@ class Orchestrator:
             result["empty"] = len(result.get("items", [])) == 0
             return result
 
+        if name == "write_outline":
+            if self.state["outlines"] >= MAX_OUTLINES:
+                return {"ok": False, "error_code": "OUTLINE_LIMIT",
+                        "message": "最多提交 %d 次大纲" % MAX_OUTLINES, "retryable": False}
+            self.state["outlines"] += 1
+            result = check_outline(args, self.brief.get("creative_brief") or {},
+                                   float(self.brief["target_duration_sec"]),
+                                   float(self.format.get("beat_tolerance_sec", 0.5)))
+            self.state["outline"] = copy.deepcopy(args)
+            self.state["outline_check"] = result
+            return {"ok": True, **result}
+
         if name == "write_draft":
             if self.state["draft_writes"] >= MAX_DRAFT_WRITES:
                 self._record_error("DRAFT_WRITE_LIMIT", "草稿写入超过上限")
                 return {"ok": False, "error_code": "DRAFT_WRITE_LIMIT",
                         "message": "最多写入 %d 次草稿" % MAX_DRAFT_WRITES, "retryable": False}
+            if self.outline_required and not (self.state["outline_check"] or {}).get("pass"):
+                return {"ok": False, "error_code": "OUTLINE_REQUIRED", "retryable": True,
+                        "message": "这个格式要先 write_outline 并通过，再写正文"}
             draft = self._draft_from(args)
-            errors = validate_draft(draft) or self._scope_errors(draft)
-            if errors:
-                return {"ok": False, "error_code": "DRAFT_SCHEMA", "errors": errors, "retryable": True}
-            known = set(m["id"] for m in self.visible_materials) | {"BRIEF"}
-            for shot in draft["shots"]:
-                for claim in shot.get("claims", []):
-                    if claim.get("source_id") not in known:
-                        return {"ok": False, "error_code": "UNKNOWN_SOURCE",
-                                "message": "未知来源: " + str(claim.get("source_id")),
-                                "retryable": True}
-            prev = self.state["current_draft"]
-            prev_rev = self.state["draft_revision"]
-            rev = prev_rev + 1
-            h = draft_hash(draft)
-            diff = _rev_diff(prev, draft, prev_rev, rev)
-            self.state["current_draft"] = draft
-            self.state["draft_revision"] = rev
-            self.state["draft_hash"] = h
-            self.state["last_estimate"] = None
-            self.state["last_checks"] = dict(EMPTY_CHECKS)
+            error = self._draft_errors(draft)
+            if error:
+                return error
             self.state["draft_writes"] += 1
-            self.state["revisions"].append({"revision": rev, "draft": copy.deepcopy(draft), "diff": diff})
-            return {"ok": True, "revision": rev, "draft_hash": h, "diff": diff}
+            return self._install(draft)
+
+        if name == "patch_draft":
+            if not self.state["current_draft"]:
+                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
+            if self.state["patches"] >= MAX_PATCHES:
+                self._record_error("PATCH_LIMIT", "补丁次数超过上限")
+                return {"ok": False, "error_code": "PATCH_LIMIT",
+                        "message": "最多 %d 次补丁" % MAX_PATCHES, "retryable": False}
+            draft, errors, touched = apply_patches(self.state["current_draft"], args.get("patches"))
+            if errors:
+                return {"ok": False, "error_code": "PATCH_INVALID", "errors": errors, "retryable": True}
+            error = self._draft_errors(draft)
+            if error:
+                return error
+            self.state["patches"] += 1
+            return dict(self._install(draft, via="patch"), touched=touched)
 
         if name == "estimate_duration":
             draft = self.state["current_draft"]
@@ -351,6 +410,28 @@ class Orchestrator:
             result["draft_hash"] = self.state["draft_hash"]
             self.state["last_checks"]["brief"] = result
             return {"ok": True, **result}
+
+        if name == "review_draft":
+            if not self.state["current_draft"]:
+                return {"ok": False, "error_code": "DRAFT_REQUIRED", "message": "请先写草稿", "retryable": True}
+            if self.state["reviews"] >= MAX_REVIEWS:
+                return {"ok": False, "error_code": "REVIEW_LIMIT", "message": "最多评审 %d 次" % MAX_REVIEWS,
+                        "retryable": False}
+            self.state["reviews"] += 1
+            try:
+                raw = self.provider.review(review_context(self.state))
+            except NotImplementedError:
+                return {"ok": False, "error_code": "REVIEW_UNAVAILABLE", "message": "当前 provider 没有评审能力",
+                        "retryable": False}
+            except Exception as exc:
+                return {"ok": False, "error_code": "REVIEW_FAILED", "message": str(exc)[:200], "retryable": False}
+            review, errors = validate_review(raw)
+            if errors:
+                return {"ok": False, "error_code": "REVIEW_INVALID", "errors": errors, "retryable": False}
+            review.update(revision=self.state["draft_revision"], draft_hash=self.state["draft_hash"],
+                          advisory=True)
+            self.state["last_review"] = review
+            return {"ok": True, **review}
 
         if name == "check_production":
             draft = self.state["current_draft"]
@@ -482,6 +563,13 @@ class Orchestrator:
                           "message": "%d 处剧情内提到产品的玩笑式说法未做事实校验，发布前请人工确认：%s" % (
                               len(citations["fiction_claims"]),
                               "；".join(c["sentence"] for c in citations["fiction_claims"]))})
+        review = self.state.get("last_review")
+        if review:
+            stale = review["draft_hash"] != self.state["draft_hash"]
+            risks.append({"code": "MODEL_REVIEW", "severity": "info",
+                          "message": "模型评审（仅供参考，不影响完成判定）：总分 %.1f/5%s；%s" % (
+                              review["overall"], "，评的是 revision %d，之后又改过" % review["revision"] if stale else "",
+                              "；".join("%s %s" % (s["shot_id"], s["issue"]) for s in review["suggestions"]) or "无修改建议")})
         brief = self.state["last_checks"].get("brief") or {}
         if brief.get("review"):
             risks.append({"code": "CONTENT_REVIEW", "severity": "warn",
@@ -564,6 +652,8 @@ class Orchestrator:
             result["beats"] = est["beats"]
         if self.format["name"] != DEFAULT_FORMAT:
             result["format"] = self.format["name"]
+        if st["last_review"]:
+            result["model_review"] = dict(st["last_review"], stale=st["last_review"]["draft_hash"] != st["draft_hash"])
         if self.production_mode:
             result["creative_brief"] = self.brief["creative_brief"]
             result["skills_loaded"] = sorted(st["loaded_skills"])

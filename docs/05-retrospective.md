@@ -60,7 +60,7 @@
 
 ## 下一步
 
-1. 核对全部 9 条 live trace（`examples/*-live*/`）；
+1. 核对全部 11 条 live trace（`examples/*-live*/`）；
 2. 用真实模型结果调整 prompt，观察是否出现“跳过检查”；
 3. 增加 TTS 实测时长，替换字符估算；
 4. 增加 claim 语义审计（可选），但保留确定性校验；

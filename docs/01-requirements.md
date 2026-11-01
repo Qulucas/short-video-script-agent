@@ -58,7 +58,7 @@
 
 3 小时校招考核版本，优先核心链路：
 
-- 做：CLI、受限 ReAct、六个工具 + 写作技能、13 个 fixture 场景 + live 场景、测试、Trace；
+- 做：CLI、受限 ReAct、检索/大纲/写稿/补丁/估算/规则/引用/制作/brief 工具 + 写作技能、14 个 fixture 场景 + live 场景、测试、Trace；
 - 不做：UI、线上部署、多 Agent、生产级 Runtime、真实 TTS。
 
 ## 成功标准
