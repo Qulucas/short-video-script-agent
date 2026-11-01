@@ -1,0 +1,69 @@
+{
+  "project_id": "video_script_agent_001",
+  "user_profile": {
+    "role": "内容创作者",
+    "goal": "生成有事实依据、满足时长限制的可编辑短视频脚本"
+  },
+  "input": {
+    "topic": "智能降噪耳机产品介绍",
+    "audience": "18-30岁年轻职场人与学生",
+    "platform": "抖音",
+    "target_duration_sec": 30,
+    "style": "快节奏、年轻化、强卖点导向",
+    "materials": [
+      {
+        "material_id": "P01",
+        "type": "产品事实",
+        "content": "支持AI降噪、续航30小时、支持字幕（仅事实，无效果数据）"
+      }
+    ],
+    "brand_rules": [
+      "不得出现未提供数据的效果承诺",
+      "必须引用素材ID",
+      "语言不得低俗"
+    ]
+  },
+  "tools": [
+    "素材检索",
+    "时长估算",
+    "规则检查"
+  ],
+  "deliverables": {
+    "required": [
+      "标题",
+      "分镜（含单镜时长）",
+      "旁白/字幕",
+      "预计总时长",
+      "素材来源ID",
+      "风险说明",
+      "任务状态"
+    ]
+  },
+  "dynamic_decision": {
+    "no_search_result": ["改写查询", "请求补充素材"],
+    "duration_or_rule_fail": ["调整脚本并重新检查", "明确说明无法满足"]
+  },
+  "acceptance_criteria": [
+    "正常生成",
+    "缺关键信息处理",
+    "无素材处理",
+    "工具失败处理",
+    "超时长修正或明确失败"
+  ],
+  "reference_case": {
+    "material": "P01（仅含‘支持字幕’等产品事实）",
+    "requirement": "30秒脚本",
+    "first_draft_duration": 38,
+    "action": "压缩脚本并重新估算",
+    "final_duration": 28,
+    "output_must_include": ["分镜", "P01引用", "总时长"]
+  },
+  "audit_points": [
+    "素材ID、分镜时长、检查结果一一对应",
+    "时长或检索结果变化后，动作是否随之调整"
+  ],
+  "scoring_key": {
+    "high_score": ["有效修正", "事实可追溯"],
+    "critical_defect": "编造产品事实（如‘效率提升80%’）"
+  }
+}
