@@ -13,7 +13,7 @@
 | 范围 | AI 参与 | 验证 |
 |---|---|---|
 | 方案 | 根据审查意见修订 `docs/00-plan.md` | 人工审查意见逐条对照 |
-| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 58 passed |
+| 核心代码 | `src/` 下 CLI、Orchestrator、工具、provider | `pytest -q` 59 passed |
 | 测试 | 单元、集成、场景测试 | 实际运行 |
 | 示例 | 12 个 fixture case + 6 条 live 的 result/trace/output | 实际运行生成 |
 | 文档 | README、docs/01–05 | 对照实际输出复核 |
@@ -33,7 +33,7 @@
 - live 路径 A：`deepseek-reasoner`，20.7s→29.2s→引用失败→28.3s，completed；
 - live 路径 B：三次空检索后 `needs_input`；
 - live 04/04b/05/12：工具持续失败→incomplete、瞬时失败→重试恢复、BR-03 驱动改稿后 unmet、38.0s 初稿→28.4s；
-- fixture 12 个场景、58 个离线测试通过。
+- fixture 12 个场景、59 个离线测试通过。
 
 ## 未验证/未完成
 

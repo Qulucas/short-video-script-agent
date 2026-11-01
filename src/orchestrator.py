@@ -81,9 +81,10 @@ class Orchestrator:
     def __init__(self, brief: Dict[str, Any], provider: Any):
         self.brief = brief
         self.provider = provider
-        self.materials = load_json(DATA_DIR / "materials.json")
+        self.materials = brief.get("materials") or load_json(DATA_DIR / "materials.json")
         self.rules_config = load_json(DATA_DIR / "brand_rules.json")
         self.materials_tool = MaterialsTool(self.materials, FaultInjector(brief.get("faults")))
+        self.explicit_material_ids = bool(brief.get("material_ids"))
         self.allowed_ids = brief.get("material_ids") or [m["id"] for m in self.materials]
         self.visible_materials = [m for m in self.materials if m["id"] in self.allowed_ids]
         self.state: Dict[str, Any] = {
@@ -192,6 +193,7 @@ class Orchestrator:
                     str(args.get("query") or ""),
                     int(args.get("top_k") or 5),
                     self.allowed_ids,
+                    fallback_to_allowed=self.explicit_material_ids,
                 )
             except ToolError as exc:
                 self._record_error(exc.code, exc.message)

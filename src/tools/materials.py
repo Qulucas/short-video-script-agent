@@ -37,7 +37,7 @@ class MaterialsTool:
         self.materials = materials
         self.faults = faults or FaultInjector()
 
-    def search(self, query: str, top_k: int = 5, allowed_ids: Optional[List[str]] = None) -> Dict[str, Any]:
+    def search(self, query: str, top_k: int = 5, allowed_ids: Optional[List[str]] = None, fallback_to_allowed: bool = False) -> Dict[str, Any]:
         fault = self.faults.take("search_materials")
         if fault == "TIMEOUT":
             raise ToolError("TIMEOUT", "素材检索超时", retryable=True, hint="可以缩小查询重试一次")
@@ -54,5 +54,9 @@ class MaterialsTool:
             if score:
                 rows.append((score, item))
         rows.sort(key=lambda pair: (-pair[0], pair[1]["id"]))
+        if not rows and allowed_ids and fallback_to_allowed:
+            # Explicit whitelist means those materials are available even if the
+            # query wording does not lexically match their tags.
+            rows = [(0, item) for item in self.materials if item["id"] in allowed_ids]
         items = [dict(item) for _, item in rows[:max(1, int(top_k))]]
         return {"ok": True, "items": items, "total": len(items), "query": query, "error_code": None}

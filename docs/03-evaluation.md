@@ -9,7 +9,7 @@ pytest -q
 实际输出见 [examples/test-report.txt](../examples/test-report.txt)：
 
 ```text
-58 passed, 1 deselected in 0.38s
+59 passed, 1 deselected in 0.41s
 ```
 
 `1 deselected` 是 live smoke 测试，默认不运行，避免无 key 环境误调用。
@@ -107,6 +107,6 @@ live 运行中观察到的问题（如实记录，未修饰）：
 3. **claim 扫描是启发式**：能抓“自动生成字幕”“80%”等明显夹带，复杂语义改写仍需人工复核。
 4. **规则通过 ≠ 法律合规**：只覆盖配置的 BR-01~05。
 5. **60 秒场景只验证动作对照**：不评价文案质量；素材只有 P01–P03。
-6. **测试数量**：58 个离线测试通过；live smoke 由手动命令运行，未纳入默认 pytest。
+6. **测试数量**：59 个离线测试通过；live smoke 由手动命令运行，未纳入默认 pytest。
 7. **规则集可被“钻空子”**：BR-03 只数内容镜数量和每镜最短时长，不评价内容质量（见 05-live 的占位镜头）。
 8. **live 模型每次调用无状态**：只看到状态快照和最近 8 步 `history`，更早的尝试不可见。

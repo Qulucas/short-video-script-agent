@@ -44,7 +44,7 @@ pytest -q
 | 缺关键信息、无素材、工具失败、超时长不可满足 | 已完成 |
 | 规则违规修正、60 秒动作对照、非法动作、检查哈希绑定 | 已完成 |
 | 12 个 fixture 场景输入、result/trace/output/draft_revisions | 已完成 |
-| `pytest -q` | **58 passed, 1 deselected** |
+| `pytest -q` | **59 passed, 1 deselected** |
 | **6 条 live trace** | **已完成（deepseek-reasoner）：正常、无素材、工具持续失败、工具瞬时失败后恢复、时长不可满足、38s 初稿压缩** |
 
 必选验收场景除“缺关键信息”（入口确定性校验，不经过模型）外都有 live 版本，对照表见 [docs/03-evaluation.md](docs/03-evaluation.md)。重点：
@@ -54,6 +54,16 @@ pytest -q
 - [05_unmet_duration-live](examples/05_unmet_duration-live/)：模型自己算出规则下限 9.0s > 8.0s 并给出放宽选项。
 
 复现命令见 [examples/LIVE_RUNBOOK.md](examples/LIVE_RUNBOOK.md)。
+
+## 输入格式
+
+支持两种输入：
+
+- 扁平 schema：`topic / platform / target_duration_sec / ...`；
+- 考核包装 schema：外层是 `{"input": {...}, "tools": [...], ...}`，会自动读取 `input` 内的字段；
+- `input.materials` 会转成运行期素材（`material_id/content`），并自动作为白名单；不会写入全局 `data/materials.json`。
+
+示例：[examples/my_case.json](examples/my_case.json)。
 
 ## 功能模块
 

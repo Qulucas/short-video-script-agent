@@ -15,16 +15,25 @@ ACTION_NAMES = {
 
 
 def normalize_brief(raw: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str, str]]]:
-    """Normalize user input and report structurally missing required fields."""
+    """Normalize user input and report structurally missing required fields.
+
+    Accept both the flat CLI schema and the assessment-style wrapper:
+    {"input": {"topic": ..., "materials": [...]}, ...}.
+    """
+    if isinstance(raw.get("input"), dict):
+        source: Dict[str, Any] = dict(raw)
+        source.update(raw["input"])
+    else:
+        source = raw
     errors: List[Dict[str, str]] = []
-    topic = str(raw.get("topic", "")).strip()
-    platform = str(raw.get("platform", "")).strip()
+    topic = str(source.get("topic", "")).strip()
+    platform = str(source.get("platform", "")).strip()
     if not topic:
         errors.append({"field": "topic", "message": "缺少主题 topic"})
     if not platform:
         errors.append({"field": "platform", "message": "缺少平台 platform"})
 
-    target = raw.get("target_duration_sec")
+    target = source.get("target_duration_sec")
     target_num = None
     try:
         target_num = float(target)
@@ -33,29 +42,58 @@ def normalize_brief(raw: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str,
     except (TypeError, ValueError):
         errors.append({"field": "target_duration_sec", "message": "缺少或非法目标时长 target_duration_sec（5~180 秒）"})
 
-    material_ids = raw.get("material_ids") or []
+    material_ids = source.get("material_ids") or []
     if not isinstance(material_ids, list):
         material_ids = []
     material_ids = [str(x).strip() for x in material_ids if str(x).strip()]
+
+    custom_materials = []
+    raw_materials = source.get("materials")
+    if isinstance(raw_materials, list):
+        for item in raw_materials:
+            if not isinstance(item, dict):
+                continue
+            mid = str(item.get("material_id") or item.get("id") or "").strip()
+            text = str(item.get("content") or item.get("text") or "").strip()
+            if not mid or not text:
+                continue
+            tags = item.get("tags")
+            if not isinstance(tags, list) or not tags:
+                tags = [mid, str(item.get("type") or "user_material")]
+            custom_materials.append({
+                "id": mid,
+                "text": text,
+                "tags": [str(t) for t in tags],
+                "source_type": str(item.get("source_type") or "user_material"),
+            })
+        if custom_materials and not material_ids:
+            material_ids = [m["id"] for m in custom_materials]
+
+    raw_query = source.get("material_query")
+    if not raw_query and custom_materials:
+        raw_query = " ".join(m["id"] for m in custom_materials)
+    material_query = str(raw_query or topic).strip()
 
     brief = {
         "topic": topic,
         "platform": platform,
         "target_duration_sec": target_num,
-        "audience": str(raw.get("audience") or "泛人群").strip(),
-        "style": str(raw.get("style") or "简洁口播").strip(),
-        "product_name": str(raw.get("product_name") or "").strip(),
-        "material_query": str(raw.get("material_query") or topic).strip(),
+        "audience": str(source.get("audience") or "泛人群").strip(),
+        "style": str(source.get("style") or "简洁口播").strip(),
+        "product_name": str(source.get("product_name") or "").strip(),
+        "material_query": material_query,
         "material_ids": material_ids,
-        "brand_rule_set": str(raw.get("brand_rule_set") or "demo_default").strip(),
-        "scenario": str(raw.get("scenario") or "normal").strip(),
-        "faults": raw.get("faults") or {},
-        "initial_draft": raw.get("initial_draft") if isinstance(raw.get("initial_draft"), dict) else None,
+        "materials": custom_materials,
+        "custom_brand_rules": source.get("brand_rules") if isinstance(source.get("brand_rules"), list) else [],
+        "brand_rule_set": str(source.get("brand_rule_set") or "demo_default").strip(),
+        "scenario": str(source.get("scenario") or "normal").strip(),
+        "faults": source.get("faults") or {},
+        "initial_draft": source.get("initial_draft") if isinstance(source.get("initial_draft"), dict) else None,
         "assumptions": [
-            "audience 使用输入值" if raw.get("audience") else "audience 未提供，使用默认泛人群",
-            "style 使用输入值" if raw.get("style") else "style 未提供，使用默认简洁口播",
+            "audience 使用输入值" if source.get("audience") else "audience 未提供，使用默认泛人群",
+            "style 使用输入值" if source.get("style") else "style 未提供，使用默认简洁口播",
             "material_ids 为空，按 material_query 检索" if not material_ids else "material_ids 为素材白名单",
-        ] + (["initial_draft 由用户提供，作为 revision 1 待检查和修改"] if isinstance(raw.get("initial_draft"), dict) else []),
+        ] + (["initial_draft 由用户提供，作为 revision 1 待检查和修改"] if isinstance(source.get("initial_draft"), dict) else []),
     }
     return brief, errors
 
